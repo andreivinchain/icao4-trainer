@@ -101,6 +101,8 @@ details .inner{padding:0 14px 12px}
 .drow.ddone b{color:var(--good)}
 .fulink{padding:10px 12px;margin-top:6px;border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:15px;background:var(--bg2)}
 .fulink:active{border-color:var(--accent)}
+.wok{color:var(--good)}
+.wmiss{color:var(--bad);text-decoration:underline dotted}
 </style>
 </head>
 <body>
@@ -13159,6 +13161,7 @@ var attempts = loadJSON("icao4_attempts",[]);
 var vocabState = loadJSON("icao4_vocab",{});
 var listenStats = loadJSON("icao4_listening",{});
 var learnMastery = loadJSON("icao4_learnstate",{}); // word -> 0..2 (2 = выучено)
+var shadowStats = loadJSON("icao4_shadow",{}); // qid -> {done:1, ts}
 var trCache = loadJSON("icao4_tr",{});
 var rtStats = loadJSON("icao4_rt",{});
 var fuCache = loadJSON("icao4_fu",{});
@@ -13236,6 +13239,7 @@ function getDaily(){
   pickSeeded(PICTURES,1,rnd,done).forEach(function(q){tasks.push({mode:"picture",id:q.id});});
   pickSeeded(LISTENING,1,rnd,listenStats).forEach(function(q){tasks.push({mode:"listening",id:q.id});});
   pickSeeded(RT,1,rnd,rtStats).forEach(function(q){tasks.push({mode:"rt",id:q.id});});
+  pickSeeded(ALL_INTERVIEW.concat(ALL_EMERGENCY),1,rnd,shadowStats).forEach(function(q){tasks.push({mode:"shadow",id:"sh:"+q.id});});
   daily={date:t,words:words,wordsDone:{},tasks:tasks,done:{},completed:false};
   saveJSON("icao4_daily",daily);
   return daily;
@@ -13390,6 +13394,7 @@ function renderHome(){
     modeCard("picture","🖼️","Picture",PICTURES.length+" заданий")+
     modeCard("listening","🎧","Listening",LISTENING.length+" диалогов")+
     modeCard("rt","📡","Радиосвязь",RT.length+" сценариев полёта")+
+    modeCard("shadow","🗣️","Shadow & Repeat","Заучивание ответов")+
     modeCard("mock","🎓","Mock Exam","Симуляция экзамена")+
     modeCard("phrases","💬","Phrase Bank","Готовые фразы Level 4")+
     modeCard("vocab","🃏","Vocabulary",VOCAB.length+" карточек")+
@@ -13402,6 +13407,7 @@ function renderHome(){
       else if(m==="picture")renderPicture();
       else if(m==="listening")renderListening();
       else if(m==="rt")renderRTList();
+      else if(m==="shadow")renderShadowList();
       else if(m==="mock")renderMockIntro();
       else if(m==="phrases")renderPhrases();
       else if(m==="vocab")renderVocab();
@@ -13415,8 +13421,13 @@ function renderHome(){
 function modeCard(m,ico,t,d){ return '<button class="mode-card" data-m="'+m+'"><div class="ico">'+ico+'</div><div class="t">'+t+'</div><div class="d">'+d+'</div></button>'; }
 
 /* ---------- training (interview / emergency) ---------- */
-var trainState={mode:"interview",cat:{interview:"Все",emergency:"Все",picture:"Все"},item:null};
-function itemsFor(mode){ return mode==="interview"?ALL_INTERVIEW:(mode==="picture"?PICTURES:ALL_EMERGENCY); }
+var trainState={mode:"interview",cat:{interview:"Все",emergency:"Все",picture:"Все",shadow:"Все"},item:null};
+function itemsFor(mode){
+  if(mode==="interview")return ALL_INTERVIEW;
+  if(mode==="picture")return PICTURES;
+  if(mode==="shadow")return ALL_INTERVIEW.concat(ALL_EMERGENCY);
+  return ALL_EMERGENCY;
+}
 function cats(mode){
   var s=[]; itemsFor(mode).forEach(function(q){ if(s.indexOf(q.category)<0)s.push(q.category); });
   return ["Все"].concat(s);
@@ -13502,13 +13513,16 @@ function toggleModel(q,mode,card){
   var fus=q.followUps||q.examinerQuestions||[];
   var fu=fus.map(function(f,i){return '<div class="fulink" data-i="'+i+'">'+esc(f)+' <span class="muted">→</span></div>';}).join("");
   box.innerHTML='<div class="model-answer">'+esc(q.level4Answer)+'</div>'+
-    '<div class="btnrow" style="margin-top:6px">'+ttsBtnHtml("ttsModel")+'<button class="btn sec small" id="trModel">🇷🇺 Перевод</button></div>'+
+    '<div class="btnrow" style="margin-top:6px">'+ttsBtnHtml("ttsModel")+'<button class="btn sec small" id="trModel">🇷🇺 Перевод</button>'+
+    (mode!=="picture"?'<button class="btn sec small" id="shadowGo">🗣️ Выучить (Shadow)</button>':'')+'</div>'+
     '<div id="trMBox" class="trbox" style="display:none"></div>'+
     '<div style="margin-top:6px">'+vocab+'</div>'+extra+
     (fu?'<h3 class="sub">Возможные follow-up вопросы <span class="muted" style="font-weight:400">(нажмите, чтобы потренировать)</span></h3>'+fu:'');
   box.style.display="";
   box.querySelector("#ttsModel").onclick=function(){ speak(q.level4Answer); };
   box.querySelector("#trModel").onclick=function(){ toggleTranslate(q.id+":m",q.level4Answer,box.querySelector("#trMBox"),this); };
+  var sg=box.querySelector("#shadowGo");
+  if(sg) sg.onclick=function(){ renderShadow(q,mode); };
   box.querySelectorAll(".fulink").forEach(function(f){
     f.onclick=function(){ renderFollowUp(q,mode,fus[parseInt(f.dataset.i,10)],parseInt(f.dataset.i,10)); };
   });
@@ -13855,7 +13869,7 @@ function finishMock(){
 
 /* ---------- daily plan screen ---------- */
 function findById(arr,id){ for(var i=0;i<arr.length;i++)if(arr[i].id===id)return arr[i]; return null; }
-var MODE_LABEL={interview:"🎙️ Interview",emergency:"⚠️ Emergency",picture:"🖼️ Picture",listening:"🎧 Listening",rt:"📡 Радиосвязь"};
+var MODE_LABEL={interview:"🎙️ Interview",emergency:"⚠️ Emergency",picture:"🖼️ Picture",listening:"🎧 Listening",rt:"📡 Радиосвязь",shadow:"🗣️ Shadow & Repeat"};
 function renderDaily(){
   setScreen("План на сегодня",true);
   var d=getDaily(), dp=dailyProgress();
@@ -13868,10 +13882,12 @@ function renderDaily(){
   var rows='<div class="drow'+(wDone?' ddone':'')+'" data-act="words">'+
     '<span>🃏 Слова дня <span class="muted">('+dp.words+'/'+dp.wordsTotal+')</span></span><b>'+(wDone?"✓":"→")+'</b></div>';
   d.tasks.forEach(function(tk){
+    var rid=tk.id.replace(/^sh:/,"");
     var item=tk.mode==="interview"?findById(ALL_INTERVIEW,tk.id):
              tk.mode==="emergency"?findById(ALL_EMERGENCY,tk.id):
              tk.mode==="picture"?findById(PICTURES,tk.id):
-             tk.mode==="listening"?findById(LISTENING,tk.id):findById(RT,tk.id);
+             tk.mode==="listening"?findById(LISTENING,tk.id):
+             tk.mode==="shadow"?findById(ALL_INTERVIEW.concat(ALL_EMERGENCY),rid):findById(RT,tk.id);
     if(!item)return;
     var sub=item.category||item.title||"";
     var ok=!!d.done[tk.id];
@@ -13888,6 +13904,7 @@ function renderDaily(){
       else if(mode==="emergency") renderTraining("emergency",findById(ALL_EMERGENCY,id));
       else if(mode==="picture") renderPicture(findById(PICTURES,id));
       else if(mode==="listening") renderListening(findById(LISTENING,id));
+      else if(mode==="shadow"){ var sq=findById(ALL_INTERVIEW.concat(ALL_EMERGENCY),id.replace(/^sh:/,"")); renderShadow(sq, findById(ALL_INTERVIEW,sq.id)?"interview":"emergency"); }
       else if(mode==="rt") startRT(findById(RT,id));
     };
   });
@@ -14028,6 +14045,152 @@ function finishRT(){
     '<button class="btn sec" id="rtList">К сценариям</button></div></div>'));
   appEl.querySelector("#rtAgain").onclick=function(){ startRT(sc); };
   appEl.querySelector("#rtList").onclick=renderRTList;
+}
+
+/* ---------- Shadow & Repeat: заучивание модельных ответов ---------- */
+var SHADOW_PASS=0.75;
+var shadow=null; // {q, mode, sents, idx, stage}
+function splitSentences(t){
+  return (t.match(/[^.!?]+[.!?]+["»']?\s*/g)||[t]).map(function(s){return s.trim();}).filter(function(s){return s.length>1;});
+}
+function shadowCompare(target,spoken){
+  var chunks=target.split(/\s+/);
+  var S=normAns(spoken).split(" ").filter(Boolean);
+  var si=0, hit=0, total=0, html="";
+  chunks.forEach(function(ch){
+    var w=normAns(ch);
+    if(!w){ html+=esc(ch)+" "; return; }
+    total++;
+    var ok=false;
+    for(var j=si;j<S.length;j++){ if(S[j]===w){ ok=true; si=j+1; break; } }
+    if(ok)hit++;
+    html+='<span class="'+(ok?"wok":"wmiss")+'">'+esc(ch)+'</span> ';
+  });
+  return {score: total?hit/total:1, html: html};
+}
+function shadowHint(target){
+  return target.split(/\s+/).map(function(ch){
+    var w=ch.replace(/[^A-Za-zА-Яа-яЁё'’-]/g,"");
+    return w? esc(w[0])+"·".repeat(Math.max(1,w.length-1)) : esc(ch);
+  }).join(" ");
+}
+function shadowSrcOf(q){ return findById(ALL_INTERVIEW,q.id)?"interview":"emergency"; }
+function renderShadowList(){
+  stopMic(); speechSynthesis.cancel();
+  setScreen("Shadow & Repeat",true);
+  appEl.appendChild(el('<div class="card muted" style="font-size:13px">Метод HyperLingua: слушайте образец Level 4 → повторяйте вслух за диктором → воспроизведите по памяти. Так ответы на типовые вопросы экзамена запоминаются целиком.</div>'));
+  var pool=ALL_INTERVIEW.concat(ALL_EMERGENCY);
+  var doneN=pool.filter(function(q){return shadowStats[q.id];}).length;
+  appEl.appendChild(el('<div class="card"><b>Выучено ответов: '+doneN+' из '+pool.length+'</b><div class="progress-bar" style="margin-top:6px"><div style="width:'+Math.round(doneN/pool.length*100)+'%"></div></div></div>'));
+  appEl.appendChild(catPills("shadow",function(){renderShadowList();}));
+  var cat=getCat("shadow");
+  var list=pool.filter(function(q){ return cat==="Все"||q.category===cat; });
+  var rows=list.slice(0,400).map(function(q){
+    var txt=(q.question||q.scenario||"").slice(0,80);
+    return '<div class="drow" data-id="'+esc(q.id)+'"><span style="flex:1;padding-right:8px">'+(shadowStats[q.id]?"✅ ":"")+esc(txt)+'…</span><b>→</b></div>';
+  }).join("");
+  var c=el('<div class="card">'+rows+'</div>');
+  c.querySelectorAll(".drow").forEach(function(r){
+    r.onclick=function(){
+      var q=findById(pool,r.dataset.id);
+      renderShadow(q,shadowSrcOf(q));
+    };
+  });
+  appEl.appendChild(c);
+}
+function renderShadow(q,mode){
+  stopMic(); speechSynthesis.cancel();
+  if(!q){ renderShadowList(); return; }
+  shadow={q:q,mode:mode,sents:splitSentences(q.level4Answer),idx:0,stage:"shadow"};
+  renderShadowStep();
+}
+function renderShadowStep(){
+  stopMic();
+  var s=shadow, total=s.sents.length;
+  var isFull=s.stage==="full";
+  var target=isFull? s.q.level4Answer : s.sents[s.idx];
+  setScreen("Shadow · "+(isFull?"весь ответ":( (s.idx+1)+"/"+total )),true);
+  var stageLabel=isFull?"ФИНАЛ: весь ответ по памяти":(s.stage==="shadow"?"Шаг 1. Повторите за диктором":"Шаг 2. Скажите по памяти");
+  var qtxt=s.mode==="emergency"?(s.q.scenario+" — "+s.q.firstQuestion):s.q.question;
+  var card=el('<div class="card">'+
+    '<span class="tag">'+esc(s.q.category)+'</span> <span class="tag" style="color:var(--accent2)">'+stageLabel+'</span>'+
+    '<div class="muted" style="font-size:13px;margin-top:6px">'+esc(qtxt.slice(0,120))+'</div>'+
+    '<div id="shTarget" class="scenario" style="font-size:17px;margin-top:10px">'+
+      (s.stage==="shadow"? esc(target) : '<span class="muted">Текст скрыт — воспроизведите по памяти</span>')+'</div>'+
+    '<div class="btnrow">'+
+      '<button class="btn sec" id="shPlay">🔊 Прослушать</button>'+
+      (s.stage!=="shadow"?'<button class="btn sec small" id="shHint">💡 Подсказка</button>':'')+
+      (s.stage!=="shadow"?'<button class="btn sec small" id="shShow">👁 Показать</button>':'')+
+    '</div>'+
+    '<div class="overall" style="margin-top:12px">Совпадение: <span id="shScore">—</span></div>'+
+    '<div id="shDiff" style="margin-top:6px;line-height:1.8"></div>'+
+    '<div class="btnrow">'+
+      micBtnHtml("shMic")+
+      '<button class="btn" id="shCheck">Проверить</button>'+
+      '<button class="btn sec" id="shPass">Дальше →</button>'+
+      '<button class="btn sec small" id="shExit">✕</button>'+
+    '</div>'+
+    '<div class="muted" style="font-size:12px;margin-top:8px">Нажмите 🎤, говорите, затем «Проверить». Зачёт от '+(SHADOW_PASS*100)+'%. Нет микрофона — читайте вслух и жмите «Дальше».</div>'+
+    '<textarea id="shBuf" style="position:absolute;left:-9999px;height:1px;min-height:1px"></textarea>'+
+  '</div>');
+  appEl.appendChild(card);
+  var buf=card.querySelector("#shBuf");
+  function play(){ speechSynthesis.cancel(); speak(target); }
+  card.querySelector("#shPlay").onclick=play;
+  if(s.stage==="shadow") setTimeout(play,350);
+  var hintBtn=card.querySelector("#shHint");
+  if(hintBtn) hintBtn.onclick=function(){ card.querySelector("#shTarget").innerHTML='<span style="letter-spacing:1px">'+shadowHint(target)+'</span>'; };
+  var showBtn=card.querySelector("#shShow");
+  if(showBtn) showBtn.onclick=function(){ card.querySelector("#shTarget").innerHTML=esc(target); };
+  card.querySelector("#shMic").onclick=function(){ speechSynthesis.cancel(); toggleMic(buf,this); };
+  card.querySelector("#shCheck").onclick=function(){
+    stopMic();
+    var spoken=buf.value.trim();
+    if(!spoken){ card.querySelector("#shDiff").innerHTML='<span class="err">Ничего не распознано. Нажмите 🎤 и говорите.</span>'; return; }
+    var r=shadowCompare(target,spoken);
+    var pct=Math.round(r.score*100);
+    var ok=r.score>=SHADOW_PASS;
+    card.querySelector("#shScore").innerHTML='<span class="'+(ok?"s-good":(pct>=50?"s-warn":"s-bad"))+'">'+pct+'%'+(ok?" ✓":"")+'</span>';
+    card.querySelector("#shDiff").innerHTML=r.html;
+    buf.value="";
+    if(ok){
+      var nb=card.querySelector("#shPass");
+      nb.classList.remove("sec");
+      nb.textContent=isFull?"Готово! 🎉":"Дальше →";
+    }
+  };
+  card.querySelector("#shPass").onclick=shadowAdvance;
+  card.querySelector("#shExit").onclick=function(){ stopMic(); speechSynthesis.cancel(); renderShadowList(); };
+}
+function shadowAdvance(){
+  var s=shadow;
+  if(s.stage==="shadow"){ s.stage="recall"; }
+  else if(s.stage==="recall"){
+    s.idx++;
+    if(s.idx<s.sents.length) s.stage="shadow";
+    else s.stage="full";
+  }
+  else { // full завершён
+    shadowStats[s.q.id]={done:1,ts:Date.now()};
+    saveJSON("icao4_shadow",shadowStats);
+    dailyDone("sh:"+s.q.id);
+    speechSynthesis.cancel();
+    setScreen("Shadow & Repeat",true);
+    appEl.appendChild(el('<div class="card" style="text-align:center"><div style="font-size:40px">🏆</div>'+
+      '<b>Ответ выучен!</b><div class="muted" style="margin-top:6px">'+esc((s.q.question||s.q.scenario||"").slice(0,90))+'</div>'+
+      '<div class="btnrow" style="justify-content:center"><button class="btn" id="shNext">Следующий ответ</button>'+
+      '<button class="btn sec" id="shList">К списку</button></div></div>'));
+    appEl.querySelector("#shNext").onclick=function(){
+      var pool=ALL_INTERVIEW.concat(ALL_EMERGENCY).filter(function(x){return !shadowStats[x.id];});
+      var cat=getCat("shadow");
+      var cp=pool.filter(function(x){return cat==="Все"||x.category===cat;});
+      var nq=(cp.length?cp:pool)[0];
+      if(nq) renderShadow(nq,shadowSrcOf(nq)); else renderShadowList();
+    };
+    appEl.querySelector("#shList").onclick=renderShadowList;
+    return;
+  }
+  renderShadowStep();
 }
 
 /* ---------- listening ---------- */
@@ -14301,6 +14464,9 @@ function renderProgress(){
     lsIds.forEach(function(k){ lc+=listenStats[k].score; lt+=listenStats[k].total; });
     appEl.appendChild(el('<div class="card"><b>Listening</b><div class="muted" style="margin-top:6px">Пройдено диалогов: '+lsIds.length+' из '+LISTENING.length+' · правильных ответов: '+Math.round(lc/lt*100)+'%</div></div>'));
   }
+  var shN=Object.keys(shadowStats).length;
+  if(shN)
+    appEl.appendChild(el('<div class="card"><b>🗣️ Shadow & Repeat</b><div class="muted" style="margin-top:6px">Выучено ответов наизусть: '+shN+' из '+(ALL_INTERVIEW.length+ALL_EMERGENCY.length)+'</div></div>'));
   var rtIds=Object.keys(rtStats);
   if(rtIds.length){
     var rsum=0; rtIds.forEach(function(k){ rsum+=rtStats[k].pct; });
@@ -14425,9 +14591,9 @@ function renderSettings(){
   };
   c.querySelector("#sClear").onclick=function(){
     if(confirm("Удалить весь прогресс (ответы и словарь)?")){
-      attempts=[]; vocabState={}; listenStats={}; rtStats={}; learnMastery={}; daily=null; dailyMeta={streak:0,lastDone:null};
+      attempts=[]; vocabState={}; listenStats={}; rtStats={}; learnMastery={}; shadowStats={}; daily=null; dailyMeta={streak:0,lastDone:null};
       saveJSON("icao4_attempts",attempts); saveJSON("icao4_vocab",vocabState); saveJSON("icao4_listening",listenStats);
-      saveJSON("icao4_rt",rtStats); saveJSON("icao4_learnstate",learnMastery); localStorage.removeItem("icao4_daily"); saveJSON("icao4_daily_meta",dailyMeta);
+      saveJSON("icao4_rt",rtStats); saveJSON("icao4_learnstate",learnMastery); saveJSON("icao4_shadow",shadowStats); localStorage.removeItem("icao4_daily"); saveJSON("icao4_daily_meta",dailyMeta);
       c.querySelector("#sMsg").textContent="Прогресс сброшен";
     }
   };
