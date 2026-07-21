@@ -11356,6 +11356,198 @@ window.DATA_PICTURES = [
   }
 ];
 
+// Picture Comparison task bank — ICAO Level 4 Aviation English Trainer (TEA-format "compare two pictures")
+// Both images in each task come from data_pictures.js (Wikimedia Commons, freely licensed).
+
+window.DATA_PICCOMPARE = [
+  {
+    id: "cmp-001",
+    category: "Сравнение картинок",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Jet_engine_damaged_by_bird_strike.jpg?width=1200",
+    imageUrl2: "https://commons.wikimedia.org/wiki/Special:FilePath/China_Eastern_Airlines_Airbus_A330-300_B-300P_at_gate_D3_at_Taoyuan_May_2026.jpg?width=1200",
+    attribution: "Wikimedia Commons (2 фото)",
+    prompt: "Compare these two pictures. What is similar and what is different?",
+    steps: ["What does each picture show?","What is similar?","What is different?","Which situation is more serious and why?","What risks are present in each?","What should be done in each case?"],
+    examinerQuestions: [
+      "Which situation looks more serious?",
+      "How could the situation in the first picture affect the operations we see in the second picture?",
+      "What can airports do to prevent the problem shown in the first picture?"
+    ],
+    level4Answer: "The first picture shows the inside of a jet engine with damaged fan blades. The engine probably ingested a bird during take-off or approach. The second picture shows a wide-body airliner parked at a terminal gate. It is connected to a jet bridge and is being prepared for its next flight. Both pictures show commercial aviation and jet aircraft. In both cases specialists are working with the aircraft on the ground. The difference is that the first picture shows an emergency result and the second shows normal operations. The first aircraft cannot fly, but the second will depart soon. The first situation is more serious, because engine failure at low altitude can be very dangerous. In the first case, engineers must inspect and repair the engine. In the second case, the ground team should simply follow normal safety procedures at the gate.",
+    vocabulary: [
+      {term:"bird strike", meaning:"a collision between a bird and an aircraft"},
+      {term:"fan blades", meaning:"the large rotating blades at the front of a jet engine"},
+      {term:"jet bridge", meaning:"the moving tunnel between the terminal and the aircraft"},
+      {term:"normal operations", meaning:"everyday work without emergencies"},
+      {term:"engine failure", meaning:"when an engine stops working"}
+    ],
+    risks: ["Engine failure at low altitude after a bird strike","Ground equipment hitting the aircraft at the gate"]
+  },
+  {
+    id: "cmp-002",
+    category: "Сравнение картинок",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Korean_Air_Boeing_737-9B5_Runway_Overrun_Niigata_Airport.jpg?width=1200",
+    imageUrl2: "https://commons.wikimedia.org/wiki/Special:FilePath/Southwest_Flight_345_after_nose-first_crash_landing_on_RWY_4_at_LaGuardia_22_July_2013.jpg?width=1200",
+    attribution: "Wikimedia Commons (2 фото)",
+    prompt: "Compare these two pictures. What is similar and what is different?",
+    steps: ["What does each picture show?","What is similar?","What is different?","Which situation is more serious and why?","What risks are present in each?","What should be done in each case?"],
+    examinerQuestions: [
+      "Which accident looks more serious and why?",
+      "What common factors can cause both types of landing accidents?",
+      "What should the crew do immediately after each event?"
+    ],
+    level4Answer: "The first picture shows a Boeing 737 that has stopped beyond the end of the runway. The aircraft stands on soft ground after a runway overrun. The second picture shows a passenger jet on the runway with its nose on the ground. Its nose gear collapsed after a very hard landing. Both pictures show landing accidents with passenger jets. In both cases the runway is blocked and emergency services are needed. The difference is the type of accident: one aircraft went too far, the other landed too hard. The first aircraft looks complete, but the second has visible structural damage. In my opinion, the second situation is more serious, because the nose gear collapse can damage the fuselage and start a fire. In both cases the crew should shut down the engines and evacuate if necessary. ATC should close the runway and send the fire trucks immediately.",
+    vocabulary: [
+      {term:"runway overrun", meaning:"when an aircraft goes past the end of the runway"},
+      {term:"nose gear", meaning:"the front wheel of the aircraft"},
+      {term:"to collapse", meaning:"to break and fall down"},
+      {term:"braking action", meaning:"how well the wheels can brake on the surface"},
+      {term:"evacuation", meaning:"getting all people out of the aircraft quickly"}
+    ],
+    risks: ["Fire and fuel leak after both accidents","Blocked runway and diverted traffic","Injuries during evacuation"]
+  },
+  {
+    id: "cmp-003",
+    category: "Сравнение картинок",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Airport_De-Icing%2C_Ottawa_0087.jpg?width=1200",
+    imageUrl2: "https://commons.wikimedia.org/wiki/Special:FilePath/US_Navy_100207-O-0000X-003_Snow_covers_the_runways_and_parking_areas_of_Ronald_Reagan_Washington_National_Airport_after_a_near-record_snowfall_in_the_Washington%2C_D.C._metropolitan_area.jpg?width=1200",
+    attribution: "Wikimedia Commons (2 фото)",
+    prompt: "Compare these two pictures. What is similar and what is different?",
+    steps: ["What does each picture show?","What is similar?","What is different?","Which situation is more serious and why?","What risks are present in each?","What should be done in each case?"],
+    examinerQuestions: [
+      "Which situation has a bigger effect on airport operations?",
+      "Why is de-icing not enough when the whole airport is covered with snow?",
+      "How do airports prepare for heavy winter weather?"
+    ],
+    level4Answer: "The first picture shows an airliner and a de-icing vehicle next to it. The ground crew is spraying de-icing fluid on the aircraft before departure. The second picture is an aerial view of a large airport covered with deep snow. The runways are completely white and the airport is probably closed. Both pictures show winter operations and cold weather problems. In both cases snow and ice stop or slow down flights. The difference is the scale of the problem. In the first picture only one aircraft is treated and operations continue. In the second picture the whole airport has stopped and hundreds of flights are cancelled. The second situation is more serious, because no aircraft can depart or land at all. In the first case the crew should watch the holdover time and depart quickly. In the second case snow removal teams must clear and inspect the runways before the airport reopens.",
+    vocabulary: [
+      {term:"de-icing fluid", meaning:"a special liquid that removes ice from the aircraft"},
+      {term:"holdover time", meaning:"the time the de-icing fluid protects the aircraft"},
+      {term:"snow removal", meaning:"cleaning snow from the surfaces"},
+      {term:"to cancel", meaning:"to decide that a flight will not operate"},
+      {term:"contaminated runway", meaning:"a runway covered with snow, ice or water"}
+    ],
+    risks: ["Ice on wings destroys lift","Airport closure and mass cancellations","Hidden ice under fresh snow"]
+  },
+  {
+    id: "cmp-004",
+    category: "Сравнение картинок",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/U.S._Coast_Guard_Petty_Officer_2nd_Class_Miguel_Arellano%2C_an_aviation_maintenance_technician_at_Coast_Guard_Air_Station_Los_Angeles%2C_operates_the_hoist_on_a_MH-65C_Dolphin_helicopter_during_training_operations_120124-G_MR731-086.jpg?width=1200",
+    imageUrl2: "https://commons.wikimedia.org/wiki/Special:FilePath/Oshkosh_Striker_fire_rescue_vehicle_in_action.jpg?width=1200",
+    attribution: "Wikimedia Commons (2 фото)",
+    prompt: "Compare these two pictures. What is similar and what is different?",
+    steps: ["What does each picture show?","What is similar?","What is different?","Which situation is more serious and why?","What risks are present in each?","What should be done in each case?"],
+    examinerQuestions: [
+      "Which rescue service faces more dangerous working conditions?",
+      "Why is regular training important for both teams?",
+      "How does ATC help rescue services during a real emergency?"
+    ],
+    level4Answer: "The first picture shows a coast guard helicopter during a training flight. A crew member at the open door is operating the rescue hoist over the water. The second picture shows a large airport fire truck in action. It is spraying water or foam from its roof cannon, probably during an exercise. Both pictures show rescue services during training. Both teams must be ready for real emergencies at any moment. The difference is the environment: the helicopter works in the air over the sea, and the fire truck works on the ground at an airport. The helicopter crew lifts people on a cable, while the firefighters fight fuel fires and help passengers escape. In my opinion, the helicopter mission is more dangerous, because hovering over water with a load on the cable needs perfect control. The helicopter crew should use clear intercom communication during the hoist. The fire crew should reach a burning aircraft in about three minutes and cool the fuselage.",
+    vocabulary: [
+      {term:"hoist", meaning:"the winch with a cable for lifting people"},
+      {term:"to hover", meaning:"to stay in the air in one place"},
+      {term:"search and rescue (SAR)", meaning:"finding and saving people in danger"},
+      {term:"foam", meaning:"a special substance used against fuel fires"},
+      {term:"roof cannon / monitor", meaning:"the water gun on top of the truck"}
+    ],
+    risks: ["Cable failure or swinging load under the helicopter","Fuel fire and explosion at the aircraft","Equipment failure during a real rescue"]
+  },
+  {
+    id: "cmp-005",
+    category: "Сравнение картинок",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Wizzair_ground_operations.jpg?width=1200",
+    imageUrl2: "https://commons.wikimedia.org/wiki/Special:FilePath/Edinburgh_Airport_-_the_apron_at_night_-_geograph.org.uk_-_5686726.jpg?width=1200",
+    attribution: "Wikimedia Commons (2 фото)",
+    prompt: "Compare these two pictures. What is similar and what is different?",
+    steps: ["What does each picture show?","What is similar?","What is different?","Which situation is more serious and why?","What risks are present in each?","What should be done in each case?"],
+    examinerQuestions: [
+      "Which time of day is more dangerous for ground operations and why?",
+      "How does fatigue affect night workers?",
+      "What extra equipment and rules help people work safely at night?"
+    ],
+    level4Answer: "The first picture shows an airliner on the apron during a daytime turnaround. Ground staff are loading baggage into the cargo hold with a belt loader. The second picture shows an airport apron at night. The area is lit by tall floodlights and some aircraft are parked at their stands. Both pictures show ground operations on the apron. In both cases people and vehicles work close to aircraft. The main difference is the light and the time of day. In the daytime workers can see obstacles easily, but at night visibility is poor. Night work is more dangerous, because fatigue and darkness cause more mistakes. Another difference is the traffic: the daytime apron is busy, while the night apron looks quiet. During the day, handlers should follow the loading instructions and watch the safety zones. At night, drivers should follow the marked roads, and everyone should use standard phraseology.",
+    vocabulary: [
+      {term:"turnaround", meaning:"the time between arrival and next departure"},
+      {term:"belt loader", meaning:"a machine with a moving belt for loading bags"},
+      {term:"floodlight", meaning:"a strong lamp that lights a large area"},
+      {term:"fatigue", meaning:"deep tiredness that reduces attention"},
+      {term:"obstacle", meaning:"an object in the way"}
+    ],
+    risks: ["Ramp vehicles hitting the aircraft","Reduced visibility of obstacles at night","Fatigue-related mistakes"]
+  },
+  {
+    id: "cmp-006",
+    category: "Сравнение картинок",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Altiport_de_Courchevel_2022.jpg?width=1200",
+    imageUrl2: "https://commons.wikimedia.org/wiki/Special:FilePath/Hawaiian_Airlines_Airbus_A330-243_(N386HA)_on_final_approach_at_LAX.jpg?width=1200",
+    attribution: "Wikimedia Commons (2 фото)",
+    prompt: "Compare these two pictures. What is similar and what is different?",
+    steps: ["What does each picture show?","What is similar?","What is different?","Which situation is more serious and why?","What risks are present in each?","What should be done in each case?"],
+    examinerQuestions: [
+      "Which landing is more demanding for the pilot?",
+      "Why is a go-around impossible at some mountain runways?",
+      "What different risks exist at a big international airport?"
+    ],
+    level4Answer: "The first picture shows a very short runway high in the mountains. It is the altiport of Courchevel, with a strong slope and snow around. The second picture shows a wide-body Airbus A330 on short final to a large airport. The gear is down and the aircraft is in landing configuration over buildings and roads. Both pictures are about landing an aircraft on a runway. In both cases the pilots must fly a precise and stable approach. The differences are very big, however. Courchevel is a tiny sloped runway for small aircraft with specially trained pilots. The big airport has a long flat runway, but very dense traffic. The mountain landing is more demanding, because a go-around is almost impossible on short final. At Courchevel, pilots need a special mountain qualification and must check the wind and snow. At the big airport, the crew should monitor speed and path, and ATC should provide safe spacing between arrivals.",
+    vocabulary: [
+      {term:"altiport", meaning:"a small mountain airfield at high altitude"},
+      {term:"slope", meaning:"the angle of the surface, uphill or downhill"},
+      {term:"short final", meaning:"the last segment of final approach, close to the runway"},
+      {term:"go around", meaning:"to stop the approach and climb away for another try"},
+      {term:"wake turbulence", meaning:"dangerous air disturbance behind a large aircraft"}
+    ],
+    risks: ["No go-around possible on short final at the altiport","High terrain and snow in the mountains","Wake turbulence and loss of separation at a busy airport"]
+  },
+  {
+    id: "cmp-007",
+    category: "Сравнение картинок",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Boeing_787_Dreamliner_Cockpit_(flight_deck).jpg?width=1200",
+    imageUrl2: "https://commons.wikimedia.org/wiki/Special:FilePath/Cockpit_of_Boeing_757_(4652855292).jpg?width=1200",
+    attribution: "Wikimedia Commons (2 фото)",
+    prompt: "Compare these two pictures. What is similar and what is different?",
+    steps: ["What does each picture show?","What is similar?","What is different?","Which situation is more serious and why?","What risks are present in each?","What should be done in each case?"],
+    examinerQuestions: [
+      "Which cockpit is easier to work in, in your opinion?",
+      "What new risks came with modern glass cockpits?",
+      "Why is crew resource management important in both cockpits?"
+    ],
+    level4Answer: "The first picture shows the flight deck of a modern Boeing 787. It has large electronic displays that show flight data, navigation and engine parameters. The second picture shows the cockpit of an older Boeing 757. Its instruments are a mix of small screens and classic round dials. Both pictures show cockpits of Boeing airliners with two pilot seats. In both cockpits the crew uses checklists and standard callouts. The main difference is the technology generation. The 787 is a full glass cockpit, while the 757 still has many mechanical instruments. The modern cockpit gives pilots better information, but it brings a new risk: over-reliance on automation. In the older cockpit, pilots must scan many separate instruments, which needs more manual work. Neither situation is an emergency, so I would say both are normal. In both aircraft the pilots should cross-check each other and be ready to fly by hand.",
+    vocabulary: [
+      {term:"glass cockpit", meaning:"a cockpit with screens instead of mechanical instruments"},
+      {term:"display", meaning:"an electronic screen with flight information"},
+      {term:"instrument panel", meaning:"the board with flight instruments"},
+      {term:"autopilot", meaning:"the system that flies the aircraft automatically"},
+      {term:"cross-check", meaning:"checking the other pilot's actions"},
+      {term:"callout", meaning:"a standard spoken phrase in the cockpit"}
+    ],
+    risks: ["Over-reliance on automation in the modern cockpit","Instrument failure not noticed in time","Poor crew communication in any cockpit"]
+  },
+  {
+    id: "cmp-008",
+    category: "Сравнение картинок",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/China_Airlines'_Boeing_747_in_maintenance_hangar.jpg?width=1200",
+    imageUrl2: "https://commons.wikimedia.org/wiki/Special:FilePath/Aerial_view_showing_damage_to_left_fuselage_and_left_engine_of_Delta_Air_Lines_Flight_1288.jpg?width=1200",
+    attribution: "Wikimedia Commons (2 фото)",
+    prompt: "Compare these two pictures. What is similar and what is different?",
+    steps: ["What does each picture show?","What is similar?","What is different?","Which situation is more serious and why?","What risks are present in each?","What should be done in each case?"],
+    examinerQuestions: [
+      "How can good maintenance prevent accidents like the one in the second picture?",
+      "Which situation is more expensive for the airline, in your opinion?",
+      "What do investigators check after an engine failure?"
+    ],
+    level4Answer: "The first picture shows a Boeing 747 inside a maintenance hangar. The aircraft is going through a planned maintenance check with engineers around it. The second picture is an aerial photo of a damaged passenger aircraft on the ground. Its left engine failed and metal fragments hit the left side of the fuselage. Both pictures show technical work with large airliners on the ground. In both cases engineers must inspect the aircraft very carefully. The difference is that the first check is planned and the second is the result of an emergency. In the hangar everything is calm, but the damaged aircraft needed a rejected take-off and evacuation. The second situation is clearly more serious, because engine fragments and fire could kill people. Good scheduled maintenance, like in the first picture, helps to prevent such failures. In the hangar, engineers should follow the manuals and sign every task. After the engine failure, investigators should examine the engine and its maintenance records.",
+    vocabulary: [
+      {term:"hangar", meaning:"a large building for aircraft"},
+      {term:"scheduled check", meaning:"planned maintenance after fixed hours or cycles"},
+      {term:"uncontained engine failure", meaning:"engine failure where parts fly out of the engine case"},
+      {term:"rejected take-off", meaning:"stopping the take-off on the runway"},
+      {term:"fragments", meaning:"broken pieces of metal"},
+      {term:"maintenance records", meaning:"documents about all repairs and checks"}
+    ],
+    risks: ["Human error during maintenance","Engine fragments hitting the cabin","Fire from damaged fuel lines"]
+  }
+];
+
 window.DATA_LISTENING = [
   // ===================== ATIS =====================
   {
@@ -12376,6 +12568,1394 @@ window.DATA_LISTENING = [
       {q: "What is the correct approach frequency?", options: ["One two zero decimal eight","One two eight decimal zero","One two eight decimal eight","One one eight decimal eight"], correct: 2, explain: "Warsaw Approach is one two eight decimal eight."}
     ],
     keyPhrases: ["unable to establish contact", "returning to your frequency", "confirm the frequency you attempted", "I say again"]
+  }
+];
+
+window.DATA_LISTENING_2 = [
+  // ===================== КТО ГОВОРИТ? (TEA Part 2A style) =====================
+  {
+    id: "lst2-001",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Disruptive passenger",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "The passenger is still not calm, please call security to meet us on arrival."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A pilot","A controller","A flight attendant","A security officer"], correct: 0, explain: "A pilot is asking the controller to arrange security on the ground."},
+      {q: "What was the message?", options: ["A passenger has calmed down and no help is needed","Security staff are already on board the aircraft","A passenger is still disruptive and security should meet the aircraft","The flight is delayed because of a security check"], correct: 2, explain: "The pilot said the passenger is still not calm and asked for security on arrival."}
+    ],
+    keyPhrases: ["passenger is still not calm", "call security", "meet us on arrival"]
+  },
+  {
+    id: "lst2-002",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Injured passenger check",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "Could you confirm the injured passenger has stopped bleeding?"}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A doctor","A controller","A pilot","A flight attendant"], correct: 1, explain: "A controller is asking the crew for an update on the injured passenger."},
+      {q: "What was the message?", options: ["A passenger has just been injured during turbulence","The speaker asked for a doctor to come to the tower","An ambulance is waiting at the stand","The speaker asked whether the injured passenger is still bleeding"], correct: 3, explain: "The controller asked the crew to confirm the passenger has stopped bleeding."}
+    ],
+    keyPhrases: ["confirm", "injured passenger", "stopped bleeding"]
+  },
+  {
+    id: "lst2-003",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Burning smell",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "We have a burning smell in the cockpit, we request an immediate return to the airfield."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A fire fighter","A controller","A pilot","A mechanic"], correct: 2, explain: "A pilot is reporting a burning smell and requesting a return."},
+      {q: "What was the message?", options: ["The crew smells burning and wants to return and land at once","There is a fire in the passenger cabin","The aircraft has already landed and is on fire","The crew requests a climb to a higher level"], correct: 0, explain: "The pilot reported a burning smell in the cockpit and requested an immediate return."}
+    ],
+    keyPhrases: ["burning smell in the cockpit", "request", "immediate return"]
+  },
+  {
+    id: "lst2-004",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Fire brigade standing by",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "Fire brigade is standing by at the runway, wind is calm, you are number one for landing."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A fire fighter","A pilot","A flight attendant","A controller"], correct: 3, explain: "A controller is telling the crew that the fire services are ready and they may land first."},
+      {q: "What was the message?", options: ["The runway is closed because of a fire","The rescue services are ready and the aircraft will land first","The wind is too strong for landing","The fire brigade needs one more minute to reach the runway"], correct: 1, explain: "The controller said the fire brigade is standing by, the wind is calm, and the aircraft is number one."}
+    ],
+    keyPhrases: ["fire brigade is standing by", "wind is calm", "number one for landing"]
+  },
+  {
+    id: "lst2-005",
+    category: "Кто говорит?",
+    difficulty: 2,
+    title: "Bird strike on departure",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "Be advised, we hit a large bird just after take off, we would like an engine check before continuing to our destination."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A ground worker","A pilot","A controller","A mechanic"], correct: 1, explain: "A pilot is reporting a bird strike and asking for an engine check."},
+      {q: "What was the message?", options: ["The aircraft hit a bird and the crew wants the engine checked before flying on","A flock of birds is sitting on the runway","The engine has failed and the aircraft is returning immediately","The crew saw a large bird but avoided it"], correct: 0, explain: "The pilot said they hit a bird after take off and would like an engine check first."}
+    ],
+    keyPhrases: ["hit a large bird", "after take off", "engine check"]
+  },
+  {
+    id: "lst2-006",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Vehicle on the runway",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "A vehicle has entered the runway without permission, go around, I say again, go around."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A driver","A pilot","A controller","A ground worker"], correct: 2, explain: "A controller is instructing the aircraft to go around because of a vehicle on the runway."},
+      {q: "What was the message?", options: ["A vehicle is waiting for the aircraft at the stand","The runway has been inspected and is clear","The aircraft must vacate the runway for a vehicle","The landing must be abandoned because a vehicle is on the runway"], correct: 3, explain: "The controller ordered a go around because a vehicle entered the runway without permission."}
+    ],
+    keyPhrases: ["vehicle has entered the runway", "without permission", "go around"]
+  },
+  {
+    id: "lst2-007",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Low on fuel",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "We are low on fuel, we can only accept one zero more minutes of holding."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A pilot","A controller","A dispatcher","A refueller"], correct: 0, explain: "A pilot is telling the controller how much longer they can hold."},
+      {q: "What was the message?", options: ["The aircraft has just been refuelled","The crew cannot hold longer than about ten minutes because of fuel","The aircraft is declaring a fuel emergency and landing now","The crew wants to hold for one more hour"], correct: 1, explain: "The pilot said they are low on fuel and can accept only ten more minutes of holding."}
+    ],
+    keyPhrases: ["low on fuel", "one zero more minutes", "holding"]
+  },
+  {
+    id: "lst2-008",
+    category: "Кто говорит?",
+    difficulty: 2,
+    title: "Turbulence on final",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "The aircraft ahead of you reported severe turbulence on final, do you want to try the approach or hold for a while?"}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A meteorologist","A flight attendant","A pilot","A controller"], correct: 3, explain: "A controller is passing a turbulence report and offering the crew a choice."},
+      {q: "What was the message?", options: ["The approach is closed because of turbulence","The speaker felt severe turbulence in their own aircraft","Another aircraft reported severe turbulence on final, and the crew may approach or hold","The turbulence has ended and the approach is smooth"], correct: 2, explain: "The controller relayed a report of severe turbulence and asked whether the crew wants to approach or hold."}
+    ],
+    keyPhrases: ["aircraft ahead", "severe turbulence on final", "approach or hold"]
+  },
+  {
+    id: "lst2-009",
+    category: "Кто говорит?",
+    difficulty: 2,
+    title: "Sick passenger on board",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "My passenger is feeling very sick, we request a doctor to meet us at the apron after landing."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A flight attendant","A passenger","A pilot","A doctor"], correct: 2, explain: "A pilot is requesting medical assistance for a passenger."},
+      {q: "What was the message?", options: ["A doctor is already on board helping the passenger","A passenger is sick and a doctor should meet the aircraft after landing","The pilot himself feels sick and needs to land","The passenger has recovered and no help is needed"], correct: 1, explain: "The pilot asked for a doctor to meet the aircraft at the apron because a passenger is very sick."}
+    ],
+    keyPhrases: ["passenger is feeling very sick", "request a doctor", "meet us at the apron"]
+  },
+  {
+    id: "lst2-010",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Snow removal in progress",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "Caution, snow removal in progress at the far end of the runway, expect a short delay for departure."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A controller","A snow plough driver","A pilot","A ground worker"], correct: 0, explain: "A controller is warning about snow removal and a possible delay."},
+      {q: "What was the message?", options: ["The runway is closed for the whole day because of snow","The aircraft must return to the stand for de-icing","Departure is cancelled because of heavy snowfall","Snow is being cleared from the runway and departure will be slightly delayed"], correct: 3, explain: "The controller said snow removal is in progress and to expect a short delay."}
+    ],
+    keyPhrases: ["snow removal in progress", "far end of the runway", "short delay"]
+  },
+  {
+    id: "lst2-011",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Unsure of position",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "We are not sure of our position, we can see a large lake and a railway line below us."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A controller","A pilot","A navigator on a ship","A train driver"], correct: 1, explain: "A pilot is admitting uncertainty about position and describing what is visible below."},
+      {q: "What was the message?", options: ["The crew is flying over the sea and cannot see land","The crew has just passed the destination airfield","The crew is unsure of its position and describes a lake and a railway in sight","The crew is asking for the position of another aircraft"], correct: 2, explain: "The pilot said they are not sure of their position and can see a lake and a railway line."}
+    ],
+    keyPhrases: ["not sure of our position", "large lake", "railway line"]
+  },
+  {
+    id: "lst2-012",
+    category: "Кто говорит?",
+    difficulty: 2,
+    title: "Radar contact lost",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "Radar contact lost, report your present position and altitude, and squawk ident."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A flight attendant","A mechanic","A pilot","A controller"], correct: 3, explain: "A controller has lost the aircraft on radar and is asking for a position report and ident."},
+      {q: "What was the message?", options: ["The aircraft disappeared from radar and must report position, altitude and squawk ident","The radio has failed and the crew should change frequency","The transponder must be switched off immediately","The aircraft is identified and radar service is terminated"], correct: 0, explain: "The controller said radar contact was lost and asked for position, altitude and an ident."}
+    ],
+    keyPhrases: ["radar contact lost", "report your present position and altitude", "squawk ident"]
+  },
+  {
+    id: "lst2-013",
+    category: "Кто говорит?",
+    difficulty: 2,
+    title: "Gear indicator unsafe",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "The nose wheel indicator shows unsafe, we request a low pass so you can check our landing gear from the tower."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A pilot","A controller","A mechanic","A ground worker"], correct: 0, explain: "A pilot is reporting a gear indication problem and requesting a low pass."},
+      {q: "What was the message?", options: ["The landing gear has collapsed on the runway","The crew has a gear indication problem and wants a visual check during a low pass","The nose wheel tyre burst during take off","The crew requests a mechanic to board the aircraft"], correct: 1, explain: "The pilot asked for a low pass so the tower can check the landing gear visually."}
+    ],
+    keyPhrases: ["nose wheel indicator shows unsafe", "request a low pass", "check our landing gear"]
+  },
+  {
+    id: "lst2-014",
+    category: "Кто говорит?",
+    difficulty: 2,
+    title: "Gear appears down",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "I can see your landing gear, all three wheels appear to be down and in place."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A passenger","A mechanic","A controller","A pilot"], correct: 2, explain: "A controller is reporting the result of a visual check of the landing gear."},
+      {q: "What was the message?", options: ["One of the wheels is missing","The landing gear doors are still open","The gear must be recycled one more time","The landing gear looks normal, all three wheels seem to be down"], correct: 3, explain: "The controller said all three wheels appear to be down and in place."}
+    ],
+    keyPhrases: ["I can see your landing gear", "all three wheels", "down and in place"]
+  },
+  {
+    id: "lst2-015",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Fuel smell, evacuating",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "There is a strong smell of fuel in the cabin, we are shutting down the engine and evacuating on the taxiway."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A refueller","A fire fighter","A controller","A pilot"], correct: 3, explain: "A pilot is reporting a fuel smell and announcing an evacuation."},
+      {q: "What was the message?", options: ["The crew smells fuel, is stopping the engine and evacuating on the taxiway","The aircraft needs more fuel before departure","Fuel is leaking from a truck on the apron","The passengers have already left the aircraft at the stand"], correct: 0, explain: "The pilot said there is a strong fuel smell and the crew is shutting down and evacuating."}
+    ],
+    keyPhrases: ["strong smell of fuel", "shutting down the engine", "evacuating on the taxiway"]
+  },
+  {
+    id: "lst2-016",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Baggage door open",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "Your baggage door appears to be open, confirm you wish to return to the stand."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A ground worker","A controller","A pilot","A flight attendant"], correct: 1, explain: "A controller has noticed an open baggage door and is asking about the crew's intentions."},
+      {q: "What was the message?", options: ["Some baggage has been left at the stand","The baggage door has been closed and checked","The aircraft's baggage door looks open and the crew is asked if they want to go back","The passengers must identify their baggage before departure"], correct: 2, explain: "The controller said the baggage door appears to be open and asked the crew to confirm a return to the stand."}
+    ],
+    keyPhrases: ["baggage door appears to be open", "confirm", "return to the stand"]
+  },
+  {
+    id: "lst2-017",
+    category: "Кто говорит?",
+    difficulty: 2,
+    title: "Unwell student pilot",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "My student is feeling unwell, this is his first flight, we request priority landing and a short taxi to the apron."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A pilot","A student","A controller","A doctor"], correct: 0, explain: "A flight instructor, that is a pilot, is asking for priority because the student feels unwell."},
+      {q: "What was the message?", options: ["A student pilot is flying solo for the first time","The instructor feels unwell and the student is flying the aircraft","The lesson is finished and the aircraft is returning normally","The student on board feels sick, so the crew wants to land with priority"], correct: 3, explain: "The instructor said the student is unwell and requested priority landing and a short taxi."}
+    ],
+    keyPhrases: ["student is feeling unwell", "first flight", "priority landing"]
+  },
+  {
+    id: "lst2-018",
+    category: "Кто говорит?",
+    difficulty: 2,
+    title: "Destination closed",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "Your destination aerodrome is closed, a disabled aircraft is blocking the runway, advise your intentions."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A dispatcher","A pilot","A controller","A ground worker"], correct: 2, explain: "A controller is informing the crew that the destination is closed and asking for their intentions."},
+      {q: "What was the message?", options: ["The departure aerodrome is closing in one hour","The destination is closed because an aircraft is blocking the runway, and the crew must say what they plan to do","The disabled aircraft has been removed and the runway is open","The crew must divert to their alternate immediately"], correct: 1, explain: "The controller said the destination is closed by a disabled aircraft and asked for intentions."}
+    ],
+    keyPhrases: ["destination aerodrome is closed", "disabled aircraft is blocking the runway", "advise your intentions"]
+  },
+  {
+    id: "lst2-019",
+    category: "Кто говорит?",
+    difficulty: 1,
+    title: "Oil on the windscreen",
+    basedOn: null,
+    dialog: [
+      {speaker: "PLT", text: "The windscreen is covered in oil, I can hardly see anything ahead of me."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A mechanic","A controller","A ground worker","A pilot"], correct: 3, explain: "A pilot is reporting that oil on the windscreen is blocking the forward view."},
+      {q: "What was the message?", options: ["The oil pressure is dropping rapidly","The windscreen is cracked and may break","Oil on the windscreen makes it very difficult to see forward","The windscreen wipers have failed in heavy rain"], correct: 2, explain: "The pilot said the windscreen is covered in oil and forward visibility is very poor."}
+    ],
+    keyPhrases: ["windscreen is covered in oil", "hardly see anything", "ahead of me"]
+  },
+  {
+    id: "lst2-020",
+    category: "Кто говорит?",
+    difficulty: 2,
+    title: "Drone near final",
+    basedOn: null,
+    dialog: [
+      {speaker: "ATC", text: "We have received a report of a drone close to the final approach path, keep a good lookout and report any sighting."}
+    ],
+    questions: [
+      {q: "Who was speaking?", options: ["A drone operator","A controller","A pilot","A police officer"], correct: 1, explain: "A controller is warning the crew about a reported drone near the approach."},
+      {q: "What was the message?", options: ["A drone was reported near the approach, so the crew should watch out and report it if seen","A drone has hit an aircraft on final","The approach is closed until the drone is found","The crew should climb immediately to avoid a drone"], correct: 0, explain: "The controller passed a drone report and asked the crew to keep a lookout."}
+    ],
+    keyPhrases: ["report of a drone", "final approach path", "keep a good lookout"]
+  },
+
+  // ===================== ПОВТОРИ НА СЛУХ (EPAP readback style) =====================
+  {
+    id: "lst2-021",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 1,
+    title: "Taxi clearance Modlin",
+    basedOn: "EPMO",
+    dialog: [
+      {speaker: "ATC", text: "Sierra Papa Kilo Mike Alfa, taxi to holding point runway two six via taxiway Alfa, Q N H one zero one five."}
+    ],
+    questions: [],
+    keyPhrases: ["Sierra Papa Kilo Mike Alfa", "holding point runway two six", "taxiway Alfa", "Q N H one zero one five"]
+  },
+  {
+    id: "lst2-022",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 1,
+    title: "Join downwind Babice",
+    basedOn: "EPBC",
+    dialog: [
+      {speaker: "ATC", text: "Sierra Papa Alfa Bravo Charlie, join left downwind runway one zero, report downwind."}
+    ],
+    questions: [],
+    keyPhrases: ["Sierra Papa Alfa Bravo Charlie", "left downwind", "runway one zero", "report downwind"]
+  },
+  {
+    id: "lst2-023",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 1,
+    title: "Cleared to land",
+    basedOn: "EPMO",
+    dialog: [
+      {speaker: "ATC", text: "Sierra Papa Golf Delta Alfa, wind two two zero degrees at six knots, runway two six, cleared to land."}
+    ],
+    questions: [],
+    keyPhrases: ["Sierra Papa Golf Delta Alfa", "runway two six", "cleared to land"]
+  },
+  {
+    id: "lst2-024",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 2,
+    title: "Enter control zone Bydgoszcz",
+    basedOn: "EPBY",
+    dialog: [
+      {speaker: "ATC", text: "Sierra Papa Lima Echo Tango, cleared to enter the control zone via point November, altitude one thousand five hundred feet, Q N H one zero zero niner."}
+    ],
+    questions: [],
+    keyPhrases: ["Sierra Papa Lima Echo Tango", "enter the control zone", "point November", "one thousand five hundred feet", "Q N H one zero zero niner"]
+  },
+  {
+    id: "lst2-025",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 2,
+    title: "Descent with report Minsk",
+    basedOn: "UMMS",
+    dialog: [
+      {speaker: "ATC", text: "Echo Whiskey Alfa Romeo Sierra, descend to altitude three thousand feet, Q N H one zero zero five, report passing four thousand feet."}
+    ],
+    questions: [],
+    keyPhrases: ["Echo Whiskey Alfa Romeo Sierra", "descend to altitude three thousand feet", "Q N H one zero zero five", "report passing four thousand feet"]
+  },
+  {
+    id: "lst2-026",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 2,
+    title: "Taxi and frequency Vilnius",
+    basedOn: "EYVI",
+    dialog: [
+      {speaker: "ATC", text: "Lima Yankee Bravo Alfa Victor, taxi to holding point Alfa four, runway zero one, contact Tower one one eight decimal two."}
+    ],
+    questions: [],
+    keyPhrases: ["Lima Yankee Bravo Alfa Victor", "holding point Alfa four", "runway zero one", "Tower one one eight decimal two"]
+  },
+  {
+    id: "lst2-027",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 1,
+    title: "Squawk assignment",
+    basedOn: "EPBY",
+    dialog: [
+      {speaker: "ATC", text: "Sierra Papa Tango Whiskey Oscar, squawk four five two one, report ready for departure."}
+    ],
+    questions: [],
+    keyPhrases: ["Sierra Papa Tango Whiskey Oscar", "squawk four five two one", "report ready for departure"]
+  },
+  {
+    id: "lst2-028",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 3,
+    title: "Hold short, traffic on final",
+    basedOn: "EPMO",
+    dialog: [
+      {speaker: "ATC", text: "Sierra Papa Delta Kilo Whiskey, hold short of runway two six, traffic is a Cessna on two mile final, expect line up after the landing traffic."}
+    ],
+    questions: [],
+    keyPhrases: ["Sierra Papa Delta Kilo Whiskey", "hold short of runway two six", "Cessna on two mile final", "line up after the landing traffic"]
+  },
+  {
+    id: "lst2-029",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 3,
+    title: "Climb, heading and handoff",
+    basedOn: "UMMS",
+    dialog: [
+      {speaker: "ATC", text: "Echo Whiskey November Golf Uniform, climb to altitude four thousand feet, turn left heading three four zero, contact Approach one two seven decimal eight five."}
+    ],
+    questions: [],
+    keyPhrases: ["Echo Whiskey November Golf Uniform", "climb to altitude four thousand feet", "turn left heading three four zero", "Approach one two seven decimal eight five"]
+  },
+  {
+    id: "lst2-030",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 2,
+    title: "Orbit for spacing",
+    basedOn: "EYVI",
+    dialog: [
+      {speaker: "ATC", text: "Lima Yankee Kilo Oscar Sierra, orbit right, one aircraft on short final, expect clearance to land in two minutes."}
+    ],
+    questions: [],
+    keyPhrases: ["Lima Yankee Kilo Oscar Sierra", "orbit right", "one aircraft on short final", "expect clearance to land in two minutes"]
+  },
+  {
+    id: "lst2-031",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 1,
+    title: "Backtrack and line up",
+    basedOn: "EPBC",
+    dialog: [
+      {speaker: "ATC", text: "Sierra Papa Mike Bravo Alfa, backtrack runway two eight, line up and wait."}
+    ],
+    questions: [],
+    keyPhrases: ["Sierra Papa Mike Bravo Alfa", "backtrack runway two eight", "line up and wait"]
+  },
+  {
+    id: "lst2-032",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 2,
+    title: "Leave the control zone",
+    basedOn: "EPBY",
+    dialog: [
+      {speaker: "ATC", text: "Sierra Papa Foxtrot Golf Hotel, leave the control zone via point Whiskey, altitude one thousand feet or below, squawk seven zero zero zero."}
+    ],
+    questions: [],
+    keyPhrases: ["Sierra Papa Foxtrot Golf Hotel", "leave the control zone via point Whiskey", "one thousand feet or below", "squawk seven zero zero zero"]
+  },
+  {
+    id: "lst2-033",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 3,
+    title: "Departure clearance Vilnius",
+    basedOn: "EYVI",
+    dialog: [
+      {speaker: "ATC", text: "Lima Yankee Delta Romeo Victor, after departure turn right heading zero four zero, climb to altitude two thousand five hundred feet, squawk four six one two, runway zero one, cleared for take off, wind three six zero degrees at one zero knots."}
+    ],
+    questions: [],
+    keyPhrases: ["Lima Yankee Delta Romeo Victor", "turn right heading zero four zero", "two thousand five hundred feet", "squawk four six one two", "runway zero one, cleared for take off"]
+  },
+  {
+    id: "lst2-034",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 3,
+    title: "ILS approach clearance Minsk",
+    basedOn: "UMMS",
+    dialog: [
+      {speaker: "ATC", text: "Echo Whiskey Bravo Tango Lima, descend to altitude two thousand feet, Q N H niner niner eight, cleared I L S approach runway three one, report established on the localizer."}
+    ],
+    questions: [],
+    keyPhrases: ["Echo Whiskey Bravo Tango Lima", "descend to altitude two thousand feet", "Q N H niner niner eight", "cleared I L S approach runway three one", "report established"]
+  },
+  {
+    id: "lst2-035",
+    category: "Повтори на слух",
+    type: "repeat",
+    difficulty: 2,
+    title: "Cross runway, give way",
+    basedOn: "EPMO",
+    dialog: [
+      {speaker: "ATC", text: "Sierra Papa Romeo Uniform Delta, cross runway two six, then hold short of taxiway Bravo, give way to the towed aircraft coming from your left."}
+    ],
+    questions: [],
+    keyPhrases: ["Sierra Papa Romeo Uniform Delta", "cross runway two six", "hold short of taxiway Bravo", "give way to the towed aircraft"]
+  }
+];
+
+// Task bank for "Ask questions" training mode (ICAO Level 4, ELPAC/TEA Part 2C style).
+// The user HEARS the line, then ASKS relevant questions (~30 s), then GIVES advice.
+window.DATA_ASKBACK = [
+  // ===================== PILOT LINES =====================
+  {
+    id: "ask-001",
+    speaker: "PLT",
+    line: "We need some help. Our engine has started losing power.",
+    context: "Пилот лёгкого самолёта, крейсерский полёт",
+    modelQuestions: [
+      "What do you think is the reason for the power loss?",
+      "Can you maintain your altitude?",
+      "Is the engine still running?",
+      "Do you see any smoke or smell any fuel?",
+      "What are your oil pressure and oil temperature?",
+      "How many people are on board?",
+      "What are your intentions, can you reach an airfield?"
+    ],
+    modelAdvice: [
+      "Fly the aircraft first — keep a safe speed and stay level or in a gentle descent.",
+      "Try carburettor heat, check the fuel selector and the mixture.",
+      "Turn towards the nearest airfield or choose a good field for landing.",
+      "Declare pan-pan or mayday and squawk seven seven zero zero."
+    ],
+    keywords: ["reason", "power", "altitude", "smoke", "oil", "fuel", "people", "intentions", "maintain"]
+  },
+  {
+    id: "ask-002",
+    speaker: "PLT",
+    line: "Our engine is running rough and the whole aircraft is shaking.",
+    context: "Пилот лёгкого самолёта, набор высоты после взлёта",
+    modelQuestions: [
+      "When did the rough running start?",
+      "What is the possible reason, is it carburettor icing?",
+      "Are you losing engine RPM?",
+      "Can you hold your altitude?",
+      "Did you check the magnetos and the fuel pump?",
+      "How far are you from the nearest airfield?",
+      "How many persons are on board?"
+    ],
+    modelAdvice: [
+      "Reduce power a little and see if the shaking gets better.",
+      "Apply carburettor heat and switch on the electric fuel pump.",
+      "Do not fly away from the airfield — stay close and plan an early landing.",
+      "Tell the controller if the situation gets worse."
+    ],
+    keywords: ["when", "reason", "rpm", "altitude", "magneto", "fuel", "airfield", "persons", "carburettor"]
+  },
+  {
+    id: "ask-003",
+    speaker: "PLT",
+    line: "We can smell smoke in the cockpit, but we cannot see any fire.",
+    context: "Пилот лёгкого самолёта, маршрутный полёт",
+    modelQuestions: [
+      "Where is the smell coming from, the engine or the instruments?",
+      "Can you see any smoke inside the cockpit?",
+      "Are all engine indications normal?",
+      "Did you switch off any electrical equipment?",
+      "Do you have a fire extinguisher on board?",
+      "How far are you from the nearest airfield?",
+      "Do you want to declare an emergency?"
+    ],
+    modelAdvice: [
+      "Switch off all electrical equipment you do not need.",
+      "Open the air vents to clear the smell from the cockpit.",
+      "Land as soon as possible at the nearest airfield.",
+      "If you see fire or the smoke gets thick, declare mayday immediately."
+    ],
+    keywords: ["where", "smell", "smoke", "fire", "electrical", "extinguisher", "airfield", "emergency", "indications"]
+  },
+  {
+    id: "ask-004",
+    speaker: "PLT",
+    line: "We are running short of fuel and we may not reach our destination.",
+    context: "Пилот лёгкого самолёта, длинный маршрут против ветра",
+    modelQuestions: [
+      "How much fuel do you have left in minutes?",
+      "What is the reason, a leak or a strong headwind?",
+      "Are both fuel tanks empty or only one?",
+      "How far is your destination from your present position?",
+      "Is there a closer airfield you can use?",
+      "Do you want to declare minimum fuel or an emergency?",
+      "How many people are on board?"
+    ],
+    modelAdvice: [
+      "Reduce power and fly at your best range speed.",
+      "Divert now to the nearest airfield — do not wait.",
+      "Say minimum fuel to the controller, or mayday fuel if you may land with less than reserve.",
+      "If no airfield is in range, choose a good field early while you still have engine power."
+    ],
+    keywords: ["fuel", "minutes", "reason", "leak", "tank", "destination", "closer", "divert", "people"]
+  },
+  {
+    id: "ask-005",
+    speaker: "PLT",
+    line: "We are not sure of our position. The ground below does not match our map.",
+    context: "Частный пилот VFR, потеря ориентировки",
+    modelQuestions: [
+      "When did you last know your exact position?",
+      "What was your heading and speed since that point?",
+      "What can you see on the ground — a town, a river, a railway?",
+      "What is your altitude?",
+      "How much fuel do you have remaining?",
+      "Is your GPS working?",
+      "Do you have a transponder on board?"
+    ],
+    modelAdvice: [
+      "Keep flying the aircraft and hold your heading — do not turn around in circles.",
+      "Climb if possible, a higher altitude gives you a better view and better radio contact.",
+      "Tell the controller you are unsure of your position and ask for help.",
+      "Squawk seven six zero zero if you also lose radio contact, and watch your fuel."
+    ],
+    keywords: ["position", "heading", "see", "ground", "altitude", "fuel", "gps", "transponder", "last"]
+  },
+  {
+    id: "ask-006",
+    speaker: "PLT",
+    line: "The weather ahead looks very bad — low cloud and heavy rain.",
+    context: "Пилот VFR на маршруте, ухудшение погоды",
+    modelQuestions: [
+      "What is your present visibility?",
+      "How low is the cloud base ahead?",
+      "Can you keep visual contact with the ground?",
+      "Is the weather better behind you?",
+      "Do you have enough fuel to fly around the weather or turn back?",
+      "Are you qualified to fly in cloud?",
+      "What are your intentions?"
+    ],
+    modelAdvice: [
+      "Do not continue into bad weather — a one-hundred-and-eighty-degree turn is the safest choice.",
+      "Turn back early while the weather behind you is still good.",
+      "If you cannot turn back, land at the nearest airfield or make a precautionary landing.",
+      "Ask the controller for the latest weather at nearby airfields."
+    ],
+    keywords: ["visibility", "cloud", "visual", "behind", "fuel", "turn", "back", "intentions", "qualified"]
+  },
+  {
+    id: "ask-007",
+    speaker: "PLT",
+    line: "We are picking up ice on the wings and on the windshield.",
+    context: "Лёгкий самолёт без противообледенительной системы",
+    modelQuestions: [
+      "How thick is the ice, is it building up quickly?",
+      "What is your altitude and the outside air temperature?",
+      "Are you in cloud or in rain?",
+      "Is your airspeed dropping?",
+      "Do you have any de-icing equipment on board?",
+      "Can you descend into warmer air?",
+      "How far is the nearest airfield?"
+    ],
+    modelAdvice: [
+      "Leave the icing conditions immediately — descend into warmer air or turn back.",
+      "Use carburettor heat and pitot heat if you have them.",
+      "Keep your speed higher than normal and avoid steep turns.",
+      "Land as soon as possible and expect a longer landing distance."
+    ],
+    keywords: ["ice", "thick", "altitude", "temperature", "cloud", "airspeed", "descend", "warmer", "airfield"]
+  },
+  {
+    id: "ask-008",
+    speaker: "PLT",
+    line: "We hit a large bird. It damaged the front of the aircraft.",
+    context: "Столкновение с птицей на малой высоте",
+    modelQuestions: [
+      "Where exactly did the bird hit the aircraft?",
+      "Is the engine running normally?",
+      "Is your windshield broken?",
+      "Can you control the aircraft normally?",
+      "Do you have any vibration?",
+      "Is anybody on board injured?",
+      "What are your intentions?"
+    ],
+    modelAdvice: [
+      "Fly the aircraft gently and check how it responds to the controls.",
+      "Slow down a little — lower speed puts less stress on the damaged part.",
+      "Return and land as soon as possible, and ask for a runway inspection after landing.",
+      "If the windshield is broken, protect your eyes and reduce speed."
+    ],
+    keywords: ["where", "hit", "engine", "windshield", "control", "vibration", "injured", "intentions", "damage"]
+  },
+  {
+    id: "ask-009",
+    speaker: "PLT",
+    line: "My passenger is feeling very bad. I need to get him on the ground quickly.",
+    context: "Частный пилот с одним пассажиром на борту",
+    modelQuestions: [
+      "What is wrong with your passenger?",
+      "Is he conscious and breathing normally?",
+      "Does he have any known medical problems?",
+      "How old is your passenger?",
+      "How far are you from the nearest airfield?",
+      "Do you need an ambulance at the airfield?",
+      "Do you want to declare an emergency?"
+    ],
+    modelAdvice: [
+      "Land at the nearest suitable airfield, not your destination.",
+      "Declare pan-pan so the controller can give you priority.",
+      "Ask the controller to call an ambulance to meet you after landing.",
+      "Give your passenger fresh air and keep talking to him."
+    ],
+    keywords: ["wrong", "conscious", "breathing", "medical", "old", "airfield", "ambulance", "emergency", "passenger"]
+  },
+  {
+    id: "ask-010",
+    speaker: "PLT",
+    line: "Our canopy opened just after takeoff. There is strong wind in the cockpit.",
+    context: "Лёгкий самолёт с открывшимся фонарём после взлёта",
+    modelQuestions: [
+      "Is the canopy fully open or only unlocked?",
+      "Can you control the aircraft normally?",
+      "Can you close and lock the canopy in flight?",
+      "Did anything fly out of the cockpit?",
+      "What is your altitude and speed?",
+      "Are you able to return for landing?",
+      "Is anybody injured?"
+    ],
+    modelAdvice: [
+      "Fly the aircraft first — an open canopy is noisy but usually not dangerous.",
+      "Reduce speed and do not try to close it while flying alone at low altitude.",
+      "Return to the airfield and land normally.",
+      "Hold your charts and loose items so they do not fly out."
+    ],
+    keywords: ["canopy", "open", "control", "close", "lock", "altitude", "speed", "return", "injured"]
+  },
+  {
+    id: "ask-011",
+    speaker: "PLT",
+    line: "Our radio is failing. We can hear you only from time to time.",
+    context: "Проблемы со связью в контролируемой зоне",
+    modelQuestions: [
+      "How do you read me now?",
+      "Is the problem in the radio or in the headset?",
+      "Do you have a second radio or a handheld radio on board?",
+      "Is your electrical system working normally?",
+      "Did you try the other frequency?",
+      "What is your position and altitude?",
+      "What are your intentions if you lose contact completely?"
+    ],
+    modelAdvice: [
+      "Check the volume, the squelch and the headset connection first.",
+      "Squawk seven six zero zero if the radio fails completely.",
+      "Follow the standard radio failure procedure and continue as planned.",
+      "Watch the tower for light signals when you arrive at the airfield."
+    ],
+    keywords: ["read", "radio", "headset", "second", "electrical", "frequency", "position", "intentions", "squawk"]
+  },
+  {
+    id: "ask-012",
+    speaker: "PLT",
+    line: "We have strong vibration from the propeller and it is getting worse.",
+    context: "Вибрация воздушного винта в полёте",
+    modelQuestions: [
+      "When did the vibration start?",
+      "Does the vibration change with engine power?",
+      "Did you hit anything, a bird or ice?",
+      "Are the engine indications normal?",
+      "Can you see any damage on the propeller?",
+      "How far are you from the nearest airfield?",
+      "How many people are on board?"
+    ],
+    modelAdvice: [
+      "Reduce power to the setting where the vibration is smallest.",
+      "Do not increase power again unless you really need it.",
+      "Land as soon as possible — strong vibration can damage the engine mount.",
+      "Be ready for a complete engine failure and keep a landing field in sight."
+    ],
+    keywords: ["when", "vibration", "power", "hit", "indications", "damage", "propeller", "airfield", "people"]
+  },
+  {
+    id: "ask-013",
+    speaker: "PLT",
+    line: "Our brakes failed on landing. We have stopped on the grass past the runway end.",
+    context: "Отказ тормозов, самолёт выкатился за полосу",
+    modelQuestions: [
+      "Is anybody on board injured?",
+      "Is the aircraft damaged?",
+      "Can you taxi or is the aircraft stuck?",
+      "Is there any fuel leaking?",
+      "Is the engine shut down?",
+      "Where exactly are you now?",
+      "Do you need any assistance?"
+    ],
+    modelAdvice: [
+      "Shut down the engine and switch off the fuel and the master switch.",
+      "Get out of the aircraft if you smell fuel and move away from it.",
+      "Stay where you are — do not walk across the runway.",
+      "Wait for the airfield staff, they will help you move the aircraft."
+    ],
+    keywords: ["injured", "damage", "taxi", "stuck", "fuel", "leak", "engine", "where", "assistance"]
+  },
+  {
+    id: "ask-014",
+    speaker: "PLT",
+    line: "I think we have a flat tyre. The aircraft pulled hard to the left on landing.",
+    context: "Подозрение на спущенное колесо после посадки",
+    modelQuestions: [
+      "Are you still on the runway or on the taxiway?",
+      "Can you move the aircraft or is it too difficult?",
+      "Is anybody injured?",
+      "Is there any other damage to the landing gear?",
+      "Which tyre is flat, the left or the right one?",
+      "Is your engine still running?",
+      "Do you need help to clear the runway?"
+    ],
+    modelAdvice: [
+      "Do not taxi with a flat tyre — you can damage the wheel and the gear leg.",
+      "Shut down the engine and tell the tower your exact position.",
+      "Ask for help to tow the aircraft off the runway.",
+      "Warn other traffic through the controller that the runway is blocked."
+    ],
+    keywords: ["runway", "taxiway", "move", "injured", "damage", "gear", "which", "tyre", "help"]
+  },
+  {
+    id: "ask-015",
+    speaker: "PLT",
+    line: "We had flames from the engine. We shut it down, but we are not sure the fire is out.",
+    context: "Пожар двигателя лёгкого самолёта, двигатель выключен",
+    modelQuestions: [
+      "Can you still see any flames or smoke?",
+      "Did you close the fuel valve?",
+      "What is your altitude and position?",
+      "Do you have a field or an airfield in gliding range?",
+      "How many people are on board?",
+      "Is there any smoke inside the cockpit?",
+      "Are you declaring mayday?"
+    ],
+    modelAdvice: [
+      "Keep the fuel and the electrics off — do not try to restart the engine.",
+      "Glide at your best glide speed and choose the nearest field.",
+      "A sideslip can keep the smoke away from the cockpit.",
+      "Land as soon as possible and get everybody out quickly after landing."
+    ],
+    keywords: ["flames", "smoke", "fuel", "valve", "altitude", "position", "glide", "people", "mayday"]
+  },
+  {
+    id: "ask-016",
+    speaker: "PLT",
+    line: "We have lost our alternator. We are running on the battery only.",
+    context: "Отказ генератора, питание только от аккумулятора",
+    modelQuestions: [
+      "How much battery time do you expect to have?",
+      "Did you try to reset the alternator?",
+      "Which equipment have you switched off?",
+      "Is your radio still working normally?",
+      "How far are you from your destination?",
+      "Is your transponder still on?",
+      "What are your intentions?"
+    ],
+    modelAdvice: [
+      "Switch off all equipment you do not need to save the battery.",
+      "Keep the radio and the transponder on as long as possible.",
+      "Land at the nearest suitable airfield before you lose the radio.",
+      "Tell the controller your plan now, while you still have communication."
+    ],
+    keywords: ["battery", "time", "reset", "alternator", "switch", "radio", "transponder", "destination", "intentions"]
+  },
+  {
+    id: "ask-017",
+    speaker: "PLT",
+    line: "Our oil pressure is dropping and the oil temperature is rising.",
+    context: "Падение давления масла в крейсерском полёте",
+    modelQuestions: [
+      "What is the oil pressure reading now?",
+      "How fast is the pressure dropping?",
+      "Is the engine still running smoothly?",
+      "Can you see any oil on the windshield or the cowling?",
+      "How far is the nearest airfield?",
+      "What is your altitude?",
+      "How many people are on board?"
+    ],
+    modelAdvice: [
+      "Expect the engine to stop — plan for it now.",
+      "Reduce power and turn directly towards the nearest airfield.",
+      "Stay high as long as you can, altitude gives you gliding distance.",
+      "Declare pan-pan now — do not wait until the engine seizes."
+    ],
+    keywords: ["pressure", "reading", "fast", "engine", "oil", "windshield", "airfield", "altitude", "people"]
+  },
+  {
+    id: "ask-018",
+    speaker: "PLT",
+    line: "Our engine has stopped. We are gliding and looking for a field.",
+    context: "Полный отказ двигателя, планирование",
+    modelQuestions: [
+      "What is your altitude and position?",
+      "Did you try to restart the engine?",
+      "What was the reason, fuel or mechanical?",
+      "Have you chosen a field already?",
+      "How many people are on board?",
+      "What is the wind at your position?",
+      "Are you declaring mayday?"
+    ],
+    modelAdvice: [
+      "Hold your best glide speed — do not stretch the glide.",
+      "Choose the field early and plan a normal approach into the wind.",
+      "Try a restart only if you have enough height, then forget the engine.",
+      "Before touchdown, turn off the fuel, the ignition and the master switch, and unlock the canopy."
+    ],
+    keywords: ["altitude", "position", "restart", "reason", "field", "people", "wind", "mayday", "glide"]
+  },
+  {
+    id: "ask-019",
+    speaker: "PLT",
+    line: "Our navigation system has failed. We are flying by map and compass only.",
+    context: "Отказ GPS-навигации в полёте по маршруту",
+    modelQuestions: [
+      "Are you sure of your present position?",
+      "Do you have a paper map on board?",
+      "What is your heading and next waypoint?",
+      "Is the rest of your electrical system working?",
+      "Are you close to any controlled airspace?",
+      "Do you need radar vectors?",
+      "How much fuel do you have?"
+    ],
+    modelAdvice: [
+      "Fly by landmarks — follow a road, a river or a railway if you can.",
+      "Ask the controller for vectors or position information.",
+      "Stay well clear of controlled airspace and the state border.",
+      "If you become unsure of your position, tell the controller early."
+    ],
+    keywords: ["position", "map", "heading", "waypoint", "electrical", "airspace", "vectors", "fuel", "sure"]
+  },
+  {
+    id: "ask-020",
+    speaker: "PLT",
+    line: "The crosswind is too strong for us. We could not land after two attempts.",
+    context: "Сильный боковой ветер, две неудачные попытки посадки",
+    modelQuestions: [
+      "What is the wind speed and direction now?",
+      "What is the maximum crosswind for your aircraft?",
+      "Is there another runway with a better wind direction?",
+      "How much fuel do you have remaining?",
+      "Is there a nearby airfield with a runway into the wind?",
+      "Do you want to hold and wait for the wind to drop?",
+      "How much crosswind experience do you have?"
+    ],
+    modelAdvice: [
+      "Do not force the landing — a go-around was the right decision.",
+      "Divert to an airfield where the runway faces the wind.",
+      "Watch your fuel while holding and set a clear time limit.",
+      "If you must land here, use the longest runway and a wing-low technique."
+    ],
+    keywords: ["wind", "speed", "direction", "maximum", "runway", "fuel", "nearby", "hold", "experience"]
+  },
+  {
+    id: "ask-021",
+    speaker: "PLT",
+    line: "We have flown into cloud and we cannot see the ground any more.",
+    context: "Пилот VFR случайно вошёл в облачность",
+    modelQuestions: [
+      "Are you qualified to fly by instruments?",
+      "What is your altitude?",
+      "Is the aircraft under control and level?",
+      "Do you know the cloud base in your area?",
+      "Is there high terrain or masts near you?",
+      "Do you have an autopilot?",
+      "What was your heading when you entered the cloud?"
+    ],
+    modelAdvice: [
+      "Trust your instruments, not your body — keep the wings level.",
+      "Make a gentle rate-one turn of one hundred and eighty degrees and fly back out.",
+      "Do not descend blindly — check the minimum safe altitude first.",
+      "Tell the controller you are a VFR flight in cloud and ask for help."
+    ],
+    keywords: ["instruments", "qualified", "altitude", "control", "level", "terrain", "autopilot", "heading", "cloud"]
+  },
+  {
+    id: "ask-022",
+    speaker: "PLT",
+    line: "The elevator control feels very stiff. The aircraft is hard to control in pitch.",
+    context: "Затруднённое управление рулём высоты",
+    modelQuestions: [
+      "When did the problem start?",
+      "Can you still climb and descend?",
+      "Does the trim still work?",
+      "Did you check for anything blocking the control stick?",
+      "What is your speed and altitude?",
+      "How does the aircraft behave when you reduce power?",
+      "How far is the nearest long runway?"
+    ],
+    modelAdvice: [
+      "Do not fight the controls with sudden movements — use slow, small inputs.",
+      "Use the trim and engine power to control the pitch.",
+      "Try the control stick carefully through its full travel at a safe altitude.",
+      "Choose a long runway and fly a long, flat final approach."
+    ],
+    keywords: ["when", "climb", "descend", "trim", "blocking", "speed", "altitude", "power", "runway"]
+  },
+  {
+    id: "ask-023",
+    speaker: "PLT",
+    line: "There is oil on the windshield. Our forward view is very poor.",
+    context: "Масло на лобовом стекле, ограниченный обзор",
+    modelQuestions: [
+      "Where is the oil coming from?",
+      "What is your oil pressure and temperature?",
+      "How much of the windshield can you still see through?",
+      "Can you see anything through the side window?",
+      "Is the engine running normally?",
+      "How far is the nearest airfield?",
+      "Do you want priority for landing?"
+    ],
+    modelAdvice: [
+      "Expect an engine problem soon — an oil leak rarely stops by itself.",
+      "Land as soon as possible at the nearest airfield.",
+      "Use the side window and a slight sideslip on final approach to see the runway.",
+      "Declare pan-pan and ask for a straight-in approach."
+    ],
+    keywords: ["where", "oil", "pressure", "temperature", "see", "window", "engine", "airfield", "priority"]
+  },
+  {
+    id: "ask-024",
+    speaker: "PLT",
+    line: "Our airspeed indicator is not working. It shows zero.",
+    context: "Отказ указателя скорости в полёте",
+    modelQuestions: [
+      "When did the indicator fail?",
+      "Could the pitot tube be blocked by ice or an insect?",
+      "Do you have pitot heat, and is it on?",
+      "Are the altimeter and the vertical speed indicator working?",
+      "Do you have a GPS ground speed reading?",
+      "What is the weather at your airfield?",
+      "Are you comfortable landing without the airspeed indicator?"
+    ],
+    modelAdvice: [
+      "Fly by attitude and power — a known power setting gives a known speed.",
+      "Switch on the pitot heat, it may clear the blockage.",
+      "Use the GPS ground speed as a rough check, but remember the wind.",
+      "Fly the final approach a little faster than normal and use a long runway."
+    ],
+    keywords: ["when", "pitot", "blocked", "ice", "heat", "altimeter", "gps", "speed", "weather"]
+  },
+  {
+    id: "ask-025",
+    speaker: "PLT",
+    line: "An aircraft just passed very close to us. We had to turn hard to avoid it.",
+    context: "Опасное сближение в неконтролируемом воздушном пространстве",
+    modelQuestions: [
+      "How close was the other aircraft?",
+      "Did you see what type it was?",
+      "Which direction did it fly after passing you?",
+      "Was it above or below your level?",
+      "Did it appear on your traffic display?",
+      "Is your aircraft under control now, any damage?",
+      "Do you want to file a report about this?"
+    ],
+    modelAdvice: [
+      "Check that your aircraft flies normally after the hard turn.",
+      "Report the other aircraft's position and direction to the controller now.",
+      "Keep a very good lookout — there may be more traffic in the area.",
+      "File an airprox report after landing while you remember the details."
+    ],
+    keywords: ["close", "type", "direction", "above", "below", "traffic", "control", "damage", "report"]
+  },
+  {
+    id: "ask-026",
+    speaker: "PLT",
+    line: "It will be dark soon and we cannot reach our destination. We plan to land in a field.",
+    context: "Приближение темноты, пилот VFR без ночного допуска",
+    modelQuestions: [
+      "How many minutes of daylight do you have left?",
+      "Are you qualified to fly at night?",
+      "Is there any airfield closer than your destination?",
+      "How much fuel do you have?",
+      "Have you already seen a suitable field?",
+      "What is the surface of the field, grass or crops?",
+      "How many people are on board?"
+    ],
+    modelAdvice: [
+      "Decide early — a precautionary landing in daylight is much safer than a forced landing in the dark.",
+      "First check for any small airfield or airstrip within range.",
+      "Fly over the chosen field first and check the surface, the slope and the wires.",
+      "Land into the wind with full flaps at the lowest safe speed, and tell the controller your position before landing."
+    ],
+    keywords: ["daylight", "minutes", "night", "qualified", "airfield", "fuel", "field", "surface", "people"]
+  },
+  {
+    id: "ask-027",
+    speaker: "PLT",
+    line: "We could not put out the fire in the left engine. We are returning to the field.",
+    context: "Экипаж авиалайнера, пожар двигателя не потушен",
+    modelQuestions: [
+      "Is the fire still burning now?",
+      "Did you use all your fire extinguisher bottles?",
+      "How many people do you have on board?",
+      "How much fuel do you have remaining?",
+      "Which runway do you want for landing?",
+      "Will you evacuate on the runway?",
+      "Do you need any other assistance?"
+    ],
+    modelAdvice: [
+      "Land as soon as possible — do not hold to burn off fuel with an open fire.",
+      "Ask for the fire trucks to be ready at the runway.",
+      "Keep the runway for yourself and stop other traffic.",
+      "Be ready for an evacuation on the runway after you stop."
+    ],
+    keywords: ["fire", "burning", "extinguisher", "people", "board", "fuel", "runway", "evacuate", "assistance"]
+  },
+  {
+    id: "ask-028",
+    speaker: "PLT",
+    line: "We have a pressurisation problem. We are starting an emergency descent.",
+    context: "Экипаж авиалайнера, разгерметизация на эшелоне",
+    modelQuestions: [
+      "What is your present level and your target altitude?",
+      "Is everybody on board using oxygen?",
+      "What is your heading during the descent?",
+      "Is anybody injured?",
+      "What was the reason for the pressurisation failure?",
+      "What are your intentions after the descent?",
+      "Do you need a diversion airfield?"
+    ],
+    modelAdvice: [
+      "Descend to a safe altitude where oxygen is not needed, normally ten thousand feet.",
+      "Watch the minimum safe altitude over high terrain.",
+      "The controller should clear the airspace below you.",
+      "After levelling off, check the passengers and decide about a diversion."
+    ],
+    keywords: ["level", "altitude", "oxygen", "heading", "injured", "reason", "intentions", "diversion", "descent"]
+  },
+  // ===================== ATC LINES =====================
+  {
+    id: "ask-029",
+    speaker: "ATC",
+    line: "The airspace ahead of you has been closed. Say your intentions.",
+    context: "Диспетчер сообщает о закрытии воздушного пространства по маршруту",
+    modelQuestions: [
+      "What is the reason for the closure?",
+      "How long will the airspace be closed?",
+      "What are the limits of the closed area?",
+      "Can I fly around it to the north or to the south?",
+      "Can you give me a routing around the area?",
+      "Is my destination airfield still open?",
+      "Can I hold in my present position and wait?"
+    ],
+    modelAdvice: [
+      "I will hold clear of the area while we agree on a new routing.",
+      "Please give me vectors or a route around the closed airspace.",
+      "If the closure is long, I will divert — please tell me which airfields are open.",
+      "Keep me informed, my fuel allows about one hour of holding."
+    ],
+    keywords: ["reason", "closure", "long", "limits", "around", "routing", "destination", "hold", "open"]
+  },
+  {
+    id: "ask-030",
+    speaker: "ATC",
+    line: "We were told you have a sick passenger on board. Confirm his condition.",
+    context: "Диспетчер запрашивает состояние заболевшего пассажира",
+    modelQuestions: [
+      "Who reported this to you?",
+      "Is an ambulance already ordered at the airfield?",
+      "Can I have priority for landing?",
+      "How many minutes until I can expect landing?",
+      "Where will the ambulance meet us after landing?",
+      "Is there a doctor available at the airfield?",
+      "Which runway can I expect?"
+    ],
+    modelAdvice: [
+      "The passenger is conscious but weak — please order an ambulance.",
+      "Give us the shortest possible routing to the runway.",
+      "Ask the medical team to meet us at the parking position.",
+      "I will report again if his condition gets worse."
+    ],
+    keywords: ["who", "ambulance", "priority", "minutes", "landing", "doctor", "runway", "meet", "condition"]
+  },
+  {
+    id: "ask-031",
+    speaker: "ATC",
+    line: "We have lost your radar contact. Report your position and altitude.",
+    context: "Диспетчер потерял метку самолёта на экране",
+    modelQuestions: [
+      "When did you lose my contact?",
+      "Is the problem with my transponder or with your radar?",
+      "Do you want me to recycle the transponder?",
+      "Which squawk code do you want me to set?",
+      "Can you still hear me clearly?",
+      "Do you want position reports at regular intervals?",
+      "Is there any traffic near me that I should know about?"
+    ],
+    modelAdvice: [
+      "I will switch the transponder off and on and set the code again.",
+      "I will report my position over each waypoint until you see me again.",
+      "If my transponder has failed, I request to continue with position reports.",
+      "Please tell me about any traffic, because you cannot see me now."
+    ],
+    keywords: ["when", "transponder", "radar", "recycle", "squawk", "code", "hear", "reports", "traffic"]
+  },
+  {
+    id: "ask-032",
+    speaker: "ATC",
+    line: "The runway is blocked by a disabled aircraft. Expect a delay.",
+    context: "Диспетчер сообщает о занятой полосе перед прилётом",
+    modelQuestions: [
+      "How long do you expect the delay to be?",
+      "What happened to the aircraft on the runway?",
+      "Is there another runway available?",
+      "Can I use the grass strip if you have one?",
+      "Where do you want me to hold?",
+      "What altitude should I hold at?",
+      "Is the nearest alternate airfield open?"
+    ],
+    modelAdvice: [
+      "I can hold for about thirty minutes, then I must divert because of fuel.",
+      "Please tell me immediately when the runway is clear.",
+      "If the delay is longer, I request routing to my alternate.",
+      "I will report my remaining fuel every ten minutes."
+    ],
+    keywords: ["long", "delay", "happened", "another", "runway", "hold", "altitude", "alternate", "fuel"]
+  },
+  {
+    id: "ask-033",
+    speaker: "ATC",
+    line: "Another pilot reported you flying very low over a village. Can you confirm your altitude?",
+    context: "Диспетчер передаёт жалобу на полёт на малой высоте",
+    modelQuestions: [
+      "What time was this report about?",
+      "Which village does the report mention?",
+      "What altitude did the other pilot report?",
+      "Who reported it, a pilot or a person on the ground?",
+      "What is the minimum altitude in this area?",
+      "Is my present altitude correct on your screen?",
+      "Do I need to write a report about this?"
+    ],
+    modelAdvice: [
+      "I am maintaining one thousand five hundred feet — please check my transponder readout.",
+      "If it was another aircraft, I suggest you check the time and position of the report.",
+      "I will note my route and times and can send a written report after landing.",
+      "I will stay well above the minimum altitude for the rest of the flight."
+    ],
+    keywords: ["time", "village", "altitude", "who", "reported", "minimum", "screen", "report", "position"]
+  },
+  {
+    id: "ask-034",
+    speaker: "ATC",
+    line: "We have no recent weather reports from your area. Can you give us your flight conditions?",
+    context: "Диспетчер запрашивает у пилота погоду по маршруту",
+    modelQuestions: [
+      "Which information do you need exactly?",
+      "Do you want the cloud base and the visibility?",
+      "Should I report the wind I calculated at my level?",
+      "Do you also need the temperature?",
+      "Is another aircraft going to fly through this area?",
+      "Do you want me to report again in ten minutes?",
+      "Who should I call with the next report?"
+    ],
+    modelAdvice: [
+      "I can report visibility about ten kilometres, scattered clouds and light turbulence.",
+      "I suggest you warn following traffic about the rain showers to the west.",
+      "I will send you a new report if the conditions change.",
+      "Ask other pilots in the area to confirm my observation."
+    ],
+    keywords: ["information", "cloud", "visibility", "wind", "temperature", "aircraft", "report", "area", "turbulence"]
+  },
+  {
+    id: "ask-035",
+    speaker: "ATC",
+    line: "The airfield will close in thirty minutes because of a thunderstorm. What are your intentions?",
+    context: "Диспетчер предупреждает о скором закрытии аэродрома из-за грозы",
+    modelQuestions: [
+      "From which direction is the storm coming?",
+      "How fast is it moving?",
+      "Can I still land before the closure?",
+      "What is the present wind at the field?",
+      "How long do you expect the airfield to stay closed?",
+      "Which alternate airfields are outside the storm?",
+      "Can I get a direct routing to shorten my flight?"
+    ],
+    modelAdvice: [
+      "If I can land within twenty minutes, give me the shortest routing.",
+      "If not, I will divert now — flying near a thunderstorm is not safe.",
+      "Please pass me the latest weather for the alternates.",
+      "I will report my decision in two minutes after checking my fuel."
+    ],
+    keywords: ["direction", "storm", "fast", "land", "wind", "closed", "alternate", "direct", "routing"]
+  },
+  {
+    id: "ask-036",
+    speaker: "ATC",
+    line: "We are receiving an emergency beacon signal near your position. Can you assist with the search?",
+    context: "Диспетчер просит помочь в поиске источника аварийного маяка",
+    modelQuestions: [
+      "Where exactly is the signal coming from?",
+      "Do you know which aircraft is missing?",
+      "What should I look for on the ground?",
+      "What altitude do you want me to search at?",
+      "How long do you need my assistance?",
+      "Is any rescue helicopter on the way?",
+      "Which frequency should I use to report what I see?"
+    ],
+    modelAdvice: [
+      "I can search for about forty minutes, then I need fuel.",
+      "Give me the area limits and I will fly a search pattern.",
+      "I will report anything unusual — smoke, a light or a parachute.",
+      "Tell the rescue team I can circle over the position I find."
+    ],
+    keywords: ["where", "signal", "missing", "look", "altitude", "search", "long", "helicopter", "frequency"]
+  },
+  {
+    id: "ask-037",
+    speaker: "ATC",
+    line: "Your flight plan for the border crossing has not arrived. Remain outside controlled airspace.",
+    context: "Проблема с планом полёта при пересечении границы",
+    modelQuestions: [
+      "Can you check the flight plan again, it was filed two hours ago?",
+      "Who can I contact to confirm the flight plan?",
+      "Can I file a new flight plan by radio with you?",
+      "Where exactly do you want me to hold?",
+      "How long will the check take?",
+      "Can I land at a nearby airfield and solve it on the ground?",
+      "What happens if I cannot get the clearance today?"
+    ],
+    modelAdvice: [
+      "I will hold outside your airspace over the lake and wait.",
+      "Please try my flight plan with my full registration and departure time.",
+      "If it takes long, I prefer to land at the nearest airfield — my fuel is limited.",
+      "I will not cross the border without your clearance."
+    ],
+    keywords: ["check", "plan", "filed", "contact", "file", "hold", "long", "land", "clearance"]
+  },
+  {
+    id: "ask-038",
+    speaker: "ATC",
+    line: "Be advised, the runway is wet and the previous pilot reported poor braking action.",
+    context: "Диспетчер предупреждает о мокрой полосе и плохом торможении",
+    modelQuestions: [
+      "What type of aircraft made that report?",
+      "How long ago was the report made?",
+      "Is it still raining at the field?",
+      "How long is the runway?",
+      "What is the wind, do I have a tailwind?",
+      "Is there standing water on the runway?",
+      "Is another runway with better conditions available?"
+    ],
+    modelAdvice: [
+      "I will land at the very beginning of the runway with the lowest safe speed.",
+      "I will use gentle braking and keep the stick back after touchdown.",
+      "If the aircraft does not slow down, I will go around early.",
+      "I will report the braking action for the next pilot after landing."
+    ],
+    keywords: ["type", "aircraft", "ago", "raining", "long", "runway", "wind", "tailwind", "water"]
+  },
+  {
+    id: "ask-039",
+    speaker: "ATC",
+    line: "We cannot see your transponder. Check it is switched on.",
+    context: "Диспетчер не видит сигнал транспондера",
+    modelQuestions: [
+      "Which code do you want me to squawk?",
+      "Since when have you not seen my signal?",
+      "Do you see my signal now after I recycled the transponder?",
+      "Do you see other aircraft in my area normally?",
+      "Can I continue in your airspace without a transponder?",
+      "Do you want position reports instead?",
+      "Could the problem be my electrical system?"
+    ],
+    modelAdvice: [
+      "I have switched the transponder off and on and set the code again.",
+      "If it still does not work, I request to continue with position reports.",
+      "I will check my electrical system, the alternator may be the reason.",
+      "I can leave your airspace by the shortest route if a transponder is required."
+    ],
+    keywords: ["code", "squawk", "when", "signal", "recycled", "continue", "reports", "electrical", "airspace"]
+  },
+  {
+    id: "ask-040",
+    speaker: "ATC",
+    line: "The previous aircraft reported many birds on the final approach.",
+    context: "Диспетчер предупреждает о птицах на предпосадочной прямой",
+    modelQuestions: [
+      "What kind of birds are they, large or small?",
+      "Where exactly are the birds, over the fence or on the runway?",
+      "At what height are they flying?",
+      "How long ago was the report?",
+      "Is the airfield doing anything to scare the birds away?",
+      "Did the previous aircraft hit any of them?",
+      "Is another runway free of birds?"
+    ],
+    modelAdvice: [
+      "I will fly the final approach a little higher and be ready to go around.",
+      "Please ask the airfield staff to clear the birds before I arrive.",
+      "If I see a large flock on short final, I will go around and try again.",
+      "I will report the birds' position to you for the next aircraft."
+    ],
+    keywords: ["kind", "birds", "where", "height", "ago", "scare", "hit", "runway", "flock"]
   }
 ];
 
@@ -16555,9 +18135,10 @@ var VOCAB = (function(){
 })();
 var TR_BUILTIN = Object.assign({}, window.DATA_TR_A||{}, window.DATA_TR_B||{}, window.DATA_TR_C||{}, window.DATA_TR_D||{}, window.DATA_TR_E||{});
 var FU_BUILTIN = Object.assign({}, window.DATA_FU_A||{}, window.DATA_FU_B||{}, window.DATA_FU_C||{}, window.DATA_FU_D||{}, window.DATA_FU_E||{});
-var PICTURES = window.DATA_PICTURES||[];
-var LISTENING = window.DATA_LISTENING||[];
+var PICTURES = (window.DATA_PICTURES||[]).concat(window.DATA_PICCOMPARE||[]);
+var LISTENING = (window.DATA_LISTENING||[]).concat(window.DATA_LISTENING_2||[]);
 var RT = window.DATA_RT||[];
+var ASKBACK = window.DATA_ASKBACK||[];
 
 var DEFAULT_PROFILE = "Private pilot, 110 flight hours total, all on Viper SD4 (light single-engine piston, Rotax 912, 2 seats, fixed gear). VFR only. Flies in Belarus and Poland (EASA context). Goal: ICAO Level 4, then EASA PPL conversion and IR.";
 
@@ -16578,6 +18159,7 @@ var vocabState = loadJSON("icao4_vocab",{});
 var listenStats = loadJSON("icao4_listening",{});
 var learnMastery = loadJSON("icao4_learnstate",{}); // word -> 0..2 (2 = выучено)
 var shadowStats = loadJSON("icao4_shadow",{}); // qid -> {done:1, ts}
+var askStats = loadJSON("icao4_ask",{});
 var trCache = loadJSON("icao4_tr",{});
 var rtStats = loadJSON("icao4_rt",{});
 var fuCache = loadJSON("icao4_fu",{});
@@ -16820,7 +18402,9 @@ function renderHome(){
     modeCard("listening","🎧","Listening",LISTENING.length+" диалогов")+
     modeCard("rt","📡","Радиосвязь",RT.length+" сценариев полёта")+
     modeCard("shadow","🗣️","Shadow & Repeat","Заучивание ответов")+
+    modeCard("ask","❓","Задай вопросы",ASKBACK.length+" заданий (Part 2C)")+
     modeCard("mock","🎓","Mock Exam","Симуляция экзамена")+
+    modeCard("guide","📖","Об экзамене","Форматы и тактика")+
     modeCard("phrases","💬","Phrase Bank","Готовые фразы Level 4")+
     modeCard("vocab","🃏","Vocabulary",VOCAB.length+" карточек")+
     modeCard("progress","📊","Прогресс","Оценки по критериям")+
@@ -16833,6 +18417,8 @@ function renderHome(){
       else if(m==="listening")renderListening();
       else if(m==="rt")renderRTList();
       else if(m==="shadow")renderShadowList();
+      else if(m==="ask")renderAskList();
+      else if(m==="guide")renderGuide();
       else if(m==="mock")renderMockIntro();
       else if(m==="phrases")renderPhrases();
       else if(m==="vocab")renderVocab();
@@ -17030,11 +18616,20 @@ function renderPicture(item){
   var body='<div class="card">'+
     '<span class="tag">'+esc(q.category)+'</span>'+
     '<img class="pic" src="'+esc(q.imageUrl)+'" alt="aviation picture" loading="lazy">'+
+    (q.imageUrl2?'<img class="pic" src="'+esc(q.imageUrl2)+'" alt="aviation picture 2" loading="lazy">':'')+
     '<div class="muted" style="font-size:11px">'+esc(q.attribution)+'</div>'+
     '<div class="qtext">'+esc(q.prompt)+'</div>'+
     '<div class="btnrow" style="margin-top:4px"><button class="btn sec small" id="trBtn">🇷🇺 Перевод</button></div>'+
     '<div id="trBox" class="trbox" style="display:none"></div>'+
     '<details><summary style="font-size:14px">Подсказка: план ответа</summary><div class="inner"><ol>'+steps+'</ol></div></details>'+
+    '<details><summary style="font-size:14px">Как строить рассказ (тактика экзамена)</summary><div class="inner"><ol>'+
+      '<li>Начните с главного события: «This is a picture of a runway excursion»</li>'+
+      '<li>Тип ВС: пассажирский / грузовой / учебный / вертолёт</li>'+
+      '<li>Положение: в воздухе, на земле, на ВПП, на стоянке</li>'+
+      '<li>Люди и техника вокруг</li>'+
+      '<li>Передний план → задний план</li>'+
+      '<li>Погода и время суток</li>'+
+      '<li>Чем больше деталей — тем лучше оценка</li></ol></div></details>'+
     '<label>Ваше описание (1.5–2 минуты речи):</label>'+
     '<textarea id="answer" placeholder="Tap the mic and describe the picture..."></textarea>'+
     '<div class="btnrow">'+
@@ -17697,6 +19292,7 @@ function renderListening(item){
     p.onclick=function(){ listenState.cat=p.dataset.c; renderListening(); };
   });
   appEl.appendChild(pr);
+  if(t.type==="repeat"){ renderListenRepeat(t); return; }
   var qhtml=t.questions.map(function(qq,qi){
     return '<div class="lq" data-qi="'+qi+'"><div style="font-weight:600;margin-top:12px">'+(qi+1)+'. '+esc(qq.q)+'</div>'+
       qq.options.map(function(o,oi){
@@ -17757,6 +19353,142 @@ function renderListening(item){
       toggleTranslate(t.id+":d",full,trs.querySelector("#trTrsBox"),this);
     };
   };
+}
+
+/* ---------- listening: repeat (readback на слух) ---------- */
+function renderListenRepeat(t){
+  var target=t.dialog[0].text;
+  var card=el('<div class="card">'+
+    '<span class="tag">'+esc(t.category)+'</span> <span class="muted">'+diffDots(t.difficulty)+'</span>'+
+    '<div class="qtext">'+esc(t.title)+'</div>'+
+    '<div class="muted" style="font-size:13px">Прослушайте указание диспетчера и повторите его дословно (readback). Цифры — самое важное.</div>'+
+    '<div class="btnrow">'+
+      '<button class="btn" id="playBtn">▶ Прослушать</button>'+
+      '<select id="rateSel" style="width:auto"><option value="0.75">0.75×</option><option value="0.9">0.9×</option><option value="1">1×</option></select>'+
+    '</div>'+
+    '<label>Ваш повтор:</label>'+
+    '<textarea id="rAns" style="min-height:70px"></textarea>'+
+    '<div class="btnrow">'+micBtnHtml("rMic")+
+      '<button class="btn" id="rCheck">Проверить</button>'+
+      '<button class="btn sec" id="nextBtn">Другое</button></div>'+
+    '<div class="overall" style="display:none" id="rScoreBox">Совпадение: <span id="rScore"></span></div>'+
+    '<div id="rDiff" style="line-height:1.8"></div>'+
+    '<div id="rTrs" style="display:none"></div>'+
+  '</div>');
+  appEl.appendChild(card);
+  card.querySelector("#rateSel").value=String(listenState.rate<=1?listenState.rate:0.9);
+  card.querySelector("#rateSel").onchange=function(){ listenState.rate=parseFloat(this.value); };
+  card.querySelector("#playBtn").onclick=function(){ playDialog(t.dialog,listenState.rate); };
+  card.querySelector("#rMic").onclick=function(){ speechSynthesis.cancel(); toggleMic(card.querySelector("#rAns"),this); };
+  card.querySelector("#nextBtn").onclick=function(){ renderListening(); };
+  card.querySelector("#rCheck").onclick=function(){
+    stopMic();
+    var spoken=card.querySelector("#rAns").value.trim();
+    if(!spoken){ card.querySelector("#rDiff").innerHTML='<span class="err">Скажите или введите повтор.</span>'; return; }
+    var r=shadowCompare(target,spoken);
+    var pct=Math.round(r.score*100), ok=r.score>=0.75;
+    card.querySelector("#rScoreBox").style.display="";
+    card.querySelector("#rScore").innerHTML='<span class="'+(ok?"s-good":(pct>=50?"s-warn":"s-bad"))+'">'+pct+'%'+(ok?" ✓":"")+'</span>';
+    card.querySelector("#rDiff").innerHTML=r.html;
+    var kp=(t.keyPhrases||[]).map(function(k){return '<span class="tag">'+esc(k)+'</span>';}).join("");
+    card.querySelector("#rTrs").innerHTML='<h3 class="sub">Оригинал</h3><div class="phrase"><b>ATC:</b> '+esc(target)+'</div>'+
+      (kp?'<h3 class="sub">Обязательные элементы</h3><div>'+kp+'</div>':'');
+    card.querySelector("#rTrs").style.display="";
+    listenStats[t.id]={score:ok?3:(pct>=40?1:0),total:3,ts:Date.now()};
+    saveJSON("icao4_listening",listenStats);
+    dailyDone(t.id);
+  };
+}
+
+/* ---------- ask mode («Задай вопросы», TEA Part 2C) ---------- */
+function renderAskList(){
+  stopMic(); speechSynthesis.cancel();
+  setScreen("Задай вопросы",true);
+  var done=Object.keys(askStats).length;
+  appEl.appendChild(el('<div class="card muted" style="font-size:13px">Формат из реального экзамена (Part 2C): вы слышите реплику пилота или диспетчера с проблемой. Ваша задача — за ~30 секунд задать как можно больше уместных вопросов, а затем дать совет говорящему. Тренирует критерий Interaction.</div>'));
+  appEl.appendChild(el('<div class="card"><b>Пройдено: '+done+' из '+ASKBACK.length+'</b><div class="progress-bar" style="margin-top:6px"><div style="width:'+Math.round(done/ASKBACK.length*100)+'%"></div></div></div>'));
+  var rows=ASKBACK.map(function(t){
+    return '<div class="drow" data-id="'+esc(t.id)+'"><span style="flex:1;padding-right:8px">'+(askStats[t.id]?"✅ ":"")+(t.speaker==="PLT"?"🧑‍✈️":"🎧")+' '+esc(t.context)+'</span><b>→</b></div>';
+  }).join("");
+  var c=el('<div class="card">'+rows+'</div>');
+  c.querySelectorAll(".drow").forEach(function(r){
+    r.onclick=function(){ renderAsk(findById(ASKBACK,r.dataset.id)); };
+  });
+  appEl.appendChild(c);
+}
+function renderAsk(t){
+  stopMic(); speechSynthesis.cancel();
+  setScreen("Задай вопросы",true);
+  var card=el('<div class="card">'+
+    '<span class="tag">'+(t.speaker==="PLT"?"🧑‍✈️ Говорит пилот":"🎧 Говорит диспетчер")+'</span>'+
+    '<div class="muted" style="font-size:13px;margin-top:6px">'+esc(t.context)+'</div>'+
+    '<div class="btnrow" style="margin-top:8px"><button class="btn" id="aPlay">🔊 Реплика</button>'+
+    '<span class="overall" style="margin:0;padding:8px 14px" id="aTimer">30</span></div>'+
+    '<label>1. Ваши вопросы говорящему (чем больше уместных — тем лучше):</label>'+
+    '<textarea id="aQ" placeholder="What is...? Can you...? Do you...?"></textarea>'+
+    '<div class="btnrow">'+micBtnHtml("aQMic")+'</div>'+
+    '<label>2. Ваш совет говорящему:</label>'+
+    '<textarea id="aA" style="min-height:80px" placeholder="I would advise you to..."></textarea>'+
+    '<div class="btnrow">'+micBtnHtml("aAMic")+
+      '<button class="btn" id="aCheck">Готово — сравнить</button>'+
+      '<button class="btn sec" id="aBack">К списку</button></div>'+
+    '<div id="aRes"></div></div>');
+  appEl.appendChild(card);
+  var timerEl=card.querySelector("#aTimer"), tLeft=30, tInt=null;
+  function startTimer(){
+    if(tInt)clearInterval(tInt);
+    tLeft=30; timerEl.textContent=tLeft; timerEl.style.color="";
+    tInt=setInterval(function(){
+      tLeft--; timerEl.textContent=tLeft>0?tLeft:"⏱";
+      if(tLeft<=5)timerEl.style.color="var(--bad)";
+      if(tLeft<=0)clearInterval(tInt);
+    },1000);
+  }
+  card.querySelector("#aPlay").onclick=function(){
+    playDialog([{speaker:t.speaker==="PLT"?"PLT":"ATC",text:t.line}],0.95);
+    startTimer();
+  };
+  card.querySelector("#aQMic").onclick=function(){ speechSynthesis.cancel(); toggleMic(card.querySelector("#aQ"),this); };
+  card.querySelector("#aAMic").onclick=function(){ speechSynthesis.cancel(); toggleMic(card.querySelector("#aA"),this); };
+  card.querySelector("#aBack").onclick=renderAskList;
+  card.querySelector("#aCheck").onclick=function(){
+    stopMic(); if(tInt)clearInterval(tInt);
+    var uq=card.querySelector("#aQ").value.trim(), ua=card.querySelector("#aA").value.trim();
+    if(!uq){ card.querySelector("#aRes").innerHTML='<div class="err">Сначала задайте хотя бы пару вопросов.</div>'; return; }
+    var norm=normAns(uq+" "+ua);
+    var hit=t.keywords.filter(function(k){ return norm.indexOf(k)>=0; });
+    var nQ=(uq.match(/\?/g)||[]).length || uq.split(/\n/).filter(function(x){return x.trim();}).length;
+    var pct=Math.round(hit.length/t.keywords.length*100);
+    askStats[t.id]={done:1,ts:Date.now()};
+    saveJSON("icao4_ask",askStats);
+    var html='<div class="overall">Вопросов: <b>'+nQ+'</b> · покрытие тем: <span class="'+(pct>=60?"s-good":(pct>=30?"s-warn":"s-bad"))+'">'+hit.length+' из '+t.keywords.length+'</span></div>'+
+      '<div class="muted" style="font-size:13px">Затронуто: '+hit.map(esc).join(", ")+'</div>'+
+      '<h3 class="sub">Реплика была</h3><div class="phrase">'+esc(t.line)+'</div>'+
+      '<h3 class="sub">Образцовые вопросы</h3><ul>'+t.modelQuestions.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+'</ul>'+
+      '<h3 class="sub">Образцовый совет</h3><ul>'+t.modelAdvice.map(function(x){return "<li>"+esc(x)+"</li>";}).join("")+'</ul>'+
+      '<div class="btnrow"><button class="btn" id="aNext">Следующее →</button></div>';
+    card.querySelector("#aRes").innerHTML=html;
+    card.querySelector("#aRes").querySelector("#aNext").onclick=function(){
+      var fresh=ASKBACK.filter(function(x){return !askStats[x.id];});
+      renderAsk(fresh.length?fresh[Math.floor(Math.random()*fresh.length)]:ASKBACK[Math.floor(Math.random()*ASKBACK.length)]);
+    };
+  };
+}
+
+/* ---------- exam guide ---------- */
+function renderGuide(){
+  setScreen("Об экзамене",true);
+  appEl.appendChild(el('<div class="card muted" style="font-size:13px">Конспект форматов ICAO LPR-экзамена из ваших материалов (EPAP / TEC / TEA). Формат зависит от организации, где сдаёте, но части везде похожи.</div>'));
+  var blocks=[
+    ["Структура экзамена","<b>Part A / Section 1 — Interview:</b> личные вопросы и мнения (наш режим Interview).<br><b>Part B / Section 2 — Audio comprehension:</b> прослушивание записей с вопросами (Listening, «Кто говорит?», «Повтори на слух», «Задай вопросы»).<br><b>Part C / Section 3 — Picture description:</b> описание и сравнение картинок + дискуссия (Picture)."],
+    ["EPAP формат","6–7 аудиозаписей: ATIS, клиренсы, нештатные ситуации, readback. Вопросы показывают на экране ДО прослушивания — читайте их заранее и слушайте прицельно. Могут попросить дословно повторить запись. Картинки на экране, после описания — минимум 2 вопроса."],
+    ["TEC формат","Часть 1: 2 короткие записи, экзаменатор отворачивается (имитация радио), вопросы говорят заранее. Часть 2: одна длинная запись — пересказ + вопросы. Картинка остаётся перед вами, ответы записываются на аудио/видео."],
+    ["TEA формат","2A: 6 коротких записей, к каждой два вопроса: «What was the message?» и «Who was speaking — pilot or controller?». Можно попросить второе прослушивание. 2B: 4 записи длиннее — пересказать С ДЕТАЛЯМИ (неполный пересказ снижает оценку), дают бумагу для заметок. 2C: 3 записи — задать как можно больше вопросов за ~20 сек + дать совет говорящему. Картинки: 30 сек на описание, потом сравнение двух картинок и дискуссия."],
+    ["Тактика","· Конспектируйте во время прослушивания — это разрешено и ожидаемо.<br>· Не отвечайте раньше, чем экзаменатор задал вопрос.<br>· Просите второе прослушивание, если разрешено — это не штрафуется.<br>· В описании картинки: сначала главное событие, потом детали. Больше деталей = выше оценка.<br>· Молчание — худшая пауза. Используйте фразы из Phrase Bank (Well, let me see…).<br>· Итоговый уровень = самый слабый критерий из шести. Провал одного критерия валит весь экзамен."]
+  ];
+  blocks.forEach(function(b){
+    appEl.appendChild(el('<details><summary>'+esc(b[0])+'</summary><div class="inner" style="line-height:1.7">'+b[1]+'</div></details>'));
+  });
 }
 
 /* ---------- phrases ---------- */
