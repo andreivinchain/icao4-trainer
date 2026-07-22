@@ -18827,6 +18827,56 @@ function parseAI(text){
   return JSON.parse(t.slice(a,b+1));
 }
 function scoreClass(s){ return s>=4?"s-good":(s>=3?"s-warn":"s-bad"); }
+
+/* ---------- офлайн-разбор ответа (без API-ключа) ---------- */
+var LINKERS=["because","so","then","first","after","finally","however","also","before","when","if","would","should","opinion","think","example","therefore","but","usually"];
+function coverageOf(q,ans){
+  var model=q.level4Answer||"";
+  var na=" "+normAns(ans)+" ";
+  var uniq={};
+  normAns(model).split(" ").forEach(function(w){ if(w.length>3)uniq[w]=1; });
+  var mset=Object.keys(uniq);
+  if(!mset.length)return 0;
+  var cover=mset.filter(function(w){return na.indexOf(" "+w+" ")>=0;}).length;
+  return Math.round(cover/mset.length*100);
+}
+function offlineReview(q,mode,ans,card,fb){
+  var words=ans.split(/\s+/).filter(Boolean).length;
+  var sents=splitSentences(ans).length;
+  var na=" "+normAns(ans)+" ";
+  var terms=(q.vocabulary||[]).map(function(v){return normAns(v.term);}).filter(Boolean);
+  var hitTerms=terms.filter(function(t){return na.indexOf(t)>=0;});
+  var links=LINKERS.filter(function(l){return na.indexOf(" "+l+" ")>=0;});
+  var cov=coverageOf(q,ans);
+  var lenOk=words>=50&&words<=140, sentOk=sents>=5;
+  attempts.push({qid:q.id,mode:mode,answer:ans,offline:true,ts:Date.now()});
+  saveJSON("icao4_attempts",attempts);
+  dailyDone(q.id);
+  var fus=q.followUps||q.examinerQuestions||[];
+  var fu=fus.length?fus[Math.floor(Math.random()*fus.length)]:null;
+  var fuIdx=fu?fus.indexOf(fu):-1;
+  var html='<div class="feedback">'+
+    '<div class="overall">Офлайн-разбор <span class="muted" style="font-weight:400;font-size:13px">(AI-оценка по критериям — с API-ключом)</span></div>'+
+    '<div class="score-grid">'+
+      '<div class="score"><div class="n '+(lenOk&&sentOk?"s-good":"s-warn")+'">'+words+'</div><div class="l">слов · '+sents+' предл. <span class="muted">(цель: 6–10 предл., 60–120 слов)</span></div></div>'+
+      '<div class="score"><div class="n '+(cov>=40?"s-good":(cov>=20?"s-warn":"s-bad"))+'">'+cov+'%</div><div class="l">покрытие тем образца</div></div>'+
+      '<div class="score"><div class="n '+(links.length>=3?"s-good":"s-warn")+'">'+links.length+'</div><div class="l">связок (because, then, however…)</div></div>'+
+      '<div class="score"><div class="n '+(hitTerms.length>=2?"s-good":"s-warn")+'">'+hitTerms.length+'/'+terms.length+'</div><div class="l">ключевой лексики вопроса</div></div>'+
+    '</div>';
+  if(/[а-яё]/i.test(ans)) html+='<div class="err">В ответе есть русские слова — на экзамене только английский!</div>';
+  html+='<h3>Сравните с образцом</h3><div class="model-answer">'+esc(q.level4Answer)+'</div>'+
+    '<div class="btnrow" style="margin-top:4px"><button class="btn sec small" id="offTts">🔊</button></div>'+
+    '<h3>Чек-лист самооценки</h3><ul style="font-size:14px">'+
+    '<li>Ответил ли я на сам вопрос? (Comprehension)</li>'+
+    '<li>Прошедшее время с -ed, would/could для гипотез? (Structure)</li>'+
+    '<li>Говорил без длинных пауз, со связками? (Fluency)</li>'+
+    '<li>Хватило ли слов, не переходил на простейшие? (Vocabulary)</li></ul>';
+  if(fu) html+='<h3>Follow-up от экзаменатора</h3><div class="fulink" id="offFu">'+esc(fu)+' <span class="muted">→ потренировать</span></div>';
+  html+='</div>';
+  fb.innerHTML=html;
+  var tb=fb.querySelector("#offTts"); if(tb)tb.onclick=function(){ speak(q.level4Answer); };
+  var fl=fb.querySelector("#offFu"); if(fl)fl.onclick=function(){ renderFollowUp(q,mode,fu,fuIdx); };
+}
 function renderFeedback(r,overall){
   var sg='<div class="score-grid">'+CRITERIA.map(function(c){
     var s=r.scores[c.key];
@@ -18850,9 +18900,7 @@ function checkAnswer(q,mode,card,imageUrl){
   var ans=card.querySelector("#answer").value.trim();
   var fb=card.querySelector("#fbBox");
   if(ans.split(/\s+/).length<15){ fb.innerHTML='<div class="err">Слишком короткий ответ. Постарайтесь дать 6–10 предложений (минимум ~15 слов).</div>'; return; }
-  if(!settings.apiKey.trim()){
-    fb.innerHTML='<div class="err">Не задан API-ключ. Откройте Настройки и вставьте ключ Anthropic или OpenAI.</div>'; return;
-  }
+  if(!settings.apiKey.trim()){ offlineReview(q,mode,ans,card,fb); return; }
   var btn=card.querySelector("#checkBtn");
   btn.disabled=true;
   fb.innerHTML='<div class="muted" style="margin-top:10px"><span class="spinner"></span> Экзаменатор оценивает ответ…</div>';
@@ -18912,7 +18960,6 @@ function pickN(arr,n){
   return out;
 }
 function startMock(){
-  if(!settings.apiKey.trim()){ alert("Для Mock Exam нужен API-ключ (Настройки)."); return; }
   var iv=pickN(ALL_INTERVIEW,3), pc=pickN(PICTURES,1), em=pickN(ALL_EMERGENCY,2);
   mock={tasks:[],idx:0,answers:[],started:Date.now()};
   iv.forEach(function(q){mock.tasks.push({part:"Part 1 — Interview",mode:"interview",q:q});});
@@ -18947,7 +18994,28 @@ function renderMockTask(){
     else finishMock();
   };
 }
+function finishMockOffline(){
+  setScreen("Mock Exam — самопроверка",true);
+  var html='<div class="card feedback">'+
+    '<div class="overall">Экзамен пройден — сравните себя с образцами</div>'+
+    '<div class="muted" style="font-size:13px">Без API-ключа оценку 1–6 по критериям поставить нельзя, но главное — вы отговорили все части подряд, как на реальном экзамене.</div>';
+  mock.tasks.forEach(function(t,i){
+    var q=t.q, ans=mock.answers[i];
+    var wc=ans.split(/\s+/).filter(Boolean).length;
+    var cov=q.level4Answer?coverageOf(q,ans):null;
+    html+='<h3>Task '+(i+1)+' · '+esc(t.part)+'</h3>'+
+      '<div class="muted" style="font-size:13px">'+wc+' слов'+(cov!==null?' · покрытие тем образца: <b class="'+(cov>=40?"s-good":"s-warn")+'">'+cov+'%</b>':'')+'</div>'+
+      '<details><summary style="font-size:14px">Ваш ответ</summary><div class="inner">'+esc(ans)+'</div></details>'+
+      (q.level4Answer?'<details><summary style="font-size:14px">Образец L4</summary><div class="inner">'+esc(q.level4Answer)+'</div></details>':'');
+  });
+  html+='<div class="btnrow"><button class="btn" id="mockAgain">Ещё раз</button><button class="btn sec" id="mockHome">На главную</button></div></div>';
+  appEl.innerHTML="";
+  appEl.appendChild(el(html));
+  appEl.querySelector("#mockAgain").onclick=renderMockIntro;
+  appEl.querySelector("#mockHome").onclick=renderHome;
+}
 function finishMock(){
+  if(!settings.apiKey.trim()){ finishMockOffline(); return; }
   setScreen("Mock Exam — результат",true);
   appEl.appendChild(el('<div class="card"><div class="muted"><span class="spinner"></span> Экзаменатор оценивает все ответы… (~30–60 сек)</div></div>'));
   var parts=mock.tasks.map(function(t,i){
@@ -19149,10 +19217,20 @@ function rtCheck(st,card){
   if(ans.split(/\s+/).length<3){ fb.innerHTML='<div class="err">Слишком короткая передача.</div>'; return; }
   var sc=rtState.sc;
   if(!settings.apiKey.trim()){
-    // офлайн-режим: самопроверка по образцу
-    rtState.results.push({phase:st.phase,verdict:"self"});
-    fb.innerHTML='<div class="model-answer"><b>Образец:</b> '+esc(st.expected)+'</div>'+
-      '<div class="muted" style="font-size:13px">Обязательные элементы: '+st.mustInclude.map(esc).join(", ")+'. Сравните сами (для AI-проверки нужен ключ в Настройках).</div>'+rtNextHtml();
+    // офлайн-проверка: совпадение слов + сверка цифр
+    var r=shadowCompare(st.expected,ans);
+    var dExp=digitsOf(st.expected), dAns=digitsOf(ans);
+    var digitsOk=!dExp||dExp===dAns;
+    var verdict=(r.score>=0.6&&digitsOk)?"good":((r.score>=0.35||digitsOk)?"partial":"poor");
+    rtState.results.push({phase:st.phase,verdict:verdict});
+    var vcls=verdict==="good"?"s-good":(verdict==="partial"?"s-warn":"s-bad");
+    var vlbl=verdict==="good"?"✓ Принято":(verdict==="partial"?"± Частично":"✗ Неверно");
+    fb.innerHTML='<div class="overall"><span class="'+vcls+'">'+vlbl+'</span> <span class="muted" style="font-weight:400">совпадение '+Math.round(r.score*100)+'%'+
+      (dExp?(digitsOk?' · цифры верны ✓':' · <b class="s-bad">цифры не совпали!</b>'):'')+'</span></div>'+
+      '<div style="line-height:1.8">'+r.html+'</div>'+
+      (!digitsOk?'<div class="err">В образце цифры: '+esc(dExp)+', у вас: '+esc(dAns||"—")+'. Readback цифр — критичен.</div>':'')+
+      '<div class="muted" style="font-size:13px;margin-top:6px">Обязательные элементы: '+st.mustInclude.map(esc).join(", ")+'</div>'+
+      rtNextHtml();
     rtBindNext(fb); return;
   }
   var btn=card.querySelector("#txBtn"); btn.disabled=true;
@@ -19192,17 +19270,16 @@ function finishRT(){
   var sc=rtState.sc, res=rtState.results;
   var good=res.filter(function(r){return r.verdict==="good";}).length;
   var partial=res.filter(function(r){return r.verdict==="partial";}).length;
-  var selfMode=res.some(function(r){return r.verdict==="self";});
-  var pct=selfMode?100:Math.round((good+partial*0.5)/res.length*100);
-  if(!selfMode){ rtStats[sc.id]={pct:pct,ts:Date.now()}; saveJSON("icao4_rt",rtStats); }
+  var pct=Math.round((good+partial*0.5)/res.length*100);
+  rtStats[sc.id]={pct:pct,ts:Date.now()}; saveJSON("icao4_rt",rtStats);
   dailyDone(sc.id);
   setScreen("Полёт завершён",true);
   var rows=res.map(function(r,i){
-    var v=r.verdict==="good"?'<b class="s-good">✓</b>':(r.verdict==="partial"?'<b class="s-warn">±</b>':(r.verdict==="self"?'<b class="muted">—</b>':'<b class="s-bad">✗</b>'));
+    var v=r.verdict==="good"?'<b class="s-good">✓</b>':(r.verdict==="partial"?'<b class="s-warn">±</b>':'<b class="s-bad">✗</b>');
     return '<div class="attempt">'+v+' '+(i+1)+'. '+esc(r.phase)+'</div>';
   }).join("");
   appEl.appendChild(el('<div class="card">'+
-    '<div class="overall">'+esc(sc.title)+(selfMode?'':': <span class="'+(pct>=80?"s-good":(pct>=50?"s-warn":"s-bad"))+'">'+pct+'%</span>')+'</div>'+
+    '<div class="overall">'+esc(sc.title)+': <span class="'+(pct>=80?"s-good":(pct>=50?"s-warn":"s-bad"))+'">'+pct+'%</span></div>'+
     rows+
     '<div class="btnrow"><button class="btn" id="rtAgain">Ещё раз</button>'+
     '<button class="btn sec" id="rtList">К сценариям</button></div></div>'));
@@ -20105,7 +20182,7 @@ function renderSettings(){
   var c=el('<div class="card">'+
     '<label>AI-провайдер</label>'+
     '<select id="sProv"><option value="anthropic">Anthropic (Claude)</option><option value="openai">OpenAI</option></select>'+
-    '<label>API-ключ</label><input id="sKey" type="password" placeholder="sk-...">'+
+    '<label>API-ключ (необязательно: без него всё работает в офлайн-режиме, ключ добавляет AI-оценку 1–6 по критериям ICAO)</label><input id="sKey" type="password" placeholder="sk-...">'+
     '<label>Модель (пусто = по умолчанию: claude-sonnet-5 / gpt-4o-mini)</label><input id="sModel" placeholder="claude-sonnet-5">'+
     '<label>Профиль пилота (AI использует его при оценке и в образцах)</label>'+
     '<textarea id="sProfile"></textarea>'+
