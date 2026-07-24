@@ -22287,7 +22287,11 @@ function renderSeraStep(){
     '<span class="tag">'+esc(it.sec)+'</span> <span class="tag">'+(isPlt?"🧑‍✈️ Ваша фраза":"↩ Ваш readback")+'</span>'+
     '<div class="qtext" style="font-size:16px">'+esc(it.circ)+'</div>'+
     (!isPlt?'<div class="btnrow"><button class="btn sec small" id="sdPlay">🔊 Реплика ATC</button></div>':'')+
-    '<details style="margin-top:6px"><summary style="font-size:13px">💡 Шаблон</summary><div class="inner" style="font-family:monospace;font-size:13px">'+esc(it.template)+'</div></details>'+
+    '<details style="margin-top:6px"><summary style="font-size:13px">💡 Подсказка</summary><div class="inner">'+
+      '<div style="font-family:monospace;font-size:13px">'+esc(it.template)+'</div>'+
+      '<div class="model-answer" style="margin-top:6px">'+esc(target)+'</div>'+
+      '<div class="btnrow" style="margin-top:4px"><button class="btn sec small" id="sdHintSay">🔊 Послушать</button></div>'+
+    '</div></details>'+
     '<label>Ваша передача:</label><textarea id="answer" style="min-height:70px"></textarea>'+
     '<div class="btnrow">'+micBtnHtml("sdMic")+
       '<button class="btn" id="sdCheck">Проверить</button>'+
@@ -22299,6 +22303,7 @@ function renderSeraStep(){
     setTimeout(function(){ playDialog([{speaker:"ATC",text:personalize(it.example)}],0.9); },350);
   }
   card.querySelector("#sdMic").onclick=function(){ speechSynthesis.cancel(); toggleMic(card.querySelector("#answer"),this); };
+  card.querySelector("#sdHintSay").onclick=function(){ speechSynthesis.cancel(); speak(target); };
   card.querySelector("#sdExit").onclick=renderSeraDrill;
   card.querySelector("#sdCheck").onclick=function(){
     stopMic();
@@ -22362,7 +22367,11 @@ function renderRTStep(){
     (st.atcText?('<div class="btnrow" style="margin-top:6px"><button class="btn sec small" id="atcPlay">🔊 ATC</button>'+
       '<button class="btn sec small" id="atcShow">Текст ATC</button></div>'+
       '<div id="atcBox" class="trbox" style="display:none"></div>'):'')+
-    (st.tip?'<details style="margin-top:8px"><summary style="font-size:14px">💡 Подсказка</summary><div class="inner">'+esc(st.tip)+'</div></details>':'')+
+    '<details style="margin-top:8px"><summary style="font-size:14px">💡 Подсказка</summary><div class="inner">'+
+      (st.tip?esc(st.tip):'')+
+      '<div class="model-answer" style="margin-top:6px">'+esc(st.expected)+'</div>'+
+      '<div class="btnrow" style="margin-top:4px"><button class="btn sec small" id="hintSay">🔊 Послушать</button></div>'+
+    '</div></details>'+
     '<label>Ваша передача:</label>'+
     '<textarea id="answer" style="min-height:80px" placeholder="Nadawaj! Say your transmission..."></textarea>'+
     '<div class="btnrow">'+micBtnHtml("micBtn")+
@@ -22379,6 +22388,7 @@ function renderRTStep(){
     setTimeout(function(){ playDialog([{speaker:"ATC",text:st.atcText}],0.9); },400);
   }
   card.querySelector("#micBtn").onclick=function(){ toggleMic(card.querySelector("#answer"),this); };
+  card.querySelector("#hintSay").onclick=function(){ speechSynthesis.cancel(); speak(st.expected); };
   card.querySelector("#txBtn").onclick=function(){ rtCheck(st,card); };
 }
 function rtNextHtml(){
