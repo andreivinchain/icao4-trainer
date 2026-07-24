@@ -24599,6 +24599,7 @@ function renderHome(){
     modeCard("rt","📡","Радиосвязь",RT.length+" сценариев полёта")+
     modeCard("shadow","🗣️","Shadow & Repeat","Заучивание ответов")+
     modeCard("ask","❓","Задай вопросы",ASKBACK.length+" заданий (Part 2C)")+
+    modeCard("liveatc","📻","Live ATC","Реальный эфир: Варшава, Вильнюс…")+
     modeCard("numbers","🔢","Цифры и частоты","Дриллы на слух и голосом")+
     modeCard("pron","👄","Произношение",PRON.length+" трудных слов")+
     modeCard("mock","🎓","Mock Exam","Симуляция экзамена")+
@@ -24616,6 +24617,7 @@ function renderHome(){
       else if(m==="rt")renderRTList();
       else if(m==="shadow")renderShadowList();
       else if(m==="ask")renderAskList();
+      else if(m==="liveatc")renderLiveATC();
       else if(m==="numbers")renderNumbers();
       else if(m==="pron")renderPron();
       else if(m==="guide")renderGuide();
@@ -25257,18 +25259,18 @@ function rtTabs(active){
 }
 /* --- Live ATC (реальный эфир, нужен интернет) --- */
 var LIVEATC=[
-  {name:"Warsaw Approach (EPWA)",loc:"Варшава 🇵🇱 — ваш регион!",mount:"epwa_app",icao:"epwa"},
-  {name:"Boston Tower (KBOS)",loc:"Бостон 🇺🇸 — топ-1 фид",mount:"kbos_twr",icao:"kbos"},
-  {name:"JFK Tower (KJFK)",loc:"Нью-Йорк 🇺🇸 — легендарный",mount:"kjfk_twr",icao:"kjfk"},
-  {name:"JFK Ground (KJFK)",loc:"Нью-Йорк 🇺🇸 — руление",mount:"kjfk_gnd",icao:"kjfk"},
-  {name:"Dublin (EIDW)",loc:"Дублин 🇮🇪 — Del/Gnd/Twr/App",mount:"eidw2",icao:"eidw"},
-  {name:"Amsterdam Tower (EHAM)",loc:"Амстердам 🇳🇱",mount:"eham_twr",icao:"eham"},
-  {name:"Zurich Tower (LSZH)",loc:"Цюрих 🇨🇭",mount:"lszh_twr",icao:"lszh"},
-  {name:"Geneva Tower (LSGG)",loc:"Женева 🇨🇭",mount:"lsgg_twr",icao:"lsgg"},
-  {name:"Chicago O'Hare Tower (KORD)",loc:"Чикаго 🇺🇸 — очень быстрый темп",mount:"kord_twr",icao:"kord"},
-  {name:"LAX Tower (KLAX)",loc:"Лос-Анджелес 🇺🇸",mount:"klax_twr",icao:"klax"},
-  {name:"SFO Tower (KSFO)",loc:"Сан-Франциско 🇺🇸",mount:"ksfo_twr",icao:"ksfo"},
-  {name:"Atlanta Tower (KATL)",loc:"Атланта 🇺🇸 — самый загруженный",mount:"katl_twr",icao:"katl"}
+  {name:"Warsaw Approach (EPWA)",loc:"Варшава 🇵🇱 — ваш регион, ваши диспетчеры",mount:"epwa_app",icao:"epwa"},
+  {name:"Warsaw Tower (EPWA)",loc:"Варшава 🇵🇱 — вышка Окенце",mount:"epwa_twr2",icao:"epwa"},
+  {name:"Kraków Approach (EPKK)",loc:"Краков 🇵🇱",mount:"epkk_app",icao:"epkk"},
+  {name:"Vilnius (EYVI)",loc:"Вильнюс 🇱🇹 — ближайший к Минску эфир",mount:"eyvi",icao:"eyvi"},
+  {name:"Dublin Tower/App (EIDW)",loc:"Дублин 🇮🇪 (Германии на LiveATC нет — там это запрещено законом)",mount:"eidw82",icao:"eidw"},
+  {name:"Amsterdam App/Dep (EHAM)",loc:"Амстердам 🇳🇱 — 118.080",mount:"eham_app_118080",icao:"eham"},
+  {name:"Zurich Approach East (LSZH)",loc:"Цюрих 🇨🇭",mount:"lszh1_app_east",icao:"lszh"},
+  {name:"Zurich Delivery (LSZH)",loc:"Цюрих 🇨🇭 — клиренсы, медленно и чётко",mount:"lszh1_del",icao:"lszh"},
+  {name:"Dublin Gnd/Twr/App (EIDW)",loc:"Дублин 🇮🇪 — всё в одном",mount:"eidw8",icao:"eidw"},
+  {name:"JFK ATIS (KJFK)",loc:"Нью-Йорк 🇺🇸 — тренировка цифр: ATIS по кругу",mount:"kjfk_atis",icao:"kjfk"},
+  {name:"Boston Approach (KBOS)",loc:"Бостон 🇺🇸 — чистый быстрый американский",mount:"kbos1_app_south",icao:"kbos"},
+  {name:"O'Hare Approach (KORD)",loc:"Чикаго 🇺🇸 — хардкорный темп",mount:"kord1n2_app_133625",icao:"kord"}
 ];
 function renderLiveATC(){
   stopMic(); speechSynthesis.cancel();
@@ -25285,7 +25287,7 @@ function renderLiveATC(){
       // остановить остальные плееры
       appEl.querySelectorAll("audio").forEach(function(a){ a.pause(); a.remove(); });
       var box=c.querySelector("#laBox"+i);
-      box.innerHTML='<audio controls autoplay src="https://s1-2.liveatc.net/'+esc(f.mount)+'" style="width:100%;margin-top:8px"></audio>'+
+      box.innerHTML='<audio controls autoplay src="https://d.liveatc.net/'+esc(f.mount)+'" style="width:100%;margin-top:8px"></audio>'+
         '<div class="muted" style="font-size:12px">Если тишина 30+ сек — частота просто молчит (это нормально). Если ошибка — жмите «На сайте».</div>';
       var au=box.querySelector("audio");
       au.onerror=function(){ box.innerHTML='<div class="err">Прямой поток недоступен — откройте «На сайте ↗»</div>'; };
