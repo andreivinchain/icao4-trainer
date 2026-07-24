@@ -24332,7 +24332,14 @@ if(IS_PWA){
   }).catch(function(){});
 }
 function sendReminderCfg(){
-  var msg={type:"cfg",reminderHour:settings.reminderHour,enabled:settings.reminderOn!==false};
+  var d=null; try{ d=getDaily(); }catch(e){}
+  var body="Пора заниматься английским! ";
+  if(dailyMeta.streak>0) body+="🔥 Стрик "+dailyMeta.streak+" дн. — не теряйте его. ";
+  if(d&&!d.completed){
+    var left=d.tasks.filter(function(tk){return !d.done[tk.id];}).length;
+    body+="В плане на сегодня осталось блоков: "+left+", цель "+settings.minMinutes+" мин.";
+  } else body+="Цель: "+settings.minMinutes+" минут.";
+  var msg={type:"cfg",reminderHour:settings.reminderHour,enabled:settings.reminderOn!==false,body:body};
   if(navigator.serviceWorker&&navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage(msg);
   else if(swReg&&swReg.active) swReg.active.postMessage(msg);
 }
@@ -24568,6 +24575,18 @@ function renderHome(){
     '</div>');
   dc.querySelector(".daily-card").onclick=renderDaily;
   appEl.appendChild(dc);
+  if(IS_PWA&&("Notification" in window)&&Notification.permission!=="granted"&&settings.reminderOn!==false){
+    var nb=el('<div class="card" style="border-color:var(--warn)"><b>🔔 Напоминания выключены</b>'+
+      '<div class="muted" style="font-size:13px;margin-top:4px">Разрешите уведомления — приложение будет напоминать о плане каждый день в '+("0"+settings.reminderHour).slice(-2)+':00.</div>'+
+      '<div class="btnrow"><button class="btn" id="nbOn">Включить</button></div></div>');
+    nb.querySelector("#nbOn").onclick=function(){
+      askNotifPermission(function(p){
+        if(p==="granted"){ sendReminderCfg(); registerPeriodic(); renderHome(); }
+        else alert("Разрешение не получено. Включите уведомления для сайта в настройках Android: Настройки → Приложения → ICAO 4 → Уведомления.");
+      });
+    };
+    appEl.appendChild(nb);
+  }
   appEl.appendChild(el('<div class="card"><b>Прогресс</b><div class="muted" style="margin-top:6px">'+
     'Проверено ответов: '+attempts.length+
     (w?('<br>Слабый критерий: <b style="color:var(--warn)">'+esc(w.label)+'</b> (ср. '+w.avg.toFixed(1)+')'):'')+
@@ -25226,14 +25245,53 @@ function rtTabs(active){
     '<span class="pill'+(active==="sc"?" on":"")+'" data-t="sc">✈️ Сценарии</span>'+
     '<span class="pill'+(active==="drill"?" on":"")+'" data-t="drill">🎯 Дрилл</span>'+
     '<span class="pill'+(active==="ref"?" on":"")+'" data-t="ref">📖 SERA</span>'+
-    '<span class="pill'+(active==="cap"?" on":"")+'" data-t="cap">📕 CAP 413</span></div>');
+    '<span class="pill'+(active==="cap"?" on":"")+'" data-t="cap">📕 CAP 413</span>'+
+    '<span class="pill'+(active==="live"?" on":"")+'" data-t="live">📻 Live ATC</span></div>');
   t.querySelectorAll(".pill").forEach(function(p){
     p.onclick=function(){
       var v=p.dataset.t;
-      if(v==="sc")renderRTList(); else if(v==="drill")renderSeraDrill(); else if(v==="cap")renderCapRef(); else renderSeraRef();
+      if(v==="sc")renderRTList(); else if(v==="drill")renderSeraDrill(); else if(v==="cap")renderCapRef(); else if(v==="live")renderLiveATC(); else renderSeraRef();
     };
   });
   return t;
+}
+/* --- Live ATC (реальный эфир, нужен интернет) --- */
+var LIVEATC=[
+  {name:"Warsaw Approach (EPWA)",loc:"Варшава 🇵🇱 — ваш регион!",mount:"epwa_app",icao:"epwa"},
+  {name:"Boston Tower (KBOS)",loc:"Бостон 🇺🇸 — топ-1 фид",mount:"kbos_twr",icao:"kbos"},
+  {name:"JFK Tower (KJFK)",loc:"Нью-Йорк 🇺🇸 — легендарный",mount:"kjfk_twr",icao:"kjfk"},
+  {name:"JFK Ground (KJFK)",loc:"Нью-Йорк 🇺🇸 — руление",mount:"kjfk_gnd",icao:"kjfk"},
+  {name:"Dublin (EIDW)",loc:"Дублин 🇮🇪 — Del/Gnd/Twr/App",mount:"eidw2",icao:"eidw"},
+  {name:"Amsterdam Tower (EHAM)",loc:"Амстердам 🇳🇱",mount:"eham_twr",icao:"eham"},
+  {name:"Zurich Tower (LSZH)",loc:"Цюрих 🇨🇭",mount:"lszh_twr",icao:"lszh"},
+  {name:"Geneva Tower (LSGG)",loc:"Женева 🇨🇭",mount:"lsgg_twr",icao:"lsgg"},
+  {name:"Chicago O'Hare Tower (KORD)",loc:"Чикаго 🇺🇸 — очень быстрый темп",mount:"kord_twr",icao:"kord"},
+  {name:"LAX Tower (KLAX)",loc:"Лос-Анджелес 🇺🇸",mount:"klax_twr",icao:"klax"},
+  {name:"SFO Tower (KSFO)",loc:"Сан-Франциско 🇺🇸",mount:"ksfo_twr",icao:"ksfo"},
+  {name:"Atlanta Tower (KATL)",loc:"Атланта 🇺🇸 — самый загруженный",mount:"katl_twr",icao:"katl"}
+];
+function renderLiveATC(){
+  stopMic(); speechSynthesis.cancel();
+  setScreen("Live ATC",true);
+  appEl.appendChild(rtTabs("live"));
+  appEl.appendChild(el('<div class="card muted" style="font-size:13px">Реальный радиообмен в прямом эфире (liveatc.net). Нужен интернет. Слушайте 10 минут в день как подкаст: сначала ловите позывные и цифры, потом смысл. Если поток молчит — частота тихая или фид офлайн, попробуйте другой или откройте на сайте. Начните с Варшавы — это ваш акцент диспетчеров, и с Бостона — чистый быстрый американский.</div>'));
+  LIVEATC.forEach(function(f,i){
+    var c=el('<div class="card">'+
+      '<b>'+esc(f.name)+'</b><div class="muted" style="font-size:13px">'+esc(f.loc)+'</div>'+
+      '<div class="btnrow"><button class="btn" data-i="'+i+'" id="la'+i+'">▶ Слушать</button>'+
+      '<a class="btn sec" style="text-decoration:none" href="https://www.liveatc.net/hlisten.php?mount='+esc(f.mount)+'&icao='+esc(f.icao)+'" target="_blank" rel="noopener">На сайте ↗</a></div>'+
+      '<div id="laBox'+i+'"></div></div>');
+    c.querySelector("#la"+i).onclick=function(){
+      // остановить остальные плееры
+      appEl.querySelectorAll("audio").forEach(function(a){ a.pause(); a.remove(); });
+      var box=c.querySelector("#laBox"+i);
+      box.innerHTML='<audio controls autoplay src="https://s1-2.liveatc.net/'+esc(f.mount)+'" style="width:100%;margin-top:8px"></audio>'+
+        '<div class="muted" style="font-size:12px">Если тишина 30+ сек — частота просто молчит (это нормально). Если ошибка — жмите «На сайте».</div>';
+      var au=box.querySelector("audio");
+      au.onerror=function(){ box.innerHTML='<div class="err">Прямой поток недоступен — откройте «На сайте ↗»</div>'; };
+    };
+    appEl.appendChild(c);
+  });
 }
 /* --- справочник CAP 413 --- */
 function renderCapRef(filter){

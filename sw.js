@@ -1,5 +1,5 @@
 /* ICAO 4 Trainer — service worker: offline cache + daily reminder */
-var CACHE = "icao4-v1";
+var CACHE = "icao4-v2";
 
 self.addEventListener("install", function(e){
   self.skipWaiting();
@@ -50,6 +50,7 @@ self.addEventListener("message", function(e){
       var cfg = await getCfg();
       cfg.reminderHour = d.reminderHour;
       cfg.enabled = d.enabled;
+      if (d.body) cfg.body = d.body;
       await setCfg(cfg);
     })());
   }
@@ -67,7 +68,7 @@ self.addEventListener("periodicsync", function(e){
       cfg.lastNotif = today;
       await setCfg(cfg);
       await self.registration.showNotification("ICAO 4 Trainer ✈️", {
-        body: "Пора заниматься! План на сегодня ждёт — 20 минут в день держат форму до экзамена.",
+        body: cfg.body || "Пора заниматься! План на сегодня ждёт — 20 минут в день держат форму до экзамена.",
         icon: "./icon-192.png",
         badge: "./icon-192.png",
         tag: "icao4-daily"
