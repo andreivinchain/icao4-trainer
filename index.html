@@ -24476,14 +24476,16 @@ function toggleMic(ta,btn){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   recog=new SR(); recogTarget=ta; recogBtn=btn;
   recog.lang="en-US"; recog.continuous=true; recog.interimResults=true;
-  var base=ta.value?ta.value.replace(/\s+$/,"")+" ":"";
+  var finals=ta.value?ta.value.replace(/\s+$/,"")+" ":"";
   recog.onresult=function(ev){
-    var fin="", interim="";
-    for(var i=0;i<ev.results.length;i++){
-      if(ev.results[i].isFinal) fin+=ev.results[i][0].transcript+" ";
-      else interim+=ev.results[i][0].transcript;
+    var interim="";
+    // ВАЖНО: читаем только НОВЫЕ результаты с ev.resultIndex — иначе на Android текст дублируется
+    for(var i=ev.resultIndex;i<ev.results.length;i++){
+      var tr=ev.results[i][0].transcript;
+      if(ev.results[i].isFinal) finals+=tr.trim()+" ";
+      else interim+=tr;
     }
-    ta.value=base+fin+interim;
+    ta.value=finals+interim;
   };
   recog.onend=function(){ if(recogBtn)recogBtn.classList.remove("rec"); recog=null; };
   recog.onerror=function(ev){ if(ev.error==="not-allowed") alert("Нет доступа к микрофону. Разрешите доступ в настройках браузера."); stopMic(); };
@@ -25174,16 +25176,25 @@ function toggleRecord(btn,holder){
   stopMic(); speechSynthesis.cancel();
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
     var chunks=[];
-    recorder=new MediaRecorder(stream);
-    recorder.ondataavailable=function(e){ chunks.push(e.data); };
+    var mime="";
+    ["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg"].some(function(m){
+      if(window.MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m)){ mime=m; return true; }
+      return false;
+    });
+    try{ recorder=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream); }
+    catch(e){ recorder=new MediaRecorder(stream); }
+    recorder.ondataavailable=function(e){ if(e.data&&e.data.size)chunks.push(e.data); };
     recorder.onstop=function(){
       stream.getTracks().forEach(function(t){t.stop();});
+      var mt=recorder.mimeType||mime||"audio/webm";
       recorder=null; btn.classList.remove("rec"); btn.textContent="⏺";
-      var url=URL.createObjectURL(new Blob(chunks,{type:"audio/webm"}));
+      if(!chunks.length){ holder.innerHTML='<div class="err">Запись пустая — говорите после нажатия ⏺ и остановите через пару секунд.</div>'; return; }
+      var url=URL.createObjectURL(new Blob(chunks,{type:mt}));
       holder.innerHTML='<audio controls src="'+url+'" style="width:100%;margin-top:8px"></audio>'+
         '<div class="muted" style="font-size:12px">Ваша запись — послушайте себя со стороны. Обратите внимание на паузы и цифры.</div>';
     };
-    recorder.start();
+    recorder.onerror=function(){ holder.innerHTML='<div class="err">Ошибка записи.</div>'; };
+    recorder.start(250);
     btn.classList.add("rec"); btn.textContent="⏹";
   }).catch(function(){ alert("Нет доступа к микрофону."); });
 }
@@ -25732,12 +25743,16 @@ function renderShadowStep(){
     recog=new SR(); recogBtn=card.querySelector("#shMic"); recogTarget=buf;
     recog.lang="en-US"; recog.continuous=true; recog.interimResults=true;
     buf.value=""; busy=false;
-    var silenceMs=isFull?3500:2200, silence=null;
+    var silenceMs=isFull?3500:2200, silence=null, finals="";
     function arm(){ if(silence)clearTimeout(silence); silence=setTimeout(function(){ if(buf.value.trim()) doCheck(); },silenceMs); }
     recog.onresult=function(ev){
-      var fin="",interim="";
-      for(var i=0;i<ev.results.length;i++){ if(ev.results[i].isFinal)fin+=ev.results[i][0].transcript+" "; else interim+=ev.results[i][0].transcript; }
-      buf.value=fin+interim;
+      var interim="";
+      for(var i=ev.resultIndex;i<ev.results.length;i++){
+        var tr=ev.results[i][0].transcript;
+        if(ev.results[i].isFinal) finals+=tr.trim()+" ";
+        else interim+=tr;
+      }
+      buf.value=finals+interim;
       arm();
     };
     recog.onend=function(){ if(recogBtn)recogBtn.classList.remove("rec"); recog=null; if(silence)clearTimeout(silence); if(buf.value.trim()) doCheck(); };
