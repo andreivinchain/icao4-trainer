@@ -24469,28 +24469,59 @@ function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,
 /* ---------- speech: mic input ---------- */
 var recog=null, recogTarget=null, recogBtn=null;
 function micSupported(){ return !!(window.SpeechRecognition||window.webkitSpeechRecognition); }
-function stopMic(){ if(recog){ try{recog.stop();}catch(e){} recog=null; if(recogBtn)recogBtn.classList.remove("rec"); recogBtn=null; recogTarget=null; } }
+function stopMic(){
+  micWant=false;
+  if(recog){ try{recog.onend=null; recog.stop(); recog.abort&&recog.abort();}catch(e){} recog=null; }
+  if(recogBtn)recogBtn.classList.remove("rec");
+  recogBtn=null; recogTarget=null;
+}
+/* Схема без дублей: continuous=false + автоперезапуск. Каждая фраза приходит один раз. */
+var micWant=false;
+function dedupePhrase(prev,add){
+  // защита от повторной выдачи той же фразы Android-движком
+  var p=normAns(prev), a=normAns(add);
+  if(!a)return prev;
+  if(p.slice(-a.length)===a) return prev;              // ровно тот же хвост
+  var words=a.split(" ");
+  for(var n=Math.min(words.length,8);n>=1;n--){        // перекрытие хвоста и начала
+    // одиночное слово режем только длинное: числа (one, tree, niner…) могут повторяться законно
+    if(n===1&&words[0].length<6)continue;
+    var head=words.slice(0,n).join(" ");
+    if(p.slice(-head.length)===head){ add=add.split(/\s+/).slice(n).join(" "); break; }
+  }
+  return (prev?prev.replace(/\s+$/,"")+" ":"")+add.trim();
+}
 function toggleMic(ta,btn){
-  if(recog){ stopMic(); return; }
+  if(recog||micWant){ stopMic(); return; }
   if(!micSupported()){ alert("Голосовой ввод не поддерживается этим браузером. Используйте Chrome на Android."); return; }
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  recog=new SR(); recogTarget=ta; recogBtn=btn;
-  recog.lang="en-US"; recog.continuous=true; recog.interimResults=true;
-  var finals=ta.value?ta.value.replace(/\s+$/,"")+" ":"";
-  recog.onresult=function(ev){
-    var interim="";
-    // ВАЖНО: читаем только НОВЫЕ результаты с ev.resultIndex — иначе на Android текст дублируется
-    for(var i=ev.resultIndex;i<ev.results.length;i++){
-      var tr=ev.results[i][0].transcript;
-      if(ev.results[i].isFinal) finals+=tr.trim()+" ";
-      else interim+=tr;
-    }
-    ta.value=finals+interim;
-  };
-  recog.onend=function(){ if(recogBtn)recogBtn.classList.remove("rec"); recog=null; };
-  recog.onerror=function(ev){ if(ev.error==="not-allowed") alert("Нет доступа к микрофону. Разрешите доступ в настройках браузера."); stopMic(); };
+  micWant=true; recogTarget=ta; recogBtn=btn;
   btn.classList.add("rec");
-  recog.start();
+  var committed=ta.value?ta.value.replace(/\s+$/,""):"";
+  function startOne(){
+    if(!micWant)return;
+    recog=new SR();
+    recog.lang="en-US"; recog.continuous=false; recog.interimResults=true; recog.maxAlternatives=1;
+    var got=false;
+    recog.onresult=function(ev){
+      var r=ev.results[ev.results.length-1];
+      var tr=r[0].transcript;
+      if(r.isFinal){ committed=dedupePhrase(committed,tr); got=true; ta.value=committed; }
+      else ta.value=(committed?committed+" ":"")+tr;
+    };
+    recog.onerror=function(ev){
+      if(ev.error==="not-allowed"){ alert("Нет доступа к микрофону. Разрешите доступ в настройках браузера."); micWant=false; }
+      if(ev.error==="no-speech"||ev.error==="aborted")return; // просто перезапустим
+      if(ev.error==="network"){ micWant=false; }
+    };
+    recog.onend=function(){
+      recog=null;
+      if(micWant) setTimeout(startOne,120);            // слушаем дальше
+      else if(recogBtn)recogBtn.classList.remove("rec");
+    };
+    try{ recog.start(); }catch(e){ setTimeout(startOne,300); }
+  }
+  startOne();
 }
 function micBtnHtml(id){ return '<button class="btn sec mic" id="'+id+'" title="Голосовой ввод">🎤</button>'; }
 
@@ -24609,7 +24640,7 @@ function renderHome(){
     modeCard("phrases","💬","Phrase Bank","Готовые фразы Level 4")+
     modeCard("vocab","🃏","Vocabulary",VOCAB.length+" карточек")+
     modeCard("progress","📊","Прогресс","Оценки по критериям")+
-    modeCard("settings","⚙️","Настройки","API-ключ, профиль")+
+    modeCard("settings","⚙️","Настройки",settings.syncToken?"Синхронизация вкл ✓":"API-ключ, профиль")+
     '</div>');
   g.querySelectorAll(".mode-card").forEach(function(b){
     b.onclick=function(){ var m=b.dataset.m;
@@ -25166,6 +25197,117 @@ function finishMock(){
     appEl.querySelector("#retryMock").onclick=finishMock;
   });
 }
+
+/* ---------- синхронизация телефон ↔ компьютер (приватный GitHub Gist) ---------- */
+var SYNC_KEYS=["icao4_attempts","icao4_vocab","icao4_learnstate","icao4_listening","icao4_rt","icao4_ask","icao4_shadow","icao4_pron","icao4_numbers","icao4_sera","icao4_time","icao4_daily","icao4_daily_meta","icao4_tr","icao4_fu"];
+function syncSnapshot(){
+  var o={_v:1,_ts:Date.now()};
+  SYNC_KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!==null)o[k]=v; });
+  return o;
+}
+function mergeMapBy(local,remote,pick){
+  var out={},k;
+  for(k in local)out[k]=local[k];
+  for(k in remote){ out[k]=(k in out)?pick(out[k],remote[k]):remote[k]; }
+  return out;
+}
+function newerByTs(a,b){ return ((b&&b.ts)||0)>((a&&a.ts)||0)?b:a; }
+function syncMerge(remote){
+  function L(k,d){ return loadJSON(k,d); }
+  function R(k,d){ try{ return remote[k]!==undefined?JSON.parse(remote[k]):d; }catch(e){ return d; } }
+  var res={};
+  // ответы: объединяем по qid+ts
+  var la=L("icao4_attempts",[]), ra=R("icao4_attempts",[]), seen={}, all=[];
+  la.concat(ra).forEach(function(a){ var k=a.qid+"|"+a.ts; if(!seen[k]){ seen[k]=1; all.push(a); } });
+  all.sort(function(a,b){return a.ts-b.ts;});
+  res.icao4_attempts=all;
+  // словарь: "know" сильнее "learn"
+  res.icao4_vocab=mergeMapBy(L("icao4_vocab",{}),R("icao4_vocab",{}),function(a,b){ return (a==="know"||b==="know")?"know":(a||b); });
+  res.icao4_learnstate=mergeMapBy(L("icao4_learnstate",{}),R("icao4_learnstate",{}),function(a,b){ return Math.max(a||0,b||0); });
+  res.icao4_pron=mergeMapBy(L("icao4_pron",{}),R("icao4_pron",{}),function(a,b){ return Math.max(a||0,b||0); });
+  // результаты заданий: берём более свежую попытку
+  ["icao4_listening","icao4_rt","icao4_ask","icao4_shadow"].forEach(function(k){
+    res[k]=mergeMapBy(L(k,{}),R(k,{}),newerByTs);
+  });
+  // время: максимум секунд за каждый день
+  res.icao4_time=mergeMapBy(L("icao4_time",{}),R("icao4_time",{}),function(a,b){ return Math.max(a||0,b||0); });
+  // счётчики
+  var ln=L("icao4_numbers",{rounds:0,correct:0,total:0}), rn=R("icao4_numbers",{rounds:0,correct:0,total:0});
+  res.icao4_numbers={rounds:Math.max(ln.rounds,rn.rounds),correct:Math.max(ln.correct,rn.correct),total:Math.max(ln.total,rn.total)};
+  var ls=L("icao4_sera",{attempts:0,correct:0}), rs=R("icao4_sera",{attempts:0,correct:0});
+  res.icao4_sera={attempts:Math.max(ls.attempts,rs.attempts),correct:Math.max(ls.correct,rs.correct)};
+  // стрик: больший + более поздняя дата
+  var lm=L("icao4_daily_meta",{streak:0,lastDone:null}), rm=R("icao4_daily_meta",{streak:0,lastDone:null});
+  res.icao4_daily_meta={streak:Math.max(lm.streak||0,rm.streak||0),lastDone:((rm.lastDone||"")>(lm.lastDone||""))?rm.lastDone:lm.lastDone};
+  // план дня: только если тот же день — объединяем отметки
+  var ld=L("icao4_daily",null), rd=R("icao4_daily",null);
+  if(ld&&rd&&ld.date===rd.date){
+    ld.done=Object.assign({},rd.done,ld.done);
+    ld.wordsDone=Object.assign({},rd.wordsDone,ld.wordsDone);
+    ld.completed=ld.completed||rd.completed;
+    res.icao4_daily=ld;
+  } else if(!ld&&rd) res.icao4_daily=rd;
+  // кэши переводов/образцов: объединение
+  res.icao4_tr=Object.assign({},R("icao4_tr",{}),L("icao4_tr",{}));
+  res.icao4_fu=Object.assign({},R("icao4_fu",{}),L("icao4_fu",{}));
+  Object.keys(res).forEach(function(k){ if(res[k]!==undefined)saveJSON(k,res[k]); });
+  // перечитываем в память
+  attempts=loadJSON("icao4_attempts",[]); vocabState=loadJSON("icao4_vocab",{}); learnMastery=loadJSON("icao4_learnstate",{});
+  listenStats=loadJSON("icao4_listening",{}); rtStats=loadJSON("icao4_rt",{}); askStats=loadJSON("icao4_ask",{});
+  shadowStats=loadJSON("icao4_shadow",{}); pronStats=loadJSON("icao4_pron",{}); numStats=loadJSON("icao4_numbers",{rounds:0,correct:0,total:0});
+  seraStats=loadJSON("icao4_sera",{attempts:0,correct:0}); timeStats=loadJSON("icao4_time",{});
+  daily=loadJSON("icao4_daily",null); dailyMeta=loadJSON("icao4_daily_meta",{streak:0,lastDone:null});
+  trCache=loadJSON("icao4_tr",{}); fuCache=loadJSON("icao4_fu",{});
+}
+function gh(path,opts){
+  opts=opts||{};
+  opts.headers=Object.assign({"accept":"application/vnd.github+json","authorization":"Bearer "+settings.syncToken.trim(),"content-type":"application/json"},opts.headers||{});
+  return fetch("https://api.github.com"+path,opts).then(function(r){
+    if(!r.ok)return r.text().then(function(t){ throw new Error(r.status===401?"неверный токен":("GitHub "+r.status)); });
+    return r.json();
+  });
+}
+var syncing=false;
+function doSync(cb){
+  if(syncing||!settings.syncToken||!settings.syncToken.trim()){ if(cb)cb("off"); return; }
+  syncing=true;
+  var body={description:"ICAO 4 Trainer progress",public:false,files:{"icao4-progress.json":{content:""}}};
+  function push(){
+    body.files["icao4-progress.json"].content=JSON.stringify(syncSnapshot());
+    if(settings.gistId){
+      return gh("/gists/"+settings.gistId,{method:"PATCH",body:JSON.stringify({files:body.files})});
+    }
+    return gh("/gists",{method:"POST",body:JSON.stringify(body)}).then(function(g){
+      settings.gistId=g.id; saveJSON("icao4_settings",settings); return g;
+    });
+  }
+  var p;
+  if(settings.gistId){
+    p=gh("/gists/"+settings.gistId).then(function(g){
+      var f=g.files&&g.files["icao4-progress.json"];
+      if(f&&f.content){ try{ syncMerge(JSON.parse(f.content)); }catch(e){} }
+      return push();
+    }).catch(function(e){
+      if(String(e.message).indexOf("404")>=0){ settings.gistId=""; return push(); }
+      throw e;
+    });
+  } else p=push();
+  p.then(function(){
+    settings.lastSync=Date.now(); saveJSON("icao4_settings",settings);
+    if(cb)cb("ok");
+  }).catch(function(e){ if(cb)cb("err:"+e.message); })
+   .finally(function(){ syncing=false; });
+}
+/* автосинк: при запуске и при возврате в приложение (не чаще раза в 2 минуты) */
+function autoSync(){
+  if(!settings.syncToken||!settings.syncToken.trim())return;
+  if(Date.now()-(settings.lastSync||0)<120000)return;
+  doSync(function(st){ if(st==="ok"&&/^(ICAO 4 Trainer)?$/.test(titleEl.textContent||""))renderHome(); });
+}
+document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible")autoSync(); });
+window.addEventListener("beforeunload",function(){
+  if(settings.syncToken&&settings.syncToken.trim()&&navigator.sendBeacon){/* push при закрытии не гарантирован — синк идёт при следующем запуске */}
+});
 
 /* ---------- запись себя ---------- */
 var recorder=null;
@@ -25740,25 +25882,32 @@ function renderShadowStep(){
     if(!micSupported())return;
     stopMic();
     var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    recog=new SR(); recogBtn=card.querySelector("#shMic"); recogTarget=buf;
-    recog.lang="en-US"; recog.continuous=true; recog.interimResults=true;
-    buf.value=""; busy=false;
-    var silenceMs=isFull?3500:2200, silence=null, finals="";
-    function arm(){ if(silence)clearTimeout(silence); silence=setTimeout(function(){ if(buf.value.trim()) doCheck(); },silenceMs); }
-    recog.onresult=function(ev){
-      var interim="";
-      for(var i=ev.resultIndex;i<ev.results.length;i++){
-        var tr=ev.results[i][0].transcript;
-        if(ev.results[i].isFinal) finals+=tr.trim()+" ";
-        else interim+=tr;
-      }
-      buf.value=finals+interim;
-      arm();
-    };
-    recog.onend=function(){ if(recogBtn)recogBtn.classList.remove("rec"); recog=null; if(silence)clearTimeout(silence); if(buf.value.trim()) doCheck(); };
-    recog.onerror=function(ev){ if(ev.error==="not-allowed"){ settings.shadowAuto=false; alert("Нет доступа к микрофону — авто-режим выключен."); } stopMic(); };
+    recogBtn=card.querySelector("#shMic"); recogTarget=buf;
+    buf.value=""; busy=false; micWant=true;
     recogBtn.classList.add("rec");
-    try{ recog.start(); setStatus("🎤 говорите…"); }catch(e){}
+    var silenceMs=isFull?3500:2200, silence=null, committed="";
+    function arm(){ if(silence)clearTimeout(silence); silence=setTimeout(function(){ micWant=false; if(buf.value.trim()) doCheck(); },silenceMs); }
+    function one(){
+      if(!micWant)return;
+      recog=new SR();
+      recog.lang="en-US"; recog.continuous=false; recog.interimResults=true; recog.maxAlternatives=1;
+      recog.onresult=function(ev){
+        var r=ev.results[ev.results.length-1], tr=r[0].transcript;
+        if(r.isFinal){ committed=dedupePhrase(committed,tr); buf.value=committed; }
+        else buf.value=(committed?committed+" ":"")+tr;
+        arm();
+      };
+      recog.onerror=function(ev){
+        if(ev.error==="not-allowed"){ settings.shadowAuto=false; micWant=false; alert("Нет доступа к микрофону — авто-режим выключен."); }
+      };
+      recog.onend=function(){
+        recog=null;
+        if(micWant) setTimeout(one,120);
+        else { if(recogBtn)recogBtn.classList.remove("rec"); if(silence)clearTimeout(silence); if(buf.value.trim()) doCheck(); }
+      };
+      try{ recog.start(); }catch(e){ setTimeout(one,300); }
+    }
+    one(); setStatus("🎤 говорите…"); arm();
   }
   function doCheck(){
     if(busy)return; busy=true;
@@ -26603,11 +26752,16 @@ function renderSettings(){
     '<button class="btn sec small" id="sNotifTest" style="white-space:nowrap">Тест 🔔</button></div>'+
     '<div class="btnrow"><button class="btn" id="sSave">Сохранить</button>'+
     '<button class="btn sec" id="sClear">Сбросить прогресс</button></div>'+
-    '<label>Перенос прогресса между устройствами (телефон ↔ компьютер)</label>'+
-    '<div class="btnrow" style="margin-top:4px"><button class="btn sec" id="sExport">⬇ Экспорт прогресса</button>'+
+    '<label>🔄 Автосинхронизация телефон ↔ компьютер (через ваш приватный GitHub Gist)</label>'+
+    '<input id="sSyncToken" type="password" placeholder="github_pat_... (токен со scope gist)">'+
+    '<div class="btnrow" style="margin-top:6px"><button class="btn" id="sSyncNow">🔄 Синхронизировать сейчас</button>'+
+    '<button class="btn sec small" id="sSyncOff">Отключить</button></div>'+
+    '<div class="muted" id="sSyncMsg" style="font-size:13px;margin-top:6px"></div>'+
+    '<div class="muted" style="font-size:12px;margin-top:6px">Как включить: github.com → Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token → отметить только <b>gist</b> → скопировать и вставить сюда → Сохранить. Один и тот же токен вставьте на телефоне и на компьютере. Дальше прогресс сливается сам при каждом запуске (ответы объединяются, минуты и выученные слова берутся максимальные). Токен хранится только на устройстве.</div>'+
+    '<label>Резервная копия файлом</label>'+
+    '<div class="btnrow" style="margin-top:4px"><button class="btn sec" id="sExport">⬇ Экспорт</button>'+
     '<button class="btn sec" id="sImport">⬆ Импорт</button></div>'+
     '<input type="file" id="sImportFile" accept=".json,application/json" style="display:none">'+
-    '<div class="muted" style="font-size:13px;margin-top:6px">Chrome не синхронизирует данные приложения между устройствами. Экспортируйте файл, перекиньте (Telegram/почта) и импортируйте на другом устройстве. Прогресс объединится с текущим (импорт перезаписывает).</div>'+
     '<div class="muted" id="sMsg" style="margin-top:8px"></div>'+
     '<div class="muted" style="margin-top:12px;font-size:13px">Ключ хранится только на этом устройстве (localStorage) и отправляется напрямую в API провайдера. Ключ Anthropic: console.anthropic.com → API Keys. Ключ OpenAI: platform.openai.com.<br><br>Голосовой ввод: Chrome на Android, нужен доступ к микрофону. Для Picture-режима AI получает саму картинку (vision).</div>'+
   '</div>');
@@ -26617,6 +26771,32 @@ function renderSettings(){
   c.querySelector("#sProfile").value=settings.profile;
   c.querySelector("#sMin").value=settings.minMinutes;
   c.querySelector("#sCallsign").value=settings.callsign;
+  c.querySelector("#sSyncToken").value=settings.syncToken||"";
+  var syncMsg=c.querySelector("#sSyncMsg");
+  function syncStatus(){
+    if(!settings.syncToken){ syncMsg.textContent="Выключена."; return; }
+    syncMsg.innerHTML="Включена ✓"+(settings.lastSync?(" · последняя синхронизация: "+new Date(settings.lastSync).toLocaleString()):"")+
+      (settings.gistId?('<br><span style="font-size:12px">Gist: '+esc(settings.gistId)+'</span>'):"");
+  }
+  syncStatus();
+  c.querySelector("#sSyncNow").onclick=function(){
+    settings.syncToken=c.querySelector("#sSyncToken").value.trim();
+    saveJSON("icao4_settings",settings);
+    if(!settings.syncToken){ syncMsg.textContent="Сначала вставьте токен."; return; }
+    var b=this; b.disabled=true; syncMsg.innerHTML='<span class="spinner"></span> Синхронизирую…';
+    settings.lastSync=0;
+    doSync(function(st){
+      b.disabled=false;
+      if(st==="ok"){ syncStatus(); syncMsg.innerHTML="Готово ✓ прогресс объединён. "+syncMsg.innerHTML; }
+      else syncMsg.innerHTML='<span class="err">Ошибка: '+esc(String(st).replace(/^err:/,""))+'</span>';
+    });
+  };
+  c.querySelector("#sSyncOff").onclick=function(){
+    settings.syncToken=""; settings.gistId=""; settings.lastSync=0;
+    saveJSON("icao4_settings",settings);
+    c.querySelector("#sSyncToken").value="";
+    syncStatus();
+  };
   var hourSel=c.querySelector("#sRemHour");
   for(var h=6;h<=23;h++){ var o=document.createElement("option"); o.value=h; o.textContent=("0"+h).slice(-2)+":00"; hourSel.appendChild(o); }
   hourSel.value=settings.reminderHour;
@@ -26639,6 +26819,7 @@ function renderSettings(){
     settings.profile=c.querySelector("#sProfile").value.trim()||DEFAULT_PROFILE;
     settings.minMinutes=Math.max(5,parseInt(c.querySelector("#sMin").value,10)||20);
     settings.callsign=c.querySelector("#sCallsign").value.trim()||"Sierra Bravo Charlie";
+    settings.syncToken=c.querySelector("#sSyncToken").value.trim();
     settings.reminderOn=c.querySelector("#sRemOn").value==="on";
     settings.reminderHour=parseInt(c.querySelector("#sRemHour").value,10);
     saveJSON("icao4_settings",settings);
@@ -26690,6 +26871,8 @@ function renderSettings(){
 }
 
 renderHome();
+
+autoSync();
 
 </script>
 </body>
