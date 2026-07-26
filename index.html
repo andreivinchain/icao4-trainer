@@ -24307,20 +24307,40 @@ var fuCache = loadJSON("icao4_fu",{});
 var timeStats = loadJSON("icao4_time",{});
 if(!settings.minMinutes) settings.minMinutes=20;
 
-/* ---------- study time tracking ---------- */
+/* ---------- study time tracking (по устройствам, чтобы время складывалось) ---------- */
+if(!settings.deviceId){ settings.deviceId="d"+Math.random().toString(36).slice(2,8); saveJSON("icao4_settings",settings); }
+function timeDay(date){            // сумма по всем устройствам за дату
+  var v=timeStats[date];
+  if(v==null)return 0;
+  if(typeof v==="number")return v; // старый формат
+  var s=0; for(var k in v)s+=v[k]||0; return s;
+}
+function timeAdd(sec){
+  var t=todayStr(), v=timeStats[t];
+  if(v==null||typeof v==="number") timeStats[t]=(typeof v==="number")?{legacy:v}:{};
+  var d=settings.deviceId;
+  timeStats[t][d]=(timeStats[t][d]||0)+sec;
+  saveJSON("icao4_time",timeStats);
+}
 var lastActivity=Date.now();
 ["click","keydown","touchstart","scroll"].forEach(function(ev){
   document.addEventListener(ev,function(){ lastActivity=Date.now(); },true);
 });
 setInterval(function(){
   if(document.visibilityState==="visible" && Date.now()-lastActivity<120000){
+    timeAdd(30);
     var t=todayStr();
-    timeStats[t]=(timeStats[t]||0)+30;
-    saveJSON("icao4_time",timeStats);
     if(daily&&daily.date===t&&!daily.completed) checkDailyComplete();
   }
 },30000);
-function todayMinutes(){ return Math.floor((timeStats[todayStr()]||0)/60); }
+function todayMinutes(){ return Math.floor(timeDay(todayStr())/60); }
+function daysAgoStr(n){ var d=new Date(Date.now()-n*86400000); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+function minutesRange(days){
+  var s=0; for(var i=0;i<days;i++) s+=timeDay(daysAgoStr(i));
+  return Math.round(s/60);
+}
+function minutesTotal(){ var s=0; for(var k in timeStats)s+=timeDay(k); return Math.round(s/60); }
+function daysStudied(){ var n=0; for(var k in timeStats)if(timeDay(k)>=300)n++; return n; }
 
 /* ---------- PWA: service worker + напоминания ---------- */
 if(settings.reminderHour==null) settings.reminderHour=19;
@@ -24646,7 +24666,7 @@ function renderHome(){
     modeCard("guide","📖","Об экзамене","Форматы и тактика")+
     modeCard("phrases","💬","Phrase Bank","Готовые фразы Level 4")+
     modeCard("vocab","🃏","Vocabulary",VOCAB.length+" карточек")+
-    modeCard("progress","📊","Прогресс","Оценки по критериям")+
+    modeCard("progress","📊","Статистика","Время, темы, прогноз")+
     modeCard("settings","⚙️","Настройки",settings.syncToken?"Синхронизация вкл ✓":"API-ключ, профиль")+
     '</div>');
   g.querySelectorAll(".mode-card").forEach(function(b){
@@ -25236,8 +25256,11 @@ function syncMerge(remote){
   ["icao4_listening","icao4_rt","icao4_ask","icao4_shadow"].forEach(function(k){
     res[k]=mergeMapBy(L(k,{}),R(k,{}),newerByTs);
   });
-  // время: максимум секунд за каждый день
-  res.icao4_time=mergeMapBy(L("icao4_time",{}),R("icao4_time",{}),function(a,b){ return Math.max(a||0,b||0); });
+  // время: по устройствам — за каждое устройство берём максимум, итог = сумма (складывается, но не задваивается)
+  res.icao4_time=mergeMapBy(L("icao4_time",{}),R("icao4_time",{}),function(a,b){
+    var A=(typeof a==="number")?{legacy:a}:(a||{}), B=(typeof b==="number")?{legacy:b}:(b||{});
+    return mergeMapBy(A,B,function(x,y){ return Math.max(x||0,y||0); });
+  });
   // счётчики
   var ln=L("icao4_numbers",{rounds:0,correct:0,total:0}), rn=R("icao4_numbers",{rounds:0,correct:0,total:0});
   res.icao4_numbers={rounds:Math.max(ln.rounds,rn.rounds),correct:Math.max(ln.correct,rn.correct),total:Math.max(ln.total,rn.total)};
@@ -25276,15 +25299,32 @@ function gh(path,opts){
 }
 var syncing=false;
 var SYNC_FILE="icao4-progress.json";
-/* ищем уже созданный gist этого аккаунта — иначе каждое устройство заведёт свой */
+/* Общее хранилище = САМЫЙ СТАРЫЙ gist с нашим файлом. Иначе устройства «залипают» каждое на своём. */
+var syncExtra=[];
 function findGist(){
-  if(settings.gistId) return Promise.resolve(settings.gistId);
   return gh("/gists?per_page=100").then(function(list){
-    var found=null;
-    (list||[]).forEach(function(g){ if(!found&&g.files&&g.files[SYNC_FILE])found=g.id; });
-    if(found){ settings.gistId=found; saveJSON("icao4_settings",settings); }
-    return found;
-  });
+    var mine=(list||[]).filter(function(g){ return g.files&&g.files[SYNC_FILE]; });
+    if(!mine.length) return settings.gistId||null;
+    mine.sort(function(a,b){ return new Date(a.created_at)-new Date(b.created_at); });
+    var canon=mine[0].id;
+    syncExtra=mine.slice(1).map(function(g){return g.id;});   // лишние — их данные тоже вольём
+    if(settings.gistId!==canon){ settings.gistId=canon; saveJSON("icao4_settings",settings); }
+    return canon;
+  }).catch(function(){ return settings.gistId||null; });
+}
+/* забираем данные из «осиротевших» gist'ов (созданных вторым устройством до фикса) */
+function absorbExtra(){
+  if(!syncExtra.length) return Promise.resolve();
+  var ids=syncExtra.slice(0,3); syncExtra=[];
+  return ids.reduce(function(p,id){
+    return p.then(function(){
+      return gh("/gists/"+id).then(function(g){
+        var f=g.files&&g.files[SYNC_FILE];
+        var get=(f&&f.truncated&&f.raw_url)?fetch(f.raw_url).then(function(r){return r.text();}):Promise.resolve(f?f.content:"");
+        return get.then(function(txt){ if(txt){ try{ syncMerge(JSON.parse(txt)); }catch(e){} } });
+      }).catch(function(){});
+    });
+  },Promise.resolve());
 }
 function doSync(cb){
   if(syncing||!settings.syncToken||!settings.syncToken.trim()){ if(cb)cb("off"); return; }
@@ -25304,8 +25344,8 @@ function doSync(cb){
       var get=(f&&f.truncated&&f.raw_url)?fetch(f.raw_url).then(function(r){return r.text();}):Promise.resolve(f?f.content:"");
       return get.then(function(txt){
         if(txt){ try{ syncMerge(JSON.parse(txt)); }catch(e){} }
-        return push();
-      });
+        return absorbExtra();                    // вливаем данные из старых «осиротевших» gist'ов
+      }).then(function(){ return push(); });
     }).catch(function(e){
       if(/404/.test(String(e.message))){ settings.gistId=""; saveJSON("icao4_settings",settings); return push(); }
       throw e;
@@ -25325,7 +25365,11 @@ function autoSync(force){
   syncMsgHome="⏳ синхронизация…";
   if(titleEl.textContent==="ICAO 4 Trainer")renderHome();
   doSync(function(st){
-    syncMsgHome=(st==="ok")?("✓ синхронизировано "+new Date().toLocaleTimeString().slice(0,5)):("⚠ "+String(st).replace(/^err:/,""));
+    var devs=0, t=timeStats[todayStr()];
+    if(t&&typeof t==="object")devs=Object.keys(t).length;
+    syncMsgHome=(st==="ok")
+      ? ("✓ "+new Date().toLocaleTimeString().slice(0,5)+" · сегодня "+todayMinutes()+" мин"+(devs>1?(" с "+devs+" устройств"):""))
+      : ("⚠ "+String(st).replace(/^err:/,""));
     if(titleEl.textContent==="ICAO 4 Trainer")renderHome();
   });
 }
@@ -26688,10 +26732,92 @@ function renderLearnDone(){
   appEl.querySelector("#lBack").onclick=renderVocab;
 }
 
+/* ---------- прогноз готовности к Level 4 ---------- */
+function forecast(){
+  var scored=attempts.filter(function(a){return a.scores&&typeof a.overall==="number";});
+  var hours=minutesTotal()/60;
+  var perDay=Math.max(10,minutesRange(14)/14); // средний темп за 2 недели, мин/день
+  if(scored.length<5){
+    return {ready:false,text:"Нужно минимум 5 проверенных ответов с AI-оценкой, чтобы построить прогноз. Пока пройдено: "+scored.length+".",pass:null,hours:hours,perDay:perDay};
+  }
+  var last=scored.slice(-20);
+  var pass=last.filter(function(a){return a.overall>=4;}).length/last.length;
+  // темп роста: сравниваем первую и вторую половину истории
+  var half=Math.floor(scored.length/2), rate=null;
+  if(scored.length>=10){
+    var p1=scored.slice(0,half).filter(function(a){return a.overall>=4;}).length/half;
+    var p2=scored.slice(half).filter(function(a){return a.overall>=4;}).length/(scored.length-half);
+    var hoursSpan=Math.max(1,hours*0.5);
+    if(p2>p1) rate=(p2-p1)/hoursSpan;   // прирост доли за час занятий
+  }
+  var target=0.8;
+  if(pass>=target&&hours>=15) return {ready:true,pass:pass,hours:hours,perDay:perDay,
+    text:"Вы стабильно держите Level 4: "+Math.round(pass*100)+"% ответов проходят порог. Продолжайте по 2–3 занятия в неделю, чтобы не терять форму — можно записываться на экзамен."};
+  var need;
+  if(rate&&rate>0.002) need=(target-pass)/rate;
+  else need=(target-pass)*60;           // консервативно: ~60 ч на полный путь с нуля до стабильного L4
+  need=Math.max(2,Math.min(need,150));
+  var days=Math.ceil(need*60/perDay);
+  var d=new Date(Date.now()+days*86400000);
+  return {ready:false,pass:pass,hours:hours,perDay:perDay,need:need,days:days,
+    text:"Сейчас порог Level 4 проходят <b>"+Math.round(pass*100)+"%</b> ваших ответов (цель — 80%). При текущем темпе <b>"+Math.round(perDay)+" мин/день</b> потребуется ещё примерно <b>"+Math.round(need)+" ч</b> занятий — это около <b>"+days+" дн.</b>, ориентировочно к "+d.toLocaleDateString()+"."};
+}
 /* ---------- progress ---------- */
+function statRow(label,done,total){
+  var pct=total?Math.round(done/total*100):0;
+  return '<div style="margin-top:10px"><span style="font-size:14px">'+esc(label)+'</span>'+
+    '<b style="float:right;font-size:14px">'+done+' / '+total+'</b>'+
+    '<div class="progress-bar"><div style="width:'+pct+'%"></div></div></div>';
+}
 function renderProgress(){
-  setScreen("Прогресс",true);
-  if(!attempts.length){ appEl.appendChild(el('<div class="card muted">Пока нет проверенных ответов. Пройдите Interview или Emergency.</div>')); return; }
+  setScreen("Статистика",true);
+  // ---- время ----
+  var tToday=todayMinutes(), tWeek=minutesRange(7), tMonth=minutesRange(30), tAll=minutesTotal();
+  function fmt(m){ return m>=60?(Math.floor(m/60)+" ч "+(m%60)+" мин"):(m+" мин"); }
+  appEl.appendChild(el('<div class="card"><b>⏱ Время занятий</b>'+
+    '<div class="score-grid" style="margin-top:8px">'+
+    '<div class="score"><div class="n '+(tToday>=settings.minMinutes?"s-good":"s-warn")+'">'+tToday+'</div><div class="l">сегодня, мин (цель '+settings.minMinutes+')</div></div>'+
+    '<div class="score"><div class="n">'+fmt(tWeek)+'</div><div class="l">за неделю</div></div>'+
+    '<div class="score"><div class="n">'+fmt(tMonth)+'</div><div class="l">за месяц</div></div>'+
+    '<div class="score"><div class="n">'+fmt(tAll)+'</div><div class="l">всего · '+daysStudied()+' дн. занятий</div></div>'+
+    '</div>'+
+    (dailyMeta.streak>0?'<div class="muted" style="margin-top:8px">🔥 Стрик: '+dailyMeta.streak+' дн. подряд</div>':'')+
+    '</div>'));
+  // ---- прогноз ----
+  var f=forecast();
+  appEl.appendChild(el('<div class="card" style="border-color:'+(f.ready?"var(--good)":"var(--accent2)")+'">'+
+    '<b>'+(f.ready?"🎯 Прогноз: вы готовы":"🎯 Прогноз до Level 4")+'</b>'+
+    '<div style="margin-top:6px;font-size:14px;line-height:1.6">'+f.text+'</div>'+
+    '<div class="muted" style="font-size:12px;margin-top:8px">Оценка ориентировочная: считается по доле ваших ответов с итогом ≥ 4 (последние 20), скорости роста и среднему темпу занятий. Это не гарантия результата на реальном экзамене.</div>'+
+    '</div>'));
+  // ---- прогресс по темам ----
+  var doneIds=answeredIds();
+  var ivDone=ALL_INTERVIEW.filter(function(q){return doneIds[q.id];}).length;
+  var emDone=ALL_EMERGENCY.filter(function(q){return doneIds[q.id];}).length;
+  var picDone=PICTURES.filter(function(q){return doneIds[q.id];}).length;
+  var lsDone=Object.keys(listenStats).length, rtDone=Object.keys(rtStats).length;
+  var shDone=Object.keys(shadowStats).length, askDone=Object.keys(askStats).length;
+  var vocDone=Object.keys(learnMastery).filter(function(k){return learnMastery[k]>=2;}).length;
+  var prDone=PRON.filter(function(p){return (pronStats[p.word]||0)>=3;}).length;
+  var html='<div class="card"><b>📚 Пройдено по темам</b>'+
+    statRow("🎙️ Interview",ivDone,ALL_INTERVIEW.length)+
+    statRow("⚠️ Emergency",emDone,ALL_EMERGENCY.length)+
+    statRow("🖼️ Picture",picDone,PICTURES.length)+
+    statRow("🎧 Listening",lsDone,LISTENING.length)+
+    statRow("📡 Сценарии RT",rtDone,RT.length)+
+    statRow("🗣️ Shadow (выучено ответов)",shDone,ALL_INTERVIEW.length+ALL_EMERGENCY.length)+
+    statRow("❓ Задай вопросы",askDone,ASKBACK.length)+
+    statRow("🃏 Словарь (выучено)",vocDone,VOCAB.length)+
+    statRow("👄 Произношение",prDone,PRON.length)+
+    '</div>';
+  appEl.appendChild(el(html));
+  if(seraStats.attempts||numStats.total){
+    appEl.appendChild(el('<div class="card"><b>🎯 Точность дриллов</b><div class="muted" style="margin-top:6px">'+
+      (seraStats.attempts?('Фразеология SERA: '+Math.round(seraStats.correct/seraStats.attempts*100)+'% ('+seraStats.attempts+' фраз)'):'')+
+      (numStats.total?((seraStats.attempts?'<br>':'')+'Цифры и частоты: '+Math.round(numStats.correct/numStats.total*100)+'% ('+numStats.total+' заданий)'):'')+
+      '</div></div>'));
+  }
+  if(!attempts.length){ appEl.appendChild(el('<div class="card muted">Оценок по критериям пока нет — пройдите Interview или Emergency с проверкой.</div>')); return; }
   var last=attempts.slice(-20);
   var html='<div class="card"><b>Средние оценки (последние '+last.length+' ответов)</b>';
   CRITERIA.forEach(function(c){
@@ -26736,7 +26862,7 @@ function renderProgress(){
   for(var di=6;di>=0;di--){
     var dd=new Date(Date.now()-di*86400000);
     var kk=dd.getFullYear()+"-"+("0"+(dd.getMonth()+1)).slice(-2)+"-"+("0"+dd.getDate()).slice(-2);
-    var mm=Math.floor((timeStats[kk]||0)/60);
+    var mm=Math.floor(timeDay(kk)/60);
     if(mm>maxMin)maxMin=mm;
     week.push({name:names[dd.getDay()],min:mm});
   }
