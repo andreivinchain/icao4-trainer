@@ -24663,6 +24663,7 @@ function renderHome(){
     modeCard("numbers","🔢","Цифры и частоты","Дриллы на слух и голосом")+
     modeCard("pron","👄","Произношение",PRON.length+" трудных слов")+
     modeCard("mock","🎓","Mock Exam","Симуляция экзамена")+
+    modeCard("course","🎓","Курс: 12 тем","Программа как на занятиях")+
     modeCard("guide","📖","Об экзамене","Форматы и тактика")+
     modeCard("phrases","💬","Phrase Bank","Готовые фразы Level 4")+
     modeCard("vocab","🃏","Vocabulary",VOCAB.length+" карточек")+
@@ -24680,6 +24681,7 @@ function renderHome(){
       else if(m==="liveatc")renderLiveATC();
       else if(m==="numbers")renderNumbers();
       else if(m==="pron")renderPron();
+      else if(m==="course")renderCourse();
       else if(m==="guide")renderGuide();
       else if(m==="mock")renderMockIntro();
       else if(m==="phrases")renderPhrases();
@@ -26552,6 +26554,87 @@ function renderPronStep(){
     btn.classList.add("rec");
     recog.start();
   };
+}
+
+/* ---------- курс по 12 темам ICAO Level 4 ---------- */
+var COURSE=[
+  {n:1,title:"Ground Operations",ru:"Наземные операции: руление, стоянка, обслуживание, буксировка",
+   voc:["Module 1. Ground ops 1","Module 1. Ground ops 2"],ivCat:["Airports","Maintenance"],emKey:["brake","tyre","door","taxi"],lsCat:["Taxi clearance","Ground handling"],seraSec:["Руление","Запуск"]},
+  {n:2,title:"Communication",ru:"Радиосвязь и недопонимание: readback, потеря связи, стандартные фразы",
+   voc:["Module 2. Communication","Module 2. Misunderstanding","Module 2. Verbs","Радиообмен"],ivCat:["ATC communication"],emKey:["radio","communication"],lsCat:["Readback correction","Lost communication"],seraSec:["Опознавание"]},
+  {n:3,title:"Technology",ru:"Техника и приборы: отказы систем, автоматика, навигационное оборудование",
+   voc:["Module 3. Technology 1","Module 3. Technology 2","Module 3. Technology 3"],ivCat:["Aircraft experience","Technology & drones"],emKey:["alternator","electrical","instrument","gauge"],lsCat:[],seraSec:[]},
+  {n:4,title:"Landing",ru:"Посадка: заход, уход на второй круг, выкатывание, жёсткая посадка",
+   voc:["Module 4. Landing"],ivCat:["Last flight"],emKey:["landing","runway","flap","forced"],lsCat:["Landing clearance"],seraSec:["Посадка"]},
+  {n:5,title:"Pilotless Drones",ru:"Беспилотники: угрозы, правила, будущее авиации",
+   voc:["Module 5. Drones 1","Module 5. Drones 2"],ivCat:["Technology & drones","Future aviation plans"],emKey:["drone"],lsCat:[],seraSec:[]},
+  {n:6,title:"Wildlife",ru:"Птицы и животные: bird strike, риски на аэродроме",
+   voc:["Module 6. Wildlife 1","Module 6. Wildlife 2"],ivCat:[],emKey:["bird","wildlife","animal"],lsCat:[],seraSec:[]},
+  {n:7,title:"Health",ru:"Здоровье и человеческий фактор: усталость, недомогание, медицина",
+   voc:["Module 7. Health 1","Module 7. Health 2"],ivCat:["Human factors"],emKey:["passenger illness","sick","unwell"],lsCat:[],seraSec:[]},
+  {n:8,title:"Fire & Dangerous Goods",ru:"Пожар и опасные грузы: дым в кабине, эвакуация",
+   voc:["Module 8. Fire & Dangerous Goods"],ivCat:["Safety"],emKey:["fire","smoke"],lsCat:["Emergency declaration"],seraSec:[]},
+  {n:9,title:"Security",ru:"Авиационная безопасность: досмотр, незаконное вмешательство",
+   voc:["Module 9. Security"],ivCat:["Safety"],emKey:["security"],lsCat:[],seraSec:[]},
+  {n:10,title:"Weather",ru:"Погода: сдвиг ветра, обледенение, гроза, видимость, уход на запасной",
+   voc:["Module 10. Weather"],ivCat:["Weather"],emKey:["weather","icing","thunder","visibility","diversion"],lsCat:["Weather update","Diversion request","ATIS"],seraSec:[]},
+  {n:11,title:"Airspace",ru:"Воздушное пространство: зоны, пересечение, нарушение границ",
+   voc:["Module 11. Airspace"],ivCat:["Navigation"],emKey:["lost","position","airspace"],lsCat:["Traffic information"],seraSec:["Транспондер"]},
+  {n:12,title:"Job-Related Questions",ru:"Вопросы о себе и профессии: обучение, опыт, планы, мотивация",
+   voc:["Module 12. Job questions","Common aviation terms","Linking words 1","Linking words 2"],ivCat:["Personal background","Flight training","Future aviation plans","Opinions & aviation topics"],emKey:[],lsCat:[],seraSec:[]}
+];
+function courseParts(m){
+  var doneIds=answeredIds();
+  var iv=ALL_INTERVIEW.filter(function(q){ return m.ivCat.indexOf(q.category)>=0; });
+  var em=ALL_EMERGENCY.filter(function(q){
+    var t=(q.category+" "+q.scenario).toLowerCase();
+    return m.emKey.some(function(k){ return t.indexOf(k)>=0; });
+  });
+  var ls=LISTENING.filter(function(t){ return m.lsCat.indexOf(t.category)>=0; });
+  var voc=VOCAB.filter(function(v){ return m.voc.indexOf(v.category)>=0; });
+  return {
+    iv:iv, ivDone:iv.filter(function(q){return doneIds[q.id];}).length,
+    em:em, emDone:em.filter(function(q){return doneIds[q.id];}).length,
+    ls:ls, lsDone:ls.filter(function(t){return listenStats[t.id];}).length,
+    voc:voc, vocDone:voc.filter(function(v){return (learnMastery[v.word]||0)>=2;}).length
+  };
+}
+function coursePct(m){
+  var p=courseParts(m);
+  var tot=p.iv.length+p.em.length+p.ls.length+p.voc.length;
+  var dn=p.ivDone+p.emDone+p.lsDone+p.vocDone;
+  return tot?Math.round(dn/tot*100):0;
+}
+function renderCourse(){
+  stopMic(); speechSynthesis.cancel();
+  setScreen("Курс: 12 тем",true);
+  var avg=Math.round(COURSE.reduce(function(s,m){return s+coursePct(m);},0)/COURSE.length);
+  appEl.appendChild(el('<div class="card"><b>Программа Level 4 по 12 темам</b>'+
+    '<div class="muted" style="font-size:13px;margin-top:6px">Те же темы, что в вашем курсе. Для каждой — наши вопросы, сценарии, аудио и ваши карточки из Quizlet. Средний прогресс: <b>'+avg+'%</b></div>'+
+    '<div class="progress-bar" style="margin-top:6px"><div style="width:'+avg+'%"></div></div></div>'));
+  COURSE.forEach(function(m){
+    var p=courseParts(m), pct=coursePct(m);
+    var c=el('<details><summary>'+(pct>=80?"✅ ":"")+'Module '+m.n+'. '+esc(m.title)+' <span class="muted">'+pct+'%</span></summary>'+
+      '<div class="inner"><div class="muted" style="font-size:13px">'+esc(m.ru)+'</div>'+
+      '<div class="progress-bar" style="margin:8px 0"><div style="width:'+pct+'%"></div></div>'+
+      (p.iv.length?'<div class="drow" data-a="iv"><span>🎙️ Вопросы интервью</span><b>'+p.ivDone+' / '+p.iv.length+'</b></div>':'')+
+      (p.em.length?'<div class="drow" data-a="em"><span>⚠️ Нештатные сценарии</span><b>'+p.emDone+' / '+p.em.length+'</b></div>':'')+
+      (p.ls.length?'<div class="drow" data-a="ls"><span>🎧 Аудирование</span><b>'+p.lsDone+' / '+p.ls.length+'</b></div>':'')+
+      (p.voc.length?'<div class="drow" data-a="voc"><span>🃏 Словарь темы</span><b>'+p.vocDone+' / '+p.voc.length+'</b></div>':'')+
+      '</div></details>');
+    c.querySelectorAll(".drow").forEach(function(r){
+      r.style.cursor="pointer";
+      r.onclick=function(){
+        var a=r.dataset.a;
+        if(a==="iv"){ trainState.cat.interview=m.ivCat[0]||"Все"; renderTraining("interview"); }
+        else if(a==="em"){ var q=p.em.filter(function(x){return !answeredIds()[x.id];})[0]||p.em[0]; renderTraining("emergency",q); }
+        else if(a==="ls"){ listenState.cat=m.lsCat[0]||"Все"; renderListening(); }
+        else { vocabView.cat=m.voc[0]; vocabView.idx=0; vocabView.flipped=false; renderVocab(); }
+      };
+    });
+    appEl.appendChild(c);
+  });
+  appEl.appendChild(el('<div class="notice">Программа собрана из наших собственных материалов по темам курса. Уроки и материалы вашего курса остаются на платформе — здесь только тренировка.</div>'));
 }
 
 /* ---------- exam guide ---------- */
