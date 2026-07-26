@@ -25755,6 +25755,7 @@ window.DATA_FU_E = {
 </script>
 <script>
 "use strict";
+var APP_VERSION="2026-07-26.1";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -28745,6 +28746,7 @@ function renderSettings(){
     '<button class="btn sec" id="sImport">⬆ Импорт</button></div>'+
     '<input type="file" id="sImportFile" accept=".json,application/json" style="display:none">'+
     '<div class="muted" id="sMsg" style="margin-top:8px"></div>'+
+    '<div class="muted" style="font-size:12px;margin-top:10px">Версия приложения: <b>'+APP_VERSION+'</b> — она должна совпадать на телефоне и компьютере. Если не совпадает: откройте приложение с интернетом, закройте полностью и откройте снова.</div>'+
     '<div class="muted" style="margin-top:12px;font-size:13px">Ключ хранится только на этом устройстве (localStorage) и отправляется напрямую в API провайдера. Ключ Anthropic: console.anthropic.com → API Keys. Ключ OpenAI: platform.openai.com.<br><br>Голосовой ввод: Chrome на Android, нужен доступ к микрофону. Для Picture-режима AI получает саму картинку (vision).</div>'+
   '</div>');
   c.querySelector("#sProv").value=settings.provider;
