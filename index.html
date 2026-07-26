@@ -24620,6 +24620,13 @@ function renderHome(){
     };
     appEl.appendChild(nb);
   }
+  if(settings.syncToken){
+    var sc=el('<div class="card" style="cursor:pointer;padding:10px 14px"><div class="muted" style="font-size:13px">🔄 '+
+      esc(syncMsgHome||(settings.lastSync?("синхронизировано "+new Date(settings.lastSync).toLocaleString()):"нажмите, чтобы синхронизировать"))+
+      ' <span style="float:right">↻</span></div></div>');
+    sc.firstChild.onclick=function(){ autoSync(true); };
+    appEl.appendChild(sc);
+  }
   appEl.appendChild(el('<div class="card"><b>Прогресс</b><div class="muted" style="margin-top:6px">'+
     'Проверено ответов: '+attempts.length+
     (w?('<br>Слабый критерий: <b style="color:var(--warn)">'+esc(w.label)+'</b> (ср. '+w.avg.toFixed(1)+')'):'')+
@@ -25268,30 +25275,42 @@ function gh(path,opts){
   });
 }
 var syncing=false;
+var SYNC_FILE="icao4-progress.json";
+/* ищем уже созданный gist этого аккаунта — иначе каждое устройство заведёт свой */
+function findGist(){
+  if(settings.gistId) return Promise.resolve(settings.gistId);
+  return gh("/gists?per_page=100").then(function(list){
+    var found=null;
+    (list||[]).forEach(function(g){ if(!found&&g.files&&g.files[SYNC_FILE])found=g.id; });
+    if(found){ settings.gistId=found; saveJSON("icao4_settings",settings); }
+    return found;
+  });
+}
 function doSync(cb){
   if(syncing||!settings.syncToken||!settings.syncToken.trim()){ if(cb)cb("off"); return; }
   syncing=true;
-  var body={description:"ICAO 4 Trainer progress",public:false,files:{"icao4-progress.json":{content:""}}};
+  function payload(){ var f={}; f[SYNC_FILE]={content:JSON.stringify(syncSnapshot())}; return {files:f}; }
   function push(){
-    body.files["icao4-progress.json"].content=JSON.stringify(syncSnapshot());
-    if(settings.gistId){
-      return gh("/gists/"+settings.gistId,{method:"PATCH",body:JSON.stringify({files:body.files})});
-    }
+    if(settings.gistId) return gh("/gists/"+settings.gistId,{method:"PATCH",body:JSON.stringify(payload())});
+    var body=payload(); body.description="ICAO 4 Trainer progress"; body.public=false;
     return gh("/gists",{method:"POST",body:JSON.stringify(body)}).then(function(g){
       settings.gistId=g.id; saveJSON("icao4_settings",settings); return g;
     });
   }
-  var p;
-  if(settings.gistId){
-    p=gh("/gists/"+settings.gistId).then(function(g){
-      var f=g.files&&g.files["icao4-progress.json"];
-      if(f&&f.content){ try{ syncMerge(JSON.parse(f.content)); }catch(e){} }
-      return push();
+  var p=findGist().then(function(id){
+    if(!id) return push();                       // ничего нет — создаём
+    return gh("/gists/"+id).then(function(g){
+      var f=g.files&&g.files[SYNC_FILE];
+      var get=(f&&f.truncated&&f.raw_url)?fetch(f.raw_url).then(function(r){return r.text();}):Promise.resolve(f?f.content:"");
+      return get.then(function(txt){
+        if(txt){ try{ syncMerge(JSON.parse(txt)); }catch(e){} }
+        return push();
+      });
     }).catch(function(e){
-      if(String(e.message).indexOf("404")>=0){ settings.gistId=""; return push(); }
+      if(/404/.test(String(e.message))){ settings.gistId=""; saveJSON("icao4_settings",settings); return push(); }
       throw e;
     });
-  } else p=push();
+  });
   p.then(function(){
     settings.lastSync=Date.now(); saveJSON("icao4_settings",settings);
     if(cb)cb("ok");
@@ -25299,10 +25318,16 @@ function doSync(cb){
    .finally(function(){ syncing=false; });
 }
 /* автосинк: при запуске и при возврате в приложение (не чаще раза в 2 минуты) */
-function autoSync(){
+var syncMsgHome="";
+function autoSync(force){
   if(!settings.syncToken||!settings.syncToken.trim())return;
-  if(Date.now()-(settings.lastSync||0)<120000)return;
-  doSync(function(st){ if(st==="ok"&&/^(ICAO 4 Trainer)?$/.test(titleEl.textContent||""))renderHome(); });
+  if(!force&&Date.now()-(settings.lastSync||0)<60000)return;
+  syncMsgHome="⏳ синхронизация…";
+  if(titleEl.textContent==="ICAO 4 Trainer")renderHome();
+  doSync(function(st){
+    syncMsgHome=(st==="ok")?("✓ синхронизировано "+new Date().toLocaleTimeString().slice(0,5)):("⚠ "+String(st).replace(/^err:/,""));
+    if(titleEl.textContent==="ICAO 4 Trainer")renderHome();
+  });
 }
 document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible")autoSync(); });
 window.addEventListener("beforeunload",function(){
