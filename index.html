@@ -26815,7 +26815,7 @@ window.DATA_FU_E = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-07-26.4";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-07-26.5";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -28065,6 +28065,13 @@ function rtTabs(active){
   return t;
 }
 /* --- Live ATC (реальный эфир, нужен интернет) --- */
+/* YouTube-трансляции с ATC — их можно встраивать, играют внутри приложения */
+var YT_ATC=[
+  {id:"n4I0d44oBEs",name:"LAX Runways 24L/24R + ATC",loc:"Лос-Анджелес, 24/7 — видео + эфир вышки и подхода"},
+  {id:"KzsNnyN8D_Q",name:"LAX Runways 25L/25R + ATC",loc:"Лос-Анджелес, вторая пара ВПП"},
+  {id:"kLLb-fPOPuk",name:"JFK Live ATC Feed",loc:"Нью-Йорк — взлёты, посадки, аварийные вызовы"},
+  {id:"aDl0oL5424Y",name:"Hong Kong VHHH + ATC",loc:"Гонконг — 3D-трекинг и эфир"}
+];
 var LIVEATC=[
   {gr:"🇵🇱 Польша",name:"Warszawa Approach (EPWA)",loc:"Окенце — подход, самый загруженный эфир страны",mount:"epwa_app",icao:"epwa"},
   {gr:"🇵🇱 Польша",name:"Warszawa Tower (EPWA)",loc:"Окенце — вышка",mount:"epwa_twr2",icao:"epwa"},
@@ -28092,9 +28099,32 @@ function renderLiveATC(){
   stopMic(); speechSynthesis.cancel();
   setScreen("Live ATC",true);
   appEl.appendChild(rtTabs("live"));
-  appEl.appendChild(el('<div class="card muted" style="font-size:13px">Реальный эфир с liveatc.net — играет прямо здесь. Нажмите частоту, затем ▶ Play в плеере (браузер требует одно нажатие). Плеер остаётся открытым, пока вы листаете список.<br><br>Как заниматься: 10 минут в день как подкаст. Сначала ловите позывные и цифры, через неделю — суть указаний. Начните с <b>Wrocław FIS</b> (VFR-борта, как вы) и <b>Zurich Delivery</b> (клиренсы медленно и чётко), потом Варшава. Тишина в эфире — это нормально, особенно ночью.</div>'));
+  appEl.appendChild(el('<div class="card muted" style="font-size:13px">Реальный эфир диспетчеров. <b>Играют прямо здесь</b> — YouTube-трансляции (первый блок). Частоты LiveATC ниже открываются на их сайте: они запрещают воспроизведение на чужих сайтах, обойти нельзя.<br><br>Как заниматься: 10 минут в день как подкаст. Сначала ловите позывные и цифры, через неделю — суть указаний. Тишина в эфире — это нормально, особенно ночью.</div>'));
   var playerBox=el('<div id="atcPlayer" style="display:none;position:sticky;top:56px;z-index:5"></div>');
   appEl.appendChild(playerBox);
+  // --- YouTube-трансляции: играют внутри приложения ---
+  appEl.appendChild(el('<div class="card" style="padding:8px 14px;background:var(--bg2)"><b>▶ Играет в приложении (YouTube)</b></div>'));
+  YT_ATC.forEach(function(y){
+    var c=el('<div class="drow" style="padding:12px 4px">'+
+      '<span style="flex:1;padding-right:8px"><b>'+esc(y.name)+'</b>'+
+      '<div class="muted" style="font-size:12px">'+esc(y.loc)+'</div></span><b>▶</b></div>');
+    c.firstChild.onclick=function(){
+      var box=appEl.querySelector("#atcPlayer");
+      box.innerHTML='<div class="card" style="padding:10px;border-color:var(--accent)">'+
+        '<div style="display:flex;align-items:center;gap:8px"><b style="flex:1;font-size:14px">📺 '+esc(y.name)+'</b>'+
+        '<button class="btn sec small" id="atcClose">✕</button></div>'+
+        '<div style="position:relative;padding-top:56%;margin-top:6px">'+
+        '<iframe src="https://www.youtube.com/embed/'+esc(y.id)+'?autoplay=1&mute=0&playsinline=1" '+
+        'style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:10px" '+
+        'allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>'+
+        '<div class="muted" style="font-size:12px;margin-top:6px">Если звука нет — нажмите на видео и снимите отключение звука 🔇.</div></div>';
+      box.style.display="";
+      box.querySelector("#atcClose").onclick=function(){ box.innerHTML=""; box.style.display="none"; };
+      box.scrollIntoView({behavior:"smooth",block:"start"});
+    };
+    appEl.appendChild(c);
+  });
+  appEl.appendChild(el('<div class="card" style="padding:8px 14px;background:var(--bg2);margin-top:14px"><b>🌐 LiveATC — открывается на их сайте</b><div class="muted" style="font-size:12px">Здесь польские и европейские частоты, включая FIS и вышки малых аэродромов</div></div>'));
   var groups=[];
   LIVEATC.forEach(function(f){ if(groups.indexOf(f.gr)<0)groups.push(f.gr); });
   groups.forEach(function(gr){
@@ -28105,19 +28135,7 @@ function renderLiveATC(){
         '<span style="flex:1;padding-right:8px"><b>'+esc(f.name)+'</b>'+
         '<div class="muted" style="font-size:12px">'+esc(f.loc)+'</div></span>'+
         '<b>▶</b></div>');
-      c.firstChild.onclick=function(){
-        var box=appEl.querySelector("#atcPlayer");
-        box.innerHTML='<div class="card" style="padding:10px;border-color:var(--accent)">'+
-          '<div style="display:flex;align-items:center;gap:8px"><b style="flex:1;font-size:14px">📻 '+esc(f.name)+'</b>'+
-          '<a class="btn sec small" style="text-decoration:none" href="'+url+'" target="_blank" rel="noopener">↗</a>'+
-          '<button class="btn sec small" id="atcClose">✕</button></div>'+
-          '<iframe src="'+url+'" style="width:100%;height:230px;border:0;border-radius:10px;margin-top:6px;background:#fff" '+
-          'allow="autoplay" referrerpolicy="no-referrer-when-downgrade"></iframe>'+
-          '<div class="muted" style="font-size:12px">Если тихо — нажмите ▶ Play в плеере выше. Кнопка ↗ откроет его отдельной вкладкой.</div></div>';
-        box.style.display="";
-        box.querySelector("#atcClose").onclick=function(){ box.innerHTML=""; box.style.display="none"; };
-        box.scrollIntoView({behavior:"smooth",block:"start"});
-      };
+      c.firstChild.onclick=function(){ window.open(url,"_blank","noopener"); };
       appEl.appendChild(c);
     });
   });
