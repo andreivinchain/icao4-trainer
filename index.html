@@ -25755,7 +25755,7 @@ window.DATA_FU_E = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-07-26.2";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-07-26.3";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -27000,41 +27000,48 @@ function rtTabs(active){
 }
 /* --- Live ATC (реальный эфир, нужен интернет) --- */
 var LIVEATC=[
-  {name:"Warsaw Approach (EPWA)",loc:"Варшава 🇵🇱 — ваш регион, ваши диспетчеры",mount:"epwa_app",icao:"epwa"},
-  {name:"Warsaw Tower (EPWA)",loc:"Варшава 🇵🇱 — вышка Окенце",mount:"epwa_twr2",icao:"epwa"},
-  {name:"Kraków Approach (EPKK)",loc:"Краков 🇵🇱",mount:"epkk_app",icao:"epkk"},
-  {name:"Vilnius (EYVI)",loc:"Вильнюс 🇱🇹 — ближайший к Минску эфир",mount:"eyvi",icao:"eyvi"},
-  {name:"Dublin Tower/App (EIDW)",loc:"Дублин 🇮🇪 (Германии на LiveATC нет — там это запрещено законом)",mount:"eidw82",icao:"eidw"},
-  {name:"Amsterdam App/Dep (EHAM)",loc:"Амстердам 🇳🇱 — 118.080",mount:"eham_app_118080",icao:"eham"},
-  {name:"Zurich Approach East (LSZH)",loc:"Цюрих 🇨🇭",mount:"lszh1_app_east",icao:"lszh"},
-  {name:"Zurich Delivery (LSZH)",loc:"Цюрих 🇨🇭 — клиренсы, медленно и чётко",mount:"lszh1_del",icao:"lszh"},
-  {name:"Dublin Gnd/Twr/App (EIDW)",loc:"Дублин 🇮🇪 — всё в одном",mount:"eidw8",icao:"eidw"},
-  {name:"JFK ATIS (KJFK)",loc:"Нью-Йорк 🇺🇸 — тренировка цифр: ATIS по кругу",mount:"kjfk_atis",icao:"kjfk"},
-  {name:"Boston Approach (KBOS)",loc:"Бостон 🇺🇸 — чистый быстрый американский",mount:"kbos1_app_south",icao:"kbos"},
-  {name:"O'Hare Approach (KORD)",loc:"Чикаго 🇺🇸 — хардкорный темп",mount:"kord1n2_app_133625",icao:"kord"}
+  {gr:"🇵🇱 Польша",name:"Warszawa Approach (EPWA)",loc:"Окенце — подход, самый загруженный эфир страны",mount:"epwa_app",icao:"epwa"},
+  {gr:"🇵🇱 Польша",name:"Warszawa Tower (EPWA)",loc:"Окенце — вышка",mount:"epwa_twr2",icao:"epwa"},
+  {gr:"🇵🇱 Польша",name:"Warszawa Ground (EPWA)",loc:"Окенце — руление, много деталей и цифр",mount:"epwa_gnd",icao:"epwa"},
+  {gr:"🇵🇱 Польша",name:"Kraków Approach (EPKK)",loc:"Краков-Балице — второй по загрузке",mount:"epkk_app",icao:"epkk"},
+  {gr:"🇵🇱 Польша",name:"Katowice Twr/App (EPKT)",loc:"Катовице-Пыжовице",mount:"epkt_twr_app",icao:"epkt"},
+  {gr:"🇵🇱 Польша",name:"Katowice Ground (EPKT)",loc:"Катовице — руление",mount:"epkt_gnd",icao:"epkt"},
+  {gr:"🇵🇱 Польша",name:"Wrocław Tower (EPWR)",loc:"Вроцлав — вышка",mount:"epwr4_twr",icao:"epwr"},
+  {gr:"🇵🇱 Польша",name:"Wrocław FIS (EPWR)",loc:"Вроцлав — информационное обслуживание: то, чем пользуетесь вы в VFR",mount:"epwr4_fis_s",icao:"epwr"},
+  {gr:"🇵🇱 Польша",name:"Wrocław ATIS (EPWR)",loc:"Вроцлав — ATIS по кругу: тренировка цифр",mount:"epwr4_atis",icao:"epwr"},
+  {gr:"🇵🇱 Польша",name:"Poznań (EPPO)",loc:"Познань-Лавица",mount:"eppo2",icao:"eppo"},
+  {gr:"🇵🇱 Польша",name:"Łódź Twr/Del (EPLL)",loc:"Лодзь — вышка и клиренсы",mount:"epll_twr_del",icao:"epll"},
+  {gr:"🇵🇱 Польша",name:"Bydgoszcz Tower (EPBY)",loc:"Быдгощ — небольшой аэропорт, спокойный темп",mount:"epby3_twr",icao:"epby"},
+  {gr:"🇵🇱 Польша",name:"Bydgoszcz ATIS (EPBY)",loc:"Быдгощ — ATIS",mount:"epby3_atis",icao:"epby"},
+  {gr:"🌍 Европа",name:"Vilnius (EYVI)",loc:"Вильнюс 🇱🇹 — ближайший к Минску эфир",mount:"eyvi",icao:"eyvi"},
+  {gr:"🌍 Европа",name:"Zurich Delivery (LSZH)",loc:"Цюрих 🇨🇭 — клиренсы, медленно и чётко: с этого начинать",mount:"lszh1_del",icao:"lszh"},
+  {gr:"🌍 Европа",name:"Zurich Approach East (LSZH)",loc:"Цюрих 🇨🇭 — подход",mount:"lszh1_app_east",icao:"lszh"},
+  {gr:"🌍 Европа",name:"Amsterdam App/Dep (EHAM)",loc:"Амстердам 🇳🇱",mount:"eham_app_118080",icao:"eham"},
+  {gr:"🌍 Европа",name:"Dublin Gnd/Twr/App (EIDW)",loc:"Дублин 🇮🇪 — всё в одном",mount:"eidw8",icao:"eidw"},
+  {gr:"🇺🇸 США — быстрый темп",name:"JFK ATIS (KJFK)",loc:"Нью-Йорк — ATIS по кругу, тренировка цифр",mount:"kjfk_atis",icao:"kjfk"},
+  {gr:"🇺🇸 США — быстрый темп",name:"Boston Approach (KBOS)",loc:"Бостон — чистый быстрый американский",mount:"kbos1_app_south",icao:"kbos"},
+  {gr:"🇺🇸 США — быстрый темп",name:"O'Hare Approach (KORD)",loc:"Чикаго — хардкорный темп",mount:"kord1n2_app_133625",icao:"kord"}
 ];
 function renderLiveATC(){
   stopMic(); speechSynthesis.cancel();
   setScreen("Live ATC",true);
   appEl.appendChild(rtTabs("live"));
-  appEl.appendChild(el('<div class="card muted" style="font-size:13px">Реальный радиообмен в прямом эфире (liveatc.net). Нужен интернет. Слушайте 10 минут в день как подкаст: сначала ловите позывные и цифры, потом смысл. Если поток молчит — частота тихая или фид офлайн, попробуйте другой или откройте на сайте. Начните с Варшавы — это ваш акцент диспетчеров, и с Бостона — чистый быстрый американский.</div>'));
-  LIVEATC.forEach(function(f,i){
-    var c=el('<div class="card">'+
-      '<b>'+esc(f.name)+'</b><div class="muted" style="font-size:13px">'+esc(f.loc)+'</div>'+
-      '<div class="btnrow"><button class="btn" data-i="'+i+'" id="la'+i+'">▶ Слушать</button>'+
-      '<a class="btn sec" style="text-decoration:none" href="https://www.liveatc.net/hlisten.php?mount='+esc(f.mount)+'&icao='+esc(f.icao)+'" target="_blank" rel="noopener">На сайте ↗</a></div>'+
-      '<div id="laBox'+i+'"></div></div>');
-    c.querySelector("#la"+i).onclick=function(){
-      // остановить остальные плееры
-      appEl.querySelectorAll("audio").forEach(function(a){ a.pause(); a.remove(); });
-      var box=c.querySelector("#laBox"+i);
-      box.innerHTML='<audio controls autoplay src="https://d.liveatc.net/'+esc(f.mount)+'" style="width:100%;margin-top:8px"></audio>'+
-        '<div class="muted" style="font-size:12px">Если тишина 30+ сек — частота просто молчит (это нормально). Если ошибка — жмите «На сайте».</div>';
-      var au=box.querySelector("audio");
-      au.onerror=function(){ box.innerHTML='<div class="err">Прямой поток недоступен — откройте «На сайте ↗»</div>'; };
-    };
-    appEl.appendChild(c);
+  appEl.appendChild(el('<div class="card muted" style="font-size:13px">Реальный эфир с liveatc.net. Нажатие открывает их плеер в новой вкладке — LiveATC не разрешает воспроизведение на чужих сайтах, поэтому играем у них (звук пойдёт сразу, вкладку можно свернуть).<br><br>Как заниматься: 10 минут в день как подкаст. Сначала ловите только позывные и цифры, через неделю — суть указаний. Начните с <b>Wrocław FIS</b> (там VFR-борта, как вы) и <b>Zurich Delivery</b> (клиренсы медленно и чётко), потом Варшава.<br><br>Тишина в эфире — это нормально, особенно ночью и на малых аэродромах.</div>'));
+  var groups=[];
+  LIVEATC.forEach(function(f){ if(groups.indexOf(f.gr)<0)groups.push(f.gr); });
+  groups.forEach(function(gr){
+    appEl.appendChild(el('<div class="card" style="padding:8px 14px;background:var(--bg2)"><b>'+esc(gr)+'</b></div>'));
+    LIVEATC.filter(function(f){return f.gr===gr;}).forEach(function(f){
+      var url="https://www.liveatc.net/hlisten.php?mount="+f.mount+"&icao="+f.icao;
+      var c=el('<div class="drow" style="padding:12px 4px">'+
+        '<span style="flex:1;padding-right:8px"><b>'+esc(f.name)+'</b>'+
+        '<div class="muted" style="font-size:12px">'+esc(f.loc)+'</div></span>'+
+        '<b>▶</b></div>');
+      c.firstChild.onclick=function(){ window.open(url,"_blank","noopener"); };
+      appEl.appendChild(c);
+    });
   });
+  appEl.appendChild(el('<div class="notice">Гданьска (EPGD), Модлина и Люблина на LiveATC нет — там никто не ведёт трансляцию. Если появятся, добавлю.</div>'));
 }
 /* --- справочник CAP 413 --- */
 function renderCapRef(filter){
@@ -28521,6 +28528,19 @@ function answerVariants(word){
   return word.split(/[,;\/]/).map(function(x){return normAns(x);}).filter(Boolean);
 }
 function sameLang(a,b){ return (/[а-яё]/i.test(a))===(/[а-яё]/i.test(b)); }
+function distractorWords(v,n){       // варианты-СЛОВА (для режима «по определению»)
+  function ok(x){ return x.word!==v.word && x.word.length<Math.max(18,v.word.length+8) && !/[а-яё]/i.test(x.word); }
+  var same=(learn&&learn.pool?learn.pool:VOCAB).filter(ok);
+  if(same.length<n) same=VOCAB.filter(ok);
+  var out=[],pool=same.slice(),seen={};
+  seen[normAns(v.word)]=1;
+  while(out.length<n&&pool.length){
+    var c=pool.splice(Math.floor(Math.random()*pool.length),1)[0].word;
+    if(!seen[normAns(c)]){ seen[normAns(c)]=1; out.push(c); }
+  }
+  while(out.length<n)out.push("—");
+  return out;
+}
 function distractors(v,n){
   // варианты только на том же языке и похожей длины — иначе ответ очевиден
   function ok(x){ return x.word!==v.word && sameLang(x.translation,v.translation) && x.translation.length<Math.max(60,v.translation.length*3); }
@@ -28544,20 +28564,32 @@ function renderLearnStep(){
   appEl.appendChild(el('<div class="muted" style="margin-bottom:8px">Сессия: '+done+' из '+learn.cards.length+' выучено · осталось в очереди: '+learn.queue.length+'</div>'));
   var card;
   if(learn.voice||(learn.review&&v.aviationMeaning)){
-    // ГОЛОСОВОЙ РЕЖИМ: показываем определение/перевод — вы называете слово по-английски
+    // ГОЛОС + ВАРИАНТЫ: показываем определение — говорите слово ИЛИ выбирайте из вариантов ниже
     var clue=v.aviationMeaning||v.translation;
-    card=el('<div class="card"><div class="cat muted">Скажите слово по-английски</div>'+
+    var wOpts=distractorWords(v,3).concat([v.word]);
+    wOpts.sort(function(){return Math.random()-0.5;});
+    card=el('<div class="card"><div class="cat muted">Скажите слово по-английски — или выберите ниже</div>'+
       '<div style="font-size:17px;margin:12px 0;line-height:1.5">'+esc(clue)+'</div>'+
       (v.aviationMeaning?'<div class="muted" style="font-size:14px">'+esc(v.translation)+'</div>':'')+
       '<div class="btnrow">'+micBtnHtml("lvMic")+
-      '<button class="btn sec small" id="lvHint">💡 Первая буква</button>'+
-      '<button class="btn sec small" id="lvSkip">Не знаю</button></div>'+
+      '<button class="btn sec small" id="lvSay">🔊 Определение</button>'+
+      '<button class="btn sec small" id="lvHint">💡 Буква</button></div>'+
       '<div id="lvHeard" class="muted" style="font-size:13px;margin-top:6px"></div>'+
+      wOpts.map(function(o){return '<div class="opt wopt" data-w="'+esc(o)+'">'+esc(o)+'</div>';}).join("")+
       '<div id="lfb"></div>'+
       '<textarea id="lvBuf" style="position:absolute;left:-9999px;height:1px;min-height:1px"></textarea></div>');
     var buf=card.querySelector("#lvBuf"), heard=card.querySelector("#lvHeard");
+    card.querySelector("#lvSay").onclick=function(){ speak(clue); };
     card.querySelector("#lvHint").onclick=function(){ heard.textContent="Подсказка: "+shadowHint(v.word); };
-    card.querySelector("#lvSkip").onclick=function(){ if(card.dataset.done)return; card.dataset.done=1; stopMic(); learnAnswer(v,false,card); };
+    card.querySelectorAll(".wopt").forEach(function(o){
+      o.onclick=function(){
+        if(card.dataset.done)return; card.dataset.done=1; stopMic();
+        var okc=o.dataset.w===v.word;
+        o.style.borderColor=okc?"var(--good)":"var(--bad)";
+        if(!okc) card.querySelectorAll(".wopt").forEach(function(x){ if(x.dataset.w===v.word)x.style.borderColor="var(--good)"; });
+        learnAnswer(v,okc,card);
+      };
+    });
     card.querySelector("#lvMic").onclick=function(){
       var btn=this;
       if(recog||micWant){ stopMic(); return; }
