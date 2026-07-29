@@ -26815,7 +26815,7 @@ window.DATA_FU_E = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-07-26.5";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-07-26.6";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -28483,14 +28483,21 @@ function shadowCompare(target,spoken){
   var chunks=target.split(/\s+/);
   var S=normAns(spoken).split(" ").filter(Boolean);
   var si=0, hit=0, total=0, html="";
+  // ищем каждое слово в ОКНЕ рядом с текущей позицией: одно пропущенное слово
+  // больше не сбивает всё дальнейшее сравнение
+  var WIN=8;
   chunks.forEach(function(ch){
     var w=normAns(ch);
     if(!w){ html+=esc(ch)+" "; return; }
     total++;
-    var ok=false;
-    for(var j=si;j<S.length;j++){ if(S[j]===w){ ok=true; si=j+1; break; } }
-    if(ok)hit++;
-    html+='<span class="'+(ok?"wok":"wmiss")+'">'+esc(ch)+'</span> ';
+    var found=-1, lim=Math.min(S.length,si+WIN);
+    for(var j=si;j<lim;j++){ if(S[j]===w){ found=j; break; } }
+    if(found<0){ // допускаем небольшой откат назад (переставленные слова)
+      var back=Math.max(0,si-3);
+      for(var k=back;k<si;k++){ if(S[k]===w){ found=k; break; } }
+    }
+    if(found>=0){ hit++; si=found+1; }
+    html+='<span class="'+(found>=0?"wok":"wmiss")+'">'+esc(ch)+'</span> ';
   });
   return {score: total?hit/total:1, html: html};
 }
@@ -28553,6 +28560,7 @@ function renderShadowStep(){
       (s.stage!=="shadow"?'<button class="btn sec small" id="shShow">👁 Показать</button>':'')+
     '</div>'+
     '<div class="overall" style="margin-top:12px">Совпадение: <span id="shScore">—</span> <span id="shStatus" class="muted" style="font-weight:400;font-size:14px"></span></div>'+
+    '<div id="shLive" class="muted" style="font-size:13px;min-height:18px;margin:4px 0"></div>'+
     '<div id="shDiff" style="margin-top:6px;line-height:1.8"></div>'+
     '<div class="btnrow">'+
       micBtnHtml("shMic")+
@@ -28571,6 +28579,8 @@ function renderShadowStep(){
   var busy=false;
   function setStatus(t){ statusEl.textContent=t; }
   function play(){ speechSynthesis.cancel(); speak(target); }
+  var liveEl=card.querySelector("#shLive");
+  var targetWords=target.split(/\s+/).filter(Boolean).length;
   function startListen(){
     if(!micSupported())return;
     stopMic();
@@ -28578,8 +28588,18 @@ function renderShadowStep(){
     recogBtn=card.querySelector("#shMic"); recogTarget=buf;
     buf.value=""; busy=false; micWant=true;
     recogBtn.classList.add("rec");
-    var silenceMs=isFull?3500:2200, silence=null, committed="";
-    function arm(){ if(silence)clearTimeout(silence); silence=setTimeout(function(){ micWant=false; if(buf.value.trim()) doCheck(); },silenceMs); }
+    // длинный текст читается дольше и с паузами: ждём дольше и не проверяем, пока не набралась половина
+    var isLong=targetWords>=25;
+    var silenceMs=isFull?8000:(isLong?5000:2500), silence=null, committed="", waited=0;
+    function arm(){
+      if(silence)clearTimeout(silence);
+      silence=setTimeout(function(){
+        var said=buf.value.trim().split(/\s+/).filter(Boolean).length;
+        // если сказано меньше половины — даём ещё время (до 3 продлений)
+        if(said<targetWords*0.5 && waited<3){ waited++; setStatus("🎤 продолжайте… ("+said+"/"+targetWords+" слов)"); arm(); return; }
+        micWant=false; if(buf.value.trim()) doCheck();
+      },silenceMs);
+    }
     function one(){
       if(!micWant)return;
       recog=new SR();
@@ -28588,6 +28608,8 @@ function renderShadowStep(){
         var r=ev.results[ev.results.length-1], tr=r[0].transcript;
         if(r.isFinal){ committed=dedupePhrase(committed,tr); buf.value=committed; }
         else buf.value=(committed?committed+" ":"")+tr;
+        var n=buf.value.trim().split(/\s+/).filter(Boolean).length;
+        if(liveEl) liveEl.textContent="🎤 "+n+"/"+targetWords+" слов: …"+buf.value.slice(-70);
         arm();
       };
       recog.onerror=function(ev){
@@ -28614,8 +28636,11 @@ function renderShadowStep(){
     }
     var r=shadowCompare(target,spoken);
     var pct=Math.round(r.score*100);
-    var ok=r.score>=SHADOW_PASS;
-    card.querySelector("#shScore").innerHTML='<span class="'+(ok?"s-good":(pct>=50?"s-warn":"s-bad"))+'">'+pct+'%'+(ok?" ✓":"")+'</span>';
+    // длинные тексты распознаются хуже — порог мягче
+    var pass=targetWords>=60?0.55:(targetWords>=25?0.65:SHADOW_PASS);
+    var ok=r.score>=pass;
+    if(liveEl)liveEl.textContent="";
+    card.querySelector("#shScore").innerHTML='<span class="'+(ok?"s-good":(pct>=50?"s-warn":"s-bad"))+'">'+pct+'%'+(ok?" ✓":"")+'</span> <span class="muted" style="font-size:12px">(нужно '+Math.round(pass*100)+'%)</span>';
     card.querySelector("#shDiff").innerHTML=r.html;
     buf.value="";
     if(ok){
