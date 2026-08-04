@@ -11356,6 +11356,290 @@ window.DATA_PICTURES = [
   }
 ];
 
+// Picture Description task bank #2 — ICAO Level 4 Aviation English Trainer
+// Topics: WEATHER (5) and EMERGENCY (7).
+// All images: Wikimedia Commons (freely licensed). Every URL verified: HTTP 200, content-type image/jpeg.
+// 6-step exam logic: see / happening / before / next / risks / actions.
+
+window.DATA_PICTURES_2 = [
+  {
+    id: "pic-101",
+    category: "Weather — thunderstorm and CB clouds",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/2022-07-18_19_01_42_View_across_a_field_towards_the_edge_of_a_thunderstorm_and_an_aircraft_on_approach_to_nearby_Dover_Air_Force_Base%2C_viewed_from_Delaware_State_Route_8_(North_Little_Creek_Road)_near_Quaker_Lane_in_Oak_Grove%2C_Kent_County%2C_Delaware.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:2022-07-18 19 01 42 View across a field towards the edge of a thunderstorm and an aircraft on approach to nearby Dover Air Force Base, viewed from Delaware State Route 8 (North Little Creek Road) near Quaker Lane in Oak Grove, Kent County, Delaware.jpg (CC BY-SA 4.0)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "Why must pilots never fly into a cumulonimbus cloud?",
+      "How can a VFR pilot get weather information about thunderstorms before departure?",
+      "What would you do if a thunderstorm moved over your destination aerodrome?"
+    ],
+    level4Answer: "I can see a very dark sky over a green field. There are big black clouds, and they seem to be cumulonimbus clouds. The base of the cloud is low and the sky under it looks grey, so it is probably raining there. In the middle of the picture I can see a small aircraft. It seems to be on approach to an aerodrome near the field. The weather looks like a thunderstorm. Before this moment, the crew probably received a warning about convective weather. They may have decided to land quickly before the storm arrives. In the next minutes the storm may move over the runway. Then the wind may become very strong and change direction. The main risks are windshear, turbulence, hail and lightning. The pilot should not fly into the cloud and should keep a good distance from it. If the storm is over the field, it is better to hold, divert or wait on the ground until it passes.",
+    vocabulary: [
+      {term:"cumulonimbus (CB)", meaning:"a large storm cloud with heavy rain, hail and strong up and down air"},
+      {term:"windshear", meaning:"a sudden change of wind speed or direction near the ground"},
+      {term:"convective weather", meaning:"weather with rising air, showers and thunderstorms"},
+      {term:"to divert", meaning:"to fly to another aerodrome instead of the planned one"},
+      {term:"to hold", meaning:"to fly a waiting pattern until the situation improves"},
+      {term:"gust front", meaning:"the strong cold wind that comes out of a storm before the rain"}
+    ],
+    risks: ["Severe turbulence and windshear on approach","Hail and lightning damage to the airframe","Sudden change of wind and loss of control near the ground","Heavy rain reducing visibility to almost zero"]
+  },
+  {
+    id: "pic-102",
+    category: "Weather — fog and low visibility on the ground",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Lisbon's_Runway_21.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Lisbon's Runway 21.jpg (CC BY 3.0)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "What is RVR and why is it important?",
+      "Why is fog especially dangerous for a VFR pilot?",
+      "What can happen if a pilot takes a wrong turn while taxiing in fog?"
+    ],
+    level4Answer: "This picture is taken from the cockpit of an aircraft. I can see a runway in front of us, but the visibility is very poor. There is thick fog everywhere, and I can only see the runway lights and the white centreline. The lights disappear after a short distance, so the visibility is probably only a few hundred metres. It seems that the aircraft is lined up on the runway and waiting for take-off clearance. Before this, the crew probably taxied slowly and used the taxiway lights to find the way. They may have received a low visibility procedure from the tower. In the next minutes they will probably start the take-off run if the reported RVR is above the minimum. The main risks are runway incursion and disorientation, because the crew cannot see other traffic. Another risk is that the aircraft leaves the runway or takes a wrong turn. The crew should follow the low visibility procedures and read back the clearance very carefully. ATC should use the ground radar and keep only one aircraft on the manoeuvring area at a time.",
+    vocabulary: [
+      {term:"RVR (runway visual range)", meaning:"the distance a pilot can see along the runway"},
+      {term:"low visibility procedures", meaning:"special rules used at an aerodrome when visibility is poor"},
+      {term:"runway incursion", meaning:"an aircraft or vehicle wrongly on the runway"},
+      {term:"centreline", meaning:"the white line in the middle of the runway"},
+      {term:"to line up", meaning:"to move onto the runway and point along it before take-off"},
+      {term:"disorientation", meaning:"the situation when a pilot loses the sense of position or direction"}
+    ],
+    risks: ["Runway incursion by another aircraft or vehicle","Taxiing onto the wrong taxiway or runway","No visual reference if the engine fails after take-off","Delay or diversion because the destination is also closed by fog"]
+  },
+  {
+    id: "pic-103",
+    category: "Weather — icing and de-icing",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Deicing_of_an_aircraft_wing_in_V%C3%A4xj%C3%B6.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Deicing of an aircraft wing in Växjö.jpg (CC BY-SA 3.0)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "Why is even a thin layer of frost on the wing dangerous?",
+      "What does 'holdover time' mean after de-icing?",
+      "How can a private pilot remove frost from a small aircraft in winter?"
+    ],
+    level4Answer: "I can see a turboprop aircraft on the apron in winter. It seems to be a Dash 8 with two propellers. Next to the aircraft there is a special de-icing vehicle with a long boom and a basket. An operator in the basket is spraying warm fluid on the wing and on the propeller. I can see a cloud of spray and steam around the aircraft, so the fluid is probably hot. The weather looks cold and grey, and the ground is probably wet or covered with snow. Before this moment, snow or frost has probably formed on the airframe during the night. The crew inspected the aircraft and then requested de-icing. Next, the operator will finish the treatment and the crew will start the engines and taxi. They must take off inside the holdover time, before new ice forms. The main risks are ice on the wing, which reduces lift and increases the stalling speed. There is also a risk of damage if the vehicle touches the aircraft. The crew should check the wing before departure and never take off with contamination on the surfaces.",
+    vocabulary: [
+      {term:"de-icing", meaning:"removing ice, frost or snow from the aircraft with fluid"},
+      {term:"anti-icing", meaning:"treatment that stops new ice from forming for some time"},
+      {term:"holdover time", meaning:"the time the anti-icing fluid protects the aircraft"},
+      {term:"contamination", meaning:"snow, ice or frost on the surface of the aircraft"},
+      {term:"airframe", meaning:"the body and the wings of the aircraft"},
+      {term:"stalling speed", meaning:"the lowest speed at which the wing still gives enough lift"}
+    ],
+    risks: ["Loss of lift and a stall if ice stays on the wing","Ice breaking off and entering the engine or hitting the propeller","Ground vehicle hitting the aircraft during the treatment","New ice forming if the aircraft waits too long before take-off"]
+  },
+  {
+    id: "pic-104",
+    category: "Weather — strong wind and crosswind",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Windsock_at_Davidstow_airfield_-_geograph.org.uk_-_945253.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Windsock at Davidstow airfield - geograph.org.uk - 945253.jpg (CC BY-SA 2.0)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "How does a pilot use a windsock before landing?",
+      "What is a crosswind limit and why does every aircraft have one?",
+      "What can happen if you land with a strong tailwind?"
+    ],
+    level4Answer: "I can see a windsock on a mast at a small airfield. The sock is orange and white, and it is fully stretched in a horizontal position. This means that the wind is probably strong, maybe twenty knots or more. Behind the mast I can see flat green ground and a wet surface, so it has probably been raining. The sky is grey and the weather looks bad. There are no aircraft in the picture, so the airfield is probably quiet at this moment. Before this, a front may have passed and the wind may have increased quickly. In the next hours the wind may stay strong or become gusty. For a light aircraft this is a serious problem, because the crosswind may be above the limit. The main risks are loss of directional control on landing and a wing lifting on the ground. There is also a risk of turbulence near buildings and trees. The pilot should check the wind direction against the runway and calculate the crosswind component. If it is above the aircraft limit, it is better to use another runway, divert or simply not to fly.",
+    vocabulary: [
+      {term:"windsock", meaning:"a cloth tube that shows the wind direction and strength"},
+      {term:"crosswind component", meaning:"the part of the wind that blows across the runway"},
+      {term:"gusty wind", meaning:"wind that changes speed quickly and suddenly"},
+      {term:"tailwind", meaning:"wind blowing from behind the aircraft"},
+      {term:"to weathercock", meaning:"the tendency of the aircraft to turn into the wind on the ground"},
+      {term:"knot", meaning:"the unit of speed used in aviation, one nautical mile per hour"}
+    ],
+    risks: ["Crosswind above the aircraft limit on landing","Loss of directional control during the landing roll","Turbulence and windshear near the ground","A gust lifting a wing of a light aircraft while taxiing"]
+  },
+  {
+    id: "pic-105",
+    category: "Weather — rain and wet runway",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Landing_on_a_very_wet_runway_at_St._John's_Nfl_(27595229845).jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Landing on a very wet runway at St. John's Nfl (27595229845).jpg (CC BY 2.0)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "What is aquaplaning and when does it happen?",
+      "How does a wet runway change your landing distance calculation?",
+      "What information about the runway surface can ATC give to the crew?"
+    ],
+    level4Answer: "This picture is taken through a cabin window during landing. I can see the wing with the spoilers and the flaps, and below the wing I can see the runway. The runway looks very wet and there is standing water on the surface. The water reflects the grey sky like a mirror. The visibility is poor and everything looks misty, so it is probably raining heavily. It seems that the aircraft has just touched down and is slowing down. Before this, the crew probably flew an approach in rain and low cloud. They may have received a report about a wet or contaminated runway. In the next moments the pilots will use reverse thrust and brakes very carefully. The main risk is aquaplaning, when the tyres ride on the water and the brakes do not work well. Another risk is a runway excursion if the aircraft cannot stop in time. The crew should touch down firmly in the touchdown zone and not float. ATC should pass the latest runway surface condition and braking action to every arriving aircraft.",
+    vocabulary: [
+      {term:"aquaplaning", meaning:"when tyres slide on a layer of water and lose grip"},
+      {term:"standing water", meaning:"water lying on the runway surface"},
+      {term:"braking action", meaning:"a report of how well the brakes work on the surface"},
+      {term:"runway excursion", meaning:"when an aircraft goes off the side or the end of the runway"},
+      {term:"touchdown zone", meaning:"the first part of the runway where aircraft should land"},
+      {term:"reverse thrust", meaning:"engine power directed forward to help the aircraft slow down"}
+    ],
+    risks: ["Aquaplaning and poor braking action","Runway excursion because the landing distance is too short","Loss of directional control in crosswind on a wet surface","Poor visibility through heavy rain during the flare"]
+  },
+  {
+    id: "pic-106",
+    category: "Emergency — engine fire after take-off",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Japan_Airlines_777_Engine_Failure_on_Departure_(2_of_2)_(51599589068).jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Japan Airlines 777 Engine Failure on Departure (2 of 2) (51599589068).jpg (CC BY 2.0)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "What are the first actions of a crew after an engine fire warning?",
+      "What information must a pilot give ATC in a MAYDAY call?",
+      "Why does a crew usually need to dump fuel or make an overweight landing?"
+    ],
+    level4Answer: "I can see a large airliner in the air against a blue sky. It seems to be a Boeing 777 of Japan Airlines just after take-off. The landing gear is already retracted, so the aircraft is climbing. Under the left wing I can see orange flames and a long trail of black smoke. It is clear that one engine has failed and is on fire. Before this moment, something probably broke inside the engine during the climb. The crew has probably heard a loud bang and felt strong vibration. Next, the pilots will shut down the engine and use the fire extinguisher bottles. They will declare a MAYDAY and ask ATC for an immediate return to the airport. The main risks are that the fire spreads to the wing and the fuel tanks. There is also a risk of asymmetric thrust and loss of control at low speed. The crew should fly the aircraft first, then run the engine fire checklist. ATC should give priority, a direct routing back to the field and alert the fire services.",
+    vocabulary: [
+      {term:"engine failure", meaning:"when an engine stops working or loses power"},
+      {term:"to shut down an engine", meaning:"to stop an engine on purpose"},
+      {term:"fire extinguisher bottle", meaning:"a container of chemical used to put out an engine fire"},
+      {term:"MAYDAY", meaning:"the radio word for a situation of serious and imminent danger"},
+      {term:"asymmetric thrust", meaning:"unequal power on the two sides of the aircraft"},
+      {term:"to declare an emergency", meaning:"to tell ATC officially that you have an emergency"}
+    ],
+    risks: ["Fire spreading from the engine to the wing and fuel tanks","Loss of control because of asymmetric thrust","Parts of the engine damaging the fuselage or the hydraulics","Overweight landing shortly after departure"]
+  },
+  {
+    id: "pic-107",
+    category: "Emergency — fire services on the runway",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Lot_Flight_16_firefighting_action.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Lot Flight 16 firefighting action.jpg (CC BY 3.0 PL)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "Why do firefighters cover an aircraft and the runway with foam?",
+      "How does an aerodrome prepare when a crew declares an emergency landing?",
+      "How long can an airport stay closed after an accident, and why?"
+    ],
+    level4Answer: "I can see an aerodrome with a large aircraft on the runway. It seems to be a Boeing 767 of LOT Polish Airlines in Warsaw. The aircraft is standing very low on the runway, so it has probably landed without the landing gear. Around the aircraft there are red fire trucks and many people in uniform. The firefighters are spraying water and foam on the fuselage and on the runway surface. There is a big white cloud of spray in the air. Before this moment, the crew probably declared an emergency and made a belly landing. The airport was probably closed and the emergency services were waiting beside the runway. Next, the firefighters will cool the metal and cover the fuel to stop a fire. Then engineers will lift the aircraft and move it off the runway. The main risks are fire from hot metal and leaking fuel. There is also a risk for the rescue workers who are standing very close. The crew should stop the engines, cut off the fuel and evacuate the passengers quickly. ATC should close the runway and keep all other traffic away from the area.",
+    vocabulary: [
+      {term:"fire and rescue services", meaning:"the airport teams that fight fires and help after an accident"},
+      {term:"foam", meaning:"a special white substance that covers fuel and stops fire"},
+      {term:"fuel leak", meaning:"fuel escaping from the tanks or pipes"},
+      {term:"to cool down", meaning:"to make hot metal or brakes colder with water"},
+      {term:"local standby", meaning:"an alert state when emergency services get ready for an incident"},
+      {term:"to close the runway", meaning:"to stop all traffic from using the runway"}
+    ],
+    risks: ["Fuel igniting on the hot fuselage or brakes","Injury to rescue workers standing near the aircraft","The aerodrome remaining closed and traffic diverting","A second aircraft entering the area during the rescue"]
+  },
+  {
+    id: "pic-108",
+    category: "Emergency — gear-up (belly) landing",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Lot_Flight_16_landing_4.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Lot Flight 16 landing 4.jpg (CC BY 3.0 PL)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "What can a pilot do if the landing gear does not come down?",
+      "Why does a crew usually burn or dump fuel before a gear-up landing?",
+      "What does the phrase 'the gear is unsafe' mean to ATC?"
+    ],
+    level4Answer: "I can see a big passenger aircraft on a runway. It seems to be a Boeing 767 of LOT Polish Airlines at Warsaw airport. The aircraft is sliding on its belly, because the landing gear is not extended. The engines are touching the runway surface and I can see smoke and spray behind the aircraft. In the background there is grey mist and the apron with stand markings. Before this moment, the crew probably had a hydraulic failure and could not lower the gear. They may have flown around the airport for some time to burn fuel and prepare the cabin. Next, the aircraft will stop on the runway and the fire services will come immediately. The crew will then order an emergency evacuation. The main risks are fire from friction and fuel, and injuries during the evacuation. Another risk is that the aircraft leaves the runway while it is sliding. The crew should land exactly on the centreline and keep the wings level as long as possible. ATC should cover the runway with foam if possible, close the aerodrome and alert all rescue services.",
+    vocabulary: [
+      {term:"belly landing", meaning:"a landing on the fuselage without the landing gear"},
+      {term:"landing gear", meaning:"the wheels and legs used for landing and taxiing"},
+      {term:"hydraulic failure", meaning:"a loss of the fluid pressure that moves the gear and controls"},
+      {term:"to burn off fuel", meaning:"to fly longer so the aircraft becomes lighter before landing"},
+      {term:"friction", meaning:"the rubbing between two surfaces that makes heat"},
+      {term:"emergency evacuation", meaning:"getting everybody out of the aircraft as fast as possible"}
+    ],
+    risks: ["Fire caused by friction sparks and leaking fuel","The aircraft turning and leaving the runway while sliding","Injuries to passengers during a fast evacuation","The runway being blocked for many hours"]
+  },
+  {
+    id: "pic-109",
+    category: "Emergency — runway excursion, aircraft bogged off the runway",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/F.28-FKA-Broome-runway-overrun-bogged-17.1.74-GG-coll-KKK.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:F.28-FKA-Broome-runway-overrun-bogged-17.1.74-GG-coll-KKK.jpg (CC BY-SA 4.0)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "What are the most common causes of a runway excursion?",
+      "Why is soft ground next to a runway dangerous for an aircraft?",
+      "What should you do if you realise your landing will be long and fast?"
+    ],
+    level4Answer: "This is an old black and white photograph of an aerodrome. I can see a jet aircraft with the engines at the back of the fuselage. It seems to be a Fokker F28 of a regional airline. The aircraft is not on the runway; it is standing on soft ground beside it. The nose is low and the wheels seem to be deep in mud, so the aircraft is probably bogged. In the foreground there is an open jeep with several people who are looking at the aircraft. Before this moment, the aircraft probably overran the runway after landing. The surface may have been wet, or the landing may have been too fast and too long. Next, engineers will put boards or bags under the wheels and tow the aircraft back. This work may take many hours. The main risks are damage to the landing gear and the engines from mud and stones. There is also a risk for people walking near the aircraft. The crew should stop the engines and check for fuel leaks before anybody comes close. ATC and the aerodrome should inspect the runway and decide if it is safe to use again.",
+    vocabulary: [
+      {term:"runway overrun", meaning:"when an aircraft goes past the end of the runway"},
+      {term:"to be bogged", meaning:"when wheels sink into soft ground and cannot move"},
+      {term:"soft ground", meaning:"wet earth or mud that cannot carry the weight of the aircraft"},
+      {term:"to tow", meaning:"to pull an aircraft with a special vehicle"},
+      {term:"landing roll", meaning:"the distance the aircraft travels on the ground after touchdown"},
+      {term:"to inspect", meaning:"to look at something carefully to check for damage"}
+    ],
+    risks: ["Damage to the landing gear, engines and fuselage","Fuel leaking onto the ground after the excursion","Injury to people working close to the aircraft","The aerodrome staying closed while the aircraft is recovered"]
+  },
+  {
+    id: "pic-110",
+    category: "Emergency — evacuation with escape slides",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Lot_Flight_16_rear_slides.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Lot Flight 16 rear slides.jpg (CC BY 3.0 PL)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "How quickly must all passengers leave a large aircraft in an evacuation?",
+      "Why must passengers leave their hand baggage on board?",
+      "Which commands does the cabin crew shout during an evacuation?"
+    ],
+    level4Answer: "I can see the rear part of a large aircraft on the ground. It seems to be a wide-body airliner seen from behind. The fuselage is very low and it is lying almost on the runway surface, so the landing gear is probably not there. Two emergency slides are inflated and they go down from the rear doors to the ground. The doors are open and the slides are grey and yellow. There is water or foam on the surface around the aircraft. Before this, the aircraft probably made an emergency landing without the gear. The commander then probably gave the order to evacuate. Next, all passengers and cabin crew will slide down and move away from the aircraft. The rescue teams will collect them in a safe place and count them. The main risks are fire near the fuel tanks and broken legs or ankles on the slides. There is also a risk that people stop to take their bags and block the exits. The cabin crew should shout clear commands and check that all exits are usable. The fire services should keep spraying foam and lead everybody upwind, away from the aircraft.",
+    vocabulary: [
+      {term:"escape slide", meaning:"an inflatable ramp used to leave the aircraft quickly"},
+      {term:"to inflate", meaning:"to fill with air so that something becomes hard"},
+      {term:"cabin crew", meaning:"the flight attendants who look after the passengers"},
+      {term:"to evacuate", meaning:"to leave the aircraft as fast as possible in an emergency"},
+      {term:"upwind", meaning:"in the direction the wind is coming from"},
+      {term:"head count", meaning:"counting all people to check that nobody is missing"}
+    ],
+    risks: ["Fire starting close to the open doors","Injuries when passengers jump onto the slides","Passengers blocking the exits with hand baggage","People walking back towards the aircraft after the evacuation"]
+  },
+  {
+    id: "pic-111",
+    category: "Emergency — damaged propeller after a strike",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Broken_propeller.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Broken propeller.jpg (CC BY-SA 3.0)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "What is a propeller strike and why must the engine be inspected after it?",
+      "What objects on the apron can be dangerous for a light aircraft?",
+      "Who must you inform after damage to your aircraft on the ground?"
+    ],
+    level4Answer: "I can see the front part of a small single-engine aircraft on an apron. The engine and the cabin are covered with a blue protective cover. In front of the engine there is a propeller, and it is clearly damaged. One blade is bent backwards and another blade looks broken and twisted. The propeller spinner is white and it seems to be damaged too. Behind the aircraft I can see other light aircraft parked on the same apron. Before this, the propeller has probably hit something hard, maybe the ground or an object on the apron. This may have happened after a heavy landing, or when the aircraft was moving on soft ground. Next, an engineer will remove the propeller and inspect the whole engine. The aircraft cannot fly until this work is finished. The main risks are hidden damage inside the engine and to the crankshaft. A damaged blade can also break in flight and cause very strong vibration. The pilot must never try to fly with a damaged propeller, even for a short flight. He should report the event to the operator and to the authority, and write it in the technical log.",
+    vocabulary: [
+      {term:"propeller strike", meaning:"when a turning propeller hits the ground or an object"},
+      {term:"blade", meaning:"one arm of the propeller"},
+      {term:"spinner", meaning:"the round cover in the centre of the propeller"},
+      {term:"crankshaft", meaning:"the main rotating shaft inside a piston engine"},
+      {term:"vibration", meaning:"fast shaking of a part or of the whole aircraft"},
+      {term:"unserviceable", meaning:"not in a condition to be used safely"}
+    ],
+    risks: ["Hidden damage to the engine and the crankshaft","A cracked blade breaking during flight","Severe vibration and possible engine separation","Injury to people if the engine is started with a damaged propeller"]
+  },
+  {
+    id: "pic-112",
+    category: "Emergency — forced landing of a light aircraft in a field",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Bundesarchiv_Bild_183-63560-0001%2C_Naumburg%2C_Notlandung_eines_Sportflugzeugs.jpg?width=1200",
+    attribution: "Wikimedia Commons, File:Bundesarchiv Bild 183-63560-0001, Naumburg, Notlandung eines Sportflugzeugs.jpg (CC BY-SA 3.0 DE)",
+    prompt: "Describe this picture. What can you see and what is happening?",
+    steps: ["What can you see?","What is happening?","What may have happened before?","What may happen next?","What risks are present?","What should the pilot / crew / ATC do?"],
+    examinerQuestions: [
+      "How do you choose a field for a forced landing?",
+      "What is the correct order of actions after an engine failure in a single-engine aircraft?",
+      "What should you do on the radio before a forced landing outside an aerodrome?"
+    ],
+    level4Answer: "This is an old black and white photograph. I can see a small high-wing aircraft standing in an open field. It seems to be a light sport aeroplane with a fixed landing gear and a wooden propeller. The aircraft is not damaged and it is standing on the grass, so the landing was probably successful. Two people in coats are standing next to the cabin and looking at it. Behind them the ground is flat and empty, and there are no buildings near. It looks like the pilot made a forced landing outside an aerodrome. Before this, the engine may have failed or the pilot may have lost his way in bad weather. He probably looked for a large flat field without wires and animals. Next, the pilot will inspect the aircraft and call for help. Engineers may repair the engine in the field, or the aircraft may be taken away by road. The main risks during such a landing are soft ground, ditches and power lines. There is also a risk of fire and of injury to people on the ground. The pilot should fly the aircraft down to a safe speed, make a MAYDAY call and switch off the fuel and the electrics before touchdown.",
+    vocabulary: [
+      {term:"forced landing", meaning:"a landing that the pilot must make because of a serious problem"},
+      {term:"engine failure", meaning:"when the engine stops producing power"},
+      {term:"to glide", meaning:"to fly down without engine power"},
+      {term:"field", meaning:"an open piece of land used for farming"},
+      {term:"power lines", meaning:"electric cables on poles, very dangerous for low flying"},
+      {term:"master switch", meaning:"the main electrical switch of a light aircraft"}
+    ],
+    risks: ["Soft or uneven ground damaging the landing gear","Power lines, ditches and fences near the chosen field","Fire after the landing because of leaking fuel","Injury to the pilot or to people and animals on the ground"]
+  }
+];
+
 // Picture Comparison task bank — ICAO Level 4 Aviation English Trainer (TEA-format "compare two pictures")
 // Both images in each task come from data_pictures.js (Wikimedia Commons, freely licensed).
 
@@ -26815,7 +27099,7 @@ window.DATA_FU_E = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-07-26.6";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-07-27.1";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -26836,7 +27120,7 @@ var VOCAB = (function(){
 })();
 var TR_BUILTIN = Object.assign({}, window.DATA_TR_A||{}, window.DATA_TR_B||{}, window.DATA_TR_C||{}, window.DATA_TR_D||{}, window.DATA_TR_E||{});
 var FU_BUILTIN = Object.assign({}, window.DATA_FU_A||{}, window.DATA_FU_B||{}, window.DATA_FU_C||{}, window.DATA_FU_D||{}, window.DATA_FU_E||{});
-var PICTURES = (window.DATA_PICTURES||[]).concat(window.DATA_PICCOMPARE||[]);
+var PICTURES = (window.DATA_PICTURES||[]).concat(window.DATA_PICTURES_2||[], window.DATA_PICCOMPARE||[]);
 var LISTENING = (window.DATA_LISTENING||[]).concat(window.DATA_LISTENING_2||[], window.DATA_ERRORS||[]);
 var RT = (window.DATA_RT||[]).concat(window.DATA_RT2||[]);
 var CAP_SECTIONS = (window.DATA_CAP_C||[]).concat(window.DATA_CAP_A||[], window.DATA_CAP_B||[]);
