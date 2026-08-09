@@ -24234,7 +24234,7 @@ window.DATA_FU_E = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-07-27.2";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-08-08.2";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -24647,13 +24647,14 @@ function renderHome(){
     modeCard("shadow","🗣️","Shadow & Repeat","Заучивание ответов")+
     modeCard("ask","❓","Задай вопросы",ASKBACK.length+" заданий (Part 2C)")+
     modeCard("liveatc","📻","Live ATC","Реальный эфир: Варшава, Вильнюс…")+
+    modeCard("myaudio","📼","Мои записи","Ваши аудио: A–B, замедление, повтор")+
     modeCard("numbers","🔢","Цифры и частоты","Дриллы на слух и голосом")+
     modeCard("pron","👄","Произношение",PRON.length+" трудных слов")+
     modeCard("mock","🎓","Mock Exam","Симуляция экзамена")+
     modeCard("course","🎓","Курс",LESSONS.length+" занятий + практика")+
     modeCard("guide","📖","Об экзамене","Форматы и тактика")+
     modeCard("phrases","💬","Phrase Bank","Готовые фразы Level 4")+
-    modeCard("vocab","🃏","Vocabulary",VOCAB.length+" карточек")+
+    modeCard("vocab","🃏","Словарь и фразы",(vocabView.cat&&vocabView.cat!=="Все")?("продолжить: "+String(vocabView.cat).slice(0,20)):(VOCAB.length+" слов + "+PHRASE_ITEMS.length+" фраз"))+
     modeCard("progress","📊","Статистика","Время, темы, прогноз")+
     modeCard("settings","⚙️","Настройки",settings.syncToken?"Синхронизация вкл ✓":"API-ключ, профиль")+
     '</div>');
@@ -24666,6 +24667,7 @@ function renderHome(){
       else if(m==="shadow")renderShadowList();
       else if(m==="ask")renderAskList();
       else if(m==="liveatc")renderLiveATC();
+      else if(m==="myaudio")renderMyAudio();
       else if(m==="numbers")renderNumbers();
       else if(m==="pron")renderPron();
       else if(m==="course")renderLessons();
@@ -25215,7 +25217,7 @@ function finishMock(){
 }
 
 /* ---------- синхронизация телефон ↔ компьютер (приватный GitHub Gist) ---------- */
-var SYNC_KEYS=["icao4_attempts","icao4_vocab","icao4_learnstate","icao4_listening","icao4_rt","icao4_ask","icao4_shadow","icao4_pron","icao4_numbers","icao4_sera","icao4_time","icao4_daily","icao4_daily_meta","icao4_tr","icao4_fu","icao4_srs","icao4_lessons"];
+var SYNC_KEYS=["icao4_attempts","icao4_vocab","icao4_learnstate","icao4_listening","icao4_rt","icao4_ask","icao4_shadow","icao4_pron","icao4_numbers","icao4_sera","icao4_time","icao4_daily","icao4_daily_meta","icao4_tr","icao4_fu","icao4_srs","icao4_lessons","icao4_audio_meta"];
 function syncSnapshot(){
   var o={_v:1,_ts:Date.now()};
   SYNC_KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!==null)o[k]=v; });
@@ -25274,6 +25276,10 @@ function syncMerge(remote){
     a=a||{};b=b||{};
     return {step:Math.max(a.step||0,b.step||0),ok:Math.max(a.ok||0,b.ok||0),
             due:((a.due||"9999")<(b.due||"9999"))?a.due:b.due};
+  });
+  // отметки о прослушанных своих аудио (сами файлы НЕ синхронизируются — только галочки и заметки)
+  res.icao4_audio_meta=mergeMapBy(L("icao4_audio_meta",{}),R("icao4_audio_meta",{}),function(a,b){
+    a=a||{};b=b||{}; return ((b.ts||0)>(a.ts||0))?b:a;
   });
   // уроки курса: объединяем пройденные секции
   res.icao4_lessons=mergeMapBy(L("icao4_lessons",{}),R("icao4_lessons",{}),function(a,b){
@@ -25378,6 +25384,153 @@ document.addEventListener("visibilitychange",function(){ if(document.visibilityS
 window.addEventListener("beforeunload",function(){
   if(settings.syncToken&&settings.syncToken.trim()&&navigator.sendBeacon){/* push при закрытии не гарантирован — синк идёт при следующем запуске */}
 });
+
+/* ---------- Мои записи: локальный плеер для собственных аудио ---------- */
+var audioMeta=loadJSON("icao4_audio_meta",{});   // name -> {done, note, ts}
+var IDB=null;
+function idb(){
+  if(IDB)return Promise.resolve(IDB);
+  return new Promise(function(res,rej){
+    var r=indexedDB.open("icao4_audio",1);
+    r.onupgradeneeded=function(e){ e.target.result.createObjectStore("files",{keyPath:"name"}); };
+    r.onsuccess=function(){ IDB=r.result; res(IDB); };
+    r.onerror=function(){ rej(r.error); };
+  });
+}
+function idbPut(name,blob){
+  return idb().then(function(db){ return new Promise(function(res,rej){
+    var t=db.transaction("files","readwrite");
+    t.objectStore("files").put({name:name,blob:blob,size:blob.size,ts:Date.now()});
+    t.oncomplete=res; t.onerror=function(){rej(t.error);};
+  });});
+}
+function idbAll(){
+  return idb().then(function(db){ return new Promise(function(res,rej){
+    var out=[], t=db.transaction("files","readonly");
+    var cur=t.objectStore("files").openCursor();
+    cur.onsuccess=function(e){ var c=e.target.result; if(c){ out.push(c.value); c.continue(); } else res(out); };
+    cur.onerror=function(){rej(cur.error);};
+  });});
+}
+function idbDel(name){
+  return idb().then(function(db){ return new Promise(function(res){
+    var t=db.transaction("files","readwrite"); t.objectStore("files").delete(name); t.oncomplete=res;
+  });});
+}
+function fmtMB(b){ return (b/1048576).toFixed(1)+" МБ"; }
+function renderMyAudio(){
+  stopMic(); speechSynthesis.cancel();
+  setScreen("Мои записи",true);
+  appEl.appendChild(el('<div class="card muted" style="font-size:13px">Ваши собственные аудиофайлы (например, записи к вашему учебнику). Файлы хранятся <b>только на этом устройстве</b>, никуда не отправляются и не синхронизируются. Здесь они получают то, чего нет у обычного плеера: повтор куска A–B, замедление, откат на 5 секунд, запись своего голоса поверх и отметки о пройденном.</div>'));
+  var add=el('<div class="card"><div class="btnrow"><button class="btn" id="aAdd">➕ Добавить файлы</button>'+
+    '<button class="btn sec small" id="aClear">Очистить всё</button></div>'+
+    '<input type="file" id="aFiles" accept="audio/*" multiple style="display:none">'+
+    '<div class="muted" id="aInfo" style="font-size:12px;margin-top:6px"></div></div>');
+  appEl.appendChild(add);
+  var list=el('<div id="aList"></div>');
+  appEl.appendChild(list);
+  add.querySelector("#aAdd").onclick=function(){ add.querySelector("#aFiles").click(); };
+  add.querySelector("#aFiles").onchange=function(){
+    var fs=Array.prototype.slice.call(this.files), i=0;
+    var info=add.querySelector("#aInfo");
+    (function next(){
+      if(i>=fs.length){ info.textContent="Готово: добавлено "+fs.length+" файлов"; draw(); return; }
+      var f=fs[i++];
+      info.textContent="Сохраняю "+i+" из "+fs.length+": "+f.name;
+      idbPut(f.name,f).then(next).catch(function(e){ info.innerHTML='<span class="err">Ошибка: '+esc(e.message)+'</span>'; });
+    })();
+  };
+  add.querySelector("#aClear").onclick=function(){
+    if(!confirm("Удалить все загруженные аудиофайлы из приложения? Сами файлы на устройстве не тронем."))return;
+    idbAll().then(function(all){
+      return Promise.all(all.map(function(x){return idbDel(x.name);}));
+    }).then(draw);
+  };
+  function draw(){
+    idbAll().then(function(all){
+      all.sort(function(a,b){ return a.name.localeCompare(b.name,undefined,{numeric:true}); });
+      var total=all.reduce(function(s,x){return s+(x.size||0);},0);
+      add.querySelector("#aInfo").textContent=all.length?("Файлов: "+all.length+" · "+fmtMB(total)):"Файлов пока нет — нажмите «Добавить файлы» и выберите аудио на устройстве.";
+      if(!all.length){ list.innerHTML=""; return; }
+      var doneN=all.filter(function(x){return (audioMeta[x.name]||{}).done;}).length;
+      list.innerHTML='<div class="card" style="padding:8px 14px;background:var(--bg2)"><b>Прослушано: '+doneN+' из '+all.length+'</b>'+
+        '<div class="progress-bar" style="margin-top:6px"><div style="width:'+Math.round(doneN/all.length*100)+'%"></div></div></div>'+
+        all.map(function(x){
+          var m=audioMeta[x.name]||{};
+          return '<div class="drow" data-n="'+esc(x.name)+'"><span style="flex:1;padding-right:8px">'+(m.done?"✅ ":"")+esc(x.name)+
+            '<div class="muted" style="font-size:12px">'+fmtMB(x.size||0)+(m.note?(" · "+esc(m.note)):"")+'</div></span><b>▶</b></div>';
+        }).join("");
+      list.querySelectorAll(".drow").forEach(function(r){
+        r.onclick=function(){ var it=all.filter(function(x){return x.name===r.dataset.n;})[0]; if(it)renderAudioPlayer(it,all); };
+      });
+    });
+  }
+  draw();
+}
+function renderAudioPlayer(item,all){
+  stopMic(); speechSynthesis.cancel();
+  setScreen(item.name.slice(0,28),true);
+  var url=URL.createObjectURL(item.blob);
+  var m=audioMeta[item.name]||{};
+  var card=el('<div class="card">'+
+    '<b style="font-size:15px">'+esc(item.name)+'</b>'+
+    '<audio id="pl" src="'+url+'" controls style="width:100%;margin-top:10px"></audio>'+
+    '<div class="btnrow">'+
+      '<button class="btn sec small" id="pBack">↺ 5 сек</button>'+
+      '<button class="btn sec small" id="pFwd">5 сек ↻</button>'+
+      '<select id="pRate" style="width:auto"><option value="0.6">0.6×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option></select>'+
+    '</div>'+
+    '<div class="btnrow">'+
+      '<button class="btn sec" id="pA">A ⟵ начало</button>'+
+      '<button class="btn sec" id="pB">конец ⟶ B</button>'+
+      '<button class="btn sec small" id="pLoopOff">✕ петля</button>'+
+    '</div>'+
+    '<div class="muted" id="pLoopInfo" style="font-size:12px">Петля A–B: слушайте кусок по кругу, пока не поймёте каждое слово.</div>'+
+    '<h3 class="sub">Повторите за диктором</h3>'+
+    '<div class="btnrow">'+recBtnHtml("pRec")+micBtnHtml("pMic")+'</div>'+
+    '<div id="pRecBox"></div>'+
+    '<label>Что вы услышали (запишите и сверьте с книгой):</label>'+
+    '<textarea id="pHeard" placeholder="Say again… или наберите текст"></textarea>'+
+    '<label>Заметка к записи</label>'+
+    '<input id="pNote" value="'+esc(m.note||"")+'" placeholder="например: Unit 1.5 taxi, трудные места">'+
+    '<div class="btnrow">'+
+      '<button class="btn" id="pDone">'+(m.done?"✅ Пройдено":"Отметить пройденным")+'</button>'+
+      '<button class="btn sec" id="pNext">Следующий файл →</button>'+
+    '</div></div>');
+  appEl.appendChild(card);
+  var au=card.querySelector("#pl"), A=null,B=null;
+  card.querySelector("#pRate").onchange=function(){ au.playbackRate=parseFloat(this.value); };
+  card.querySelector("#pBack").onclick=function(){ au.currentTime=Math.max(0,au.currentTime-5); };
+  card.querySelector("#pFwd").onclick=function(){ au.currentTime=au.currentTime+5; };
+  function loopInfo(){
+    card.querySelector("#pLoopInfo").textContent=(A!=null&&B!=null)
+      ? ("Петля: "+A.toFixed(1)+"с — "+B.toFixed(1)+"с, играет по кругу")
+      : (A!=null?("Начало отмечено на "+A.toFixed(1)+"с — теперь отметьте конец"):"Петля A–B: слушайте кусок по кругу, пока не поймёте каждое слово.");
+  }
+  card.querySelector("#pA").onclick=function(){ A=au.currentTime; B=null; loopInfo(); };
+  card.querySelector("#pB").onclick=function(){ if(A==null){A=0;} B=au.currentTime; if(B<=A)B=A+2; au.currentTime=A; au.play(); loopInfo(); };
+  card.querySelector("#pLoopOff").onclick=function(){ A=null;B=null; loopInfo(); };
+  au.ontimeupdate=function(){ if(A!=null&&B!=null&&au.currentTime>=B) au.currentTime=A; };
+  card.querySelector("#pRec").onclick=function(){ au.pause(); toggleRecord(this,card.querySelector("#pRecBox")); };
+  card.querySelector("#pMic").onclick=function(){ au.pause(); toggleMic(card.querySelector("#pHeard"),this); };
+  card.querySelector("#pDone").onclick=function(){
+    var meta=audioMeta[item.name]||{};
+    meta.done=meta.done?0:1; meta.ts=Date.now();
+    meta.note=card.querySelector("#pNote").value.trim();
+    audioMeta[item.name]=meta; saveJSON("icao4_audio_meta",audioMeta);
+    this.textContent=meta.done?"✅ Пройдено":"Отметить пройденным";
+  };
+  card.querySelector("#pNote").onchange=function(){
+    var meta=audioMeta[item.name]||{}; meta.note=this.value.trim();
+    audioMeta[item.name]=meta; saveJSON("icao4_audio_meta",audioMeta);
+  };
+  card.querySelector("#pNext").onclick=function(){
+    var idx=all.map(function(x){return x.name;}).indexOf(item.name);
+    var nx=all[idx+1];
+    URL.revokeObjectURL(url);
+    if(nx)renderAudioPlayer(nx,all); else renderMyAudio();
+  };
+}
 
 /* ---------- запись себя ---------- */
 var recorder=null;
@@ -26979,22 +27132,37 @@ function renderPhrases(){
 }
 
 /* ---------- vocabulary ---------- */
-var vocabView={cat:"Все",idx:0,flipped:false};
-function vocabCats(){ var s=[]; VOCAB.forEach(function(v){ if(s.indexOf(v.category)<0)s.push(v.category); }); return ["Сегодня","🔁 На повторение","Все","Повторить"].concat(s); }
+var vocabView=Object.assign({cat:"Все",idx:0,flipped:false,set:"words"},loadJSON("icao4_vocabview",{}));
+function vocabSource(){ return vocabView.set==="phrases"?PHRASE_ITEMS:VOCAB; }
+function vocabCats(){
+  var s=[]; vocabSource().forEach(function(v){ if(s.indexOf(v.category)<0)s.push(v.category); });
+  return (vocabView.set==="phrases"?["Все"]:["Сегодня","🔁 На повторение","Все","Повторить"]).concat(s);
+}
 function vocabPool(){
+  var src=vocabSource();
   if(vocabView.cat==="🔁 На повторение") return srsDue();
   if(vocabView.cat==="Сегодня"){ var d=getDaily(); return VOCAB.filter(function(v){return d.words.indexOf(v.word)>=0;}); }
-  if(vocabView.cat==="Все") return VOCAB;
-  if(vocabView.cat==="Повторить") return VOCAB.filter(function(v){return vocabState[v.word]==="learn";});
-  return VOCAB.filter(function(v){return v.category===vocabView.cat;});
+  if(vocabView.cat==="Все") return src;
+  if(vocabView.cat==="Повторить") return src.filter(function(v){return vocabState[v.word]==="learn";});
+  var byCat=src.filter(function(v){return v.category===vocabView.cat;});
+  return byCat.length?byCat:src;
 }
+function saveVocabView(){ saveJSON("icao4_vocabview",{cat:vocabView.cat,set:vocabView.set,idx:vocabView.idx}); }
 function renderVocab(){
-  setScreen("Vocabulary",true);
+  stopMic(); speechSynthesis.cancel();
+  setScreen(vocabView.set==="phrases"?"Фразы":"Словарь",true);
+  var tabs=el('<div class="pill-row">'+
+    '<span class="pill'+(vocabView.set==="words"?" on":"")+'" data-s="words">🃏 Слова</span>'+
+    '<span class="pill'+(vocabView.set==="phrases"?" on":"")+'" data-s="phrases">💬 Фразы</span></div>');
+  tabs.querySelectorAll(".pill").forEach(function(p){
+    p.onclick=function(){ vocabView.set=p.dataset.s; vocabView.cat="Все"; vocabView.idx=0; vocabView.flipped=false; saveVocabView(); renderVocab(); };
+  });
+  appEl.appendChild(tabs);
   var pills='<div class="pill-row">'+vocabCats().map(function(c){
     return '<span class="pill'+(c===vocabView.cat?" on":"")+'" data-c="'+esc(c)+'">'+esc(c)+'</span>';}).join("")+'</div>';
   var pr=el(pills);
   pr.querySelectorAll(".pill").forEach(function(p){
-    p.onclick=function(){ vocabView.cat=p.dataset.c; vocabView.idx=0; vocabView.flipped=false; renderVocab(); };
+    p.onclick=function(){ vocabView.cat=p.dataset.c; vocabView.idx=0; vocabView.flipped=false; saveVocabView(); renderVocab(); };
   });
   appEl.appendChild(pr);
   var pool=vocabPool();
@@ -27029,7 +27197,19 @@ function renderVocab(){
   c.querySelector("#vLearn").onclick=function(){ vocabState[v.word]="learn"; saveJSON("icao4_vocab",vocabState); dailyWordDone(v.word); nextCard(pool); };
   appEl.appendChild(c);
 }
-function nextCard(pool){ vocabView.idx=(vocabView.idx+1)%pool.length; vocabView.flipped=false; renderVocab(); }
+function nextCard(pool){ vocabView.idx=(vocabView.idx+1)%pool.length; vocabView.flipped=false; saveVocabView(); renderVocab(); }
+
+/* ---------- ФРАЗЫ как объекты для заучивания ---------- */
+var PHRASE_ITEMS=(function(){
+  var out=[];
+  PHRASES.forEach(function(g){
+    g.phrases.forEach(function(p){
+      out.push({word:p.phrase, translation:g.group, aviationMeaning:p.example, category:"💬 Фразы: "+g.group, isPhrase:true});
+    });
+  });
+  return out;
+})();
+function poolFor(mode){ return mode==="phrases"?PHRASE_ITEMS:VOCAB; }
 
 /* ---------- SRS: интервальные повторения ---------- */
 var srs=loadJSON("icao4_srs",{});   // word -> {due:"YYYY-MM-DD", step:0..5, ok:n}
@@ -27049,13 +27229,17 @@ function srsDue(){
 /* ---------- learn mode (заучивание + SRS + голос) ---------- */
 var learn=null; // {pool, queue:[words], cur, phase}
 function mastery(w){ return learnMastery[w]||0; }
+/* Раунд как в Quizlet: 7 карточек, три ступени — узнавание, обратное узнавание, ввод/голос.
+   Карточка уходит из очереди только после всех ступеней. */
 function startLearn(pool,mode){
   var due=srsDue().filter(function(v){ return pool.indexOf(v)>=0; });
-  var cand=pool.filter(function(v){return mastery(v.word)<2;});
+  var cand=pool.filter(function(v){return mastery(v.word)<3;});
   cand.sort(function(a,b){ return mastery(a.word)-mastery(b.word) || Math.random()-0.5; });
-  var session=due.slice(0,4).concat(cand.slice(0,7-Math.min(4,due.length)));
-  if(!session.length){ alert("В этой категории всё выучено, и повторять пока нечего. Слова вернутся на повторение по расписанию."); return; }
-  learn={pool:pool, cards:session, queue:session.slice(), learned:0, voice:mode==="voice"};
+  var session=due.slice(0,3).concat(cand.slice(0,7-Math.min(3,due.length)));
+  var seen={},uniq=[];
+  session.forEach(function(v){ if(!seen[v.word]){seen[v.word]=1;uniq.push(v);} });
+  if(!uniq.length){ alert("Здесь всё выучено, и повторять пока нечего. Карточки вернутся по расписанию."); return; }
+  learn={pool:pool, cards:uniq, queue:uniq.slice(), learned:0, voice:mode==="voice", asked:0, right:0};
   renderLearnStep();
 }
 function startReview(){          // отдельная сессия повторения по расписанию
@@ -27099,144 +27283,164 @@ function distractors(v,n){
   while(out.length<n) out.push("—");
   return out;
 }
+function learnStage(v){ return Math.min(mastery(v.word),3); }
 function renderLearnStep(){
+  stopMic(); speechSynthesis.cancel();
   if(!learn.queue.length){ renderLearnDone(); return; }
-  var v=learn.queue[0], m=mastery(v.word);
+  var v=learn.queue[0], st=learnStage(v);
+  if(learn.voice&&st<3) st=3;                       // явный голосовой режим
   setScreen(learn.review?"Повторение":"Заучивание",true);
-  var done=learn.cards.filter(function(c){return mastery(c.word)>=2;}).length;
-  appEl.appendChild(el('<div class="muted" style="margin-bottom:8px">Сессия: '+done+' из '+learn.cards.length+' выучено · осталось в очереди: '+learn.queue.length+'</div>'));
+  var doneN=learn.cards.filter(function(c){return mastery(c.word)>=3;}).length;
+  var stName=["Узнавание","Обратное узнавание","Напишите","Скажите вслух"][st];
+  appEl.appendChild(el('<div class="muted" style="margin-bottom:8px">Раунд: '+doneN+' из '+learn.cards.length+' выучено · осталось '+learn.queue.length+
+    ' · ступень: <b>'+stName+'</b></div>'));
   var card;
-  if(learn.voice||(learn.review&&v.aviationMeaning)){
-    // ГОЛОС + ВАРИАНТЫ: показываем определение — говорите слово ИЛИ выбирайте из вариантов ниже
-    var clue=v.aviationMeaning||v.translation;
-    var wOpts=distractorWords(v,3).concat([v.word]);
-    wOpts.sort(function(){return Math.random()-0.5;});
-    card=el('<div class="card"><div class="cat muted">Скажите слово по-английски — или выберите ниже</div>'+
-      '<div style="font-size:17px;margin:12px 0;line-height:1.5">'+esc(clue)+'</div>'+
-      (v.aviationMeaning?'<div class="muted" style="font-size:14px">'+esc(v.translation)+'</div>':'')+
-      '<div class="btnrow">'+micBtnHtml("lvMic")+
-      '<button class="btn sec small" id="lvSay">🔊 Определение</button>'+
-      '<button class="btn sec small" id="lvHint">💡 Буква</button></div>'+
-      '<div id="lvHeard" class="muted" style="font-size:13px;margin-top:6px"></div>'+
-      wOpts.map(function(o){return '<div class="opt wopt" data-w="'+esc(o)+'">'+esc(o)+'</div>';}).join("")+
-      '<div id="lfb"></div>'+
-      '<textarea id="lvBuf" style="position:absolute;left:-9999px;height:1px;min-height:1px"></textarea></div>');
-    var buf=card.querySelector("#lvBuf"), heard=card.querySelector("#lvHeard");
-    card.querySelector("#lvSay").onclick=function(){ speak(clue); };
-    card.querySelector("#lvHint").onclick=function(){ heard.textContent="Подсказка: "+shadowHint(v.word); };
-    card.querySelectorAll(".wopt").forEach(function(o){
-      o.onclick=function(){
-        if(card.dataset.done)return; card.dataset.done=1; stopMic();
-        var okc=o.dataset.w===v.word;
-        o.style.borderColor=okc?"var(--good)":"var(--bad)";
-        if(!okc) card.querySelectorAll(".wopt").forEach(function(x){ if(x.dataset.w===v.word)x.style.borderColor="var(--good)"; });
-        learnAnswer(v,okc,card);
-      };
-    });
-    card.querySelector("#lvMic").onclick=function(){
-      var btn=this;
-      if(recog||micWant){ stopMic(); return; }
-      if(!micSupported()){ alert("Нужен Chrome с микрофоном."); return; }
-      buf.value="";
-      toggleMic(buf,btn);
-      var chk=setInterval(function(){
-        var said=buf.value.trim();
-        if(!said)return;
-        var norm=" "+normAns(said)+" ";
-        var target=normAns(v.word);
-        if(norm.indexOf(" "+target+" ")>=0||normAns(said)===target){
-          clearInterval(chk); stopMic();
-          if(card.dataset.done)return; card.dataset.done=1;
-          learnAnswer(v,true,card);
-        } else heard.textContent="Услышано: "+said;
-        if(!micWant&&!recog){ clearInterval(chk); }
-      },400);
-      setTimeout(function(){
-        clearInterval(chk);
-        if(!card.dataset.done&&(recog||micWant)){
-          stopMic();
-          var said=buf.value.trim();
-          var okv=said&&(" "+normAns(said)+" ").indexOf(" "+normAns(v.word)+" ")>=0;
-          card.dataset.done=1; learnAnswer(v,!!okv,card);
-        }
-      },12000);
-    };
-  }
-  else if(m===0){
-    // выбор из 4 вариантов
-    var opts=distractors(v,3).concat([v.translation]);
-    opts.sort(function(){return Math.random()-0.5;});
+  if(st===0){                                        // слово → выбрать перевод
+    var opts=distractors(v,3).concat([v.translation]); opts.sort(function(){return Math.random()-0.5;});
     card=el('<div class="card"><div class="cat muted">Выберите перевод</div>'+
-      '<div class="w" style="font-size:26px;font-weight:700;margin:12px 0">'+esc(v.word)+'</div>'+
-      opts.map(function(o){return '<div class="opt lopt">'+esc(o)+'</div>';}).join("")+
-      '<div id="lfb"></div></div>');
+      '<div class="w" style="font-size:24px;font-weight:700;margin:12px 0">'+esc(v.word)+
+      ' <button class="btn sec small lSay" style="padding:2px 8px">🔊</button></div>'+
+      opts.map(function(o){return '<div class="opt lopt">'+esc(o)+'</div>';}).join("")+'<div id="lfb"></div></div>');
     card.querySelectorAll(".lopt").forEach(function(o){
-      o.onclick=function(){
-        if(card.dataset.done)return; card.dataset.done=1;
+      o.onclick=function(){ if(card.dataset.done)return; card.dataset.done=1;
         var ok=o.textContent===v.translation;
         o.style.borderColor=ok?"var(--good)":"var(--bad)";
-        card.querySelectorAll(".lopt").forEach(function(x){ if(x.textContent===v.translation)x.style.borderColor="var(--good)"; });
-        learnAnswer(v,ok,card);
-      };
+        if(!ok)card.querySelectorAll(".lopt").forEach(function(x){ if(x.textContent===v.translation)x.style.borderColor="var(--good)"; });
+        learnAnswer(v,ok,card); };
     });
-  } else {
-    // письменный ответ
-    card=el('<div class="card"><div class="cat muted">Напишите слово по-английски</div>'+
-      '<div class="tr" style="font-size:20px;color:var(--accent2);font-weight:600;margin:12px 0">'+esc(v.translation)+'</div>'+
-      '<input id="lIn" autocomplete="off" autocapitalize="off" placeholder="Type the English term...">'+
+  }
+  else if(st===1){                                   // перевод/определение → выбрать слово
+    var clue=v.aviationMeaning||v.translation;
+    var wo=distractorWords(v,3).concat([v.word]); wo.sort(function(){return Math.random()-0.5;});
+    card=el('<div class="card"><div class="cat muted">Выберите '+(v.isPhrase?"фразу":"слово")+'</div>'+
+      '<div style="font-size:17px;margin:12px 0;line-height:1.5">'+esc(clue)+'</div>'+
+      (v.aviationMeaning?'<div class="muted" style="font-size:13px">'+esc(v.translation)+'</div>':'')+
+      wo.map(function(o){return '<div class="opt lopt">'+esc(o)+'</div>';}).join("")+'<div id="lfb"></div></div>');
+    card.querySelectorAll(".lopt").forEach(function(o){
+      o.onclick=function(){ if(card.dataset.done)return; card.dataset.done=1;
+        var ok=o.textContent===v.word;
+        o.style.borderColor=ok?"var(--good)":"var(--bad)";
+        if(!ok)card.querySelectorAll(".lopt").forEach(function(x){ if(x.textContent===v.word)x.style.borderColor="var(--good)"; });
+        learnAnswer(v,ok,card); };
+    });
+  }
+  else if(st===2){                                   // ввод с клавиатуры
+    var clue2=v.aviationMeaning||v.translation;
+    card=el('<div class="card"><div class="cat muted">Напишите по-английски</div>'+
+      '<div style="font-size:17px;margin:12px 0;line-height:1.5">'+esc(clue2)+'</div>'+
+      '<input id="lIn" autocomplete="off" autocapitalize="off" placeholder="ваш ответ">'+
       '<div class="btnrow"><button class="btn" id="lChk">Проверить</button>'+
-      '<button class="btn sec" id="lDk">Не знаю</button></div>'+
-      '<div id="lfb"></div></div>');
+      '<button class="btn sec small" id="lHint">💡 Буква</button>'+
+      '<button class="btn sec small" id="lDk">Не знаю</button></div><div id="lfb"></div></div>');
     var inp=card.querySelector("#lIn");
-    setTimeout(function(){ inp.focus(); },100);
+    setTimeout(function(){ inp.focus(); },120);
     inp.onkeydown=function(e){ if(e.key==="Enter")card.querySelector("#lChk").click(); };
+    card.querySelector("#lHint").onclick=function(){ inp.placeholder=shadowHint(v.word); };
     card.querySelector("#lChk").onclick=function(){
       if(card.dataset.done)return; card.dataset.done=1;
-      var a=normAns(inp.value);
-      var ok=a.length>0&&answerVariants(v.word).some(function(x){return x===a;});
+      var a=normAns(inp.value), t=normAns(v.word);
+      var ok=a===t||(v.isPhrase&&shadowCompare(v.word,inp.value).score>=0.7);
       learnAnswer(v,ok,card);
     };
-    card.querySelector("#lDk").onclick=function(){
-      if(card.dataset.done)return; card.dataset.done=1;
-      learnAnswer(v,false,card);
+    card.querySelector("#lDk").onclick=function(){ if(card.dataset.done)return; card.dataset.done=1; learnAnswer(v,false,card); };
+  }
+  else {                                             // ГОЛОС: одна попытка, без бесконечного цикла
+    var clue3=v.aviationMeaning||v.translation;
+    card=el('<div class="card"><div class="cat muted">Скажите вслух по-английски</div>'+
+      '<div style="font-size:17px;margin:12px 0;line-height:1.5">'+esc(clue3)+'</div>'+
+      (v.aviationMeaning?'<div class="muted" style="font-size:13px">'+esc(v.translation)+'</div>':'')+
+      '<div class="btnrow"><button class="btn" id="lRec">🎤 Говорить</button>'+
+      '<button class="btn sec small" id="lHint2">💡 Буква</button>'+
+      '<button class="btn sec small" id="lSkip">Не знаю</button>'+
+      '<button class="btn sec small" id="lType">⌨ Ввести</button></div>'+
+      '<div id="lStatus" class="muted" style="font-size:13px;margin-top:6px">Нажмите «Говорить» и произнесите '+(v.isPhrase?"фразу":"слово")+'.</div>'+
+      '<div id="lfb"></div></div>');
+    var status=card.querySelector("#lStatus"), rec=null, tmo=null;
+    function stopRec(){ if(tmo)clearTimeout(tmo); if(rec){ try{rec.onend=null;rec.abort();}catch(e){} rec=null; }
+      card.querySelector("#lRec").classList.remove("rec"); card.querySelector("#lRec").textContent="🎤 Говорить"; }
+    card.querySelector("#lHint2").onclick=function(){ status.textContent="Подсказка: "+shadowHint(v.word); };
+    card.querySelector("#lSkip").onclick=function(){ if(card.dataset.done)return; card.dataset.done=1; stopRec(); learnAnswer(v,false,card); };
+    card.querySelector("#lType").onclick=function(){ stopRec(); learn.voice=false; learnMastery[v.word]=2; saveJSON("icao4_learnstate",learnMastery); renderLearnStep(); };
+    card.querySelector("#lRec").onclick=function(){
+      if(rec){ stopRec(); status.textContent="Остановлено."; return; }
+      if(!micSupported()){ status.innerHTML='<span class="err">Голосовой ввод не поддерживается — используйте «⌨ Ввести».</span>'; return; }
+      var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      rec=new SR(); rec.lang="en-US"; rec.continuous=false; rec.interimResults=true; rec.maxAlternatives=3;
+      var btn=this; btn.classList.add("rec"); btn.textContent="⏹ Стоп";
+      status.textContent="🎤 Слушаю…";
+      var heard="";
+      rec.onresult=function(ev){
+        var r=ev.results[ev.results.length-1];
+        var alts=[]; for(var i=0;i<r.length;i++)alts.push(r[i].transcript);
+        heard=alts[0]||"";
+        status.textContent=(r.isFinal?"Услышано: ":"… ")+heard;
+        if(!r.isFinal)return;
+        var t=normAns(v.word);
+        var ok=alts.some(function(a){ var n=" "+normAns(a)+" ";
+          return n.indexOf(" "+t+" ")>=0 || normAns(a)===t || (v.isPhrase&&shadowCompare(v.word,a).score>=0.6); });
+        stopRec();
+        if(card.dataset.done)return; card.dataset.done=1;
+        learnAnswer(v,ok,card);
+      };
+      rec.onerror=function(ev){
+        stopRec();
+        status.innerHTML=(ev.error==="not-allowed")
+          ? '<span class="err">Нет доступа к микрофону — разрешите в настройках браузера или нажмите «⌨ Ввести».</span>'
+          : '<span class="s-warn">Не расслышал ('+esc(ev.error)+'). Нажмите «Говорить» ещё раз.</span>';
+      };
+      rec.onend=function(){ if(!card.dataset.done){ stopRec(); if(!heard) status.innerHTML='<span class="s-warn">Тишина. Нажмите «Говорить» и произнесите ответ.</span>'; } };
+      try{ rec.start(); }catch(e){ stopRec(); status.textContent="Не удалось включить микрофон, попробуйте ещё раз."; }
+      tmo=setTimeout(function(){ if(!card.dataset.done){ stopRec(); status.innerHTML='<span class="s-warn">Время вышло. Нажмите «Говорить» ещё раз.</span>'; } },10000);
     };
   }
   appEl.appendChild(card);
+  card.querySelectorAll(".lSay").forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); speak(v.word); }; });
+  var ex=el('<div class="btnrow"><button class="btn sec small" id="lQuit">✕ Закончить раунд</button></div>');
+  ex.querySelector("#lQuit").onclick=renderLearnDone;
+  appEl.appendChild(ex);
 }
 function learnAnswer(v,ok,card){
   var fb=card.querySelector("#lfb");
-  srsSchedule(v.word,ok);          // ставим слово в расписание повторений
+  learn.asked++; if(ok)learn.right++;
+  srsSchedule(v.word,ok);
+  var st=learnStage(v);
   if(ok){
-    if(learn.review){              // повторение: слово уже выучено, просто подтверждаем
-      learn.queue.shift();
-      fb.innerHTML='<div style="color:var(--good);margin-top:10px;font-weight:600">✓ Верно — следующее повторение через '+SRS_STEPS[(srs[v.word]||{}).step||0]+' дн.</div>';
+    learnMastery[v.word]=Math.min(3,mastery(v.word)+1);
+    saveJSON("icao4_learnstate",learnMastery);
+    learn.queue.shift();
+    if(mastery(v.word)>=3){
+      learn.queue=learn.queue.filter(function(x){return x.word!==v.word;});
+      vocabState[v.word]="know"; saveJSON("icao4_vocab",vocabState); dailyWordDone(v.word);
+      fb.innerHTML='<div style="color:var(--good);margin-top:10px;font-weight:600">✓ Выучено! Вернётся на повторение через день.</div>';
     } else {
-      learnMastery[v.word]=mastery(v.word)+1;
-      saveJSON("icao4_learnstate",learnMastery);
-      learn.queue.shift();
-      if(mastery(v.word)>=2){ learn.queue=learn.queue.filter(function(x){return x.word!==v.word;}); vocabState[v.word]="know"; saveJSON("icao4_vocab",vocabState); dailyWordDone(v.word); }
-      else learn.queue.push(v); // придёт ещё раз письменно
-      fb.innerHTML='<div style="color:var(--good);margin-top:10px;font-weight:600">✓ Верно'+(mastery(v.word)>=2?" — выучено! Повторим через день.":"")+'</div>';
+      learn.queue.push(v);
+      fb.innerHTML='<div style="color:var(--good);margin-top:10px;font-weight:600">✓ Верно — следующая ступень позже в раунде</div>';
     }
   } else {
-    if(!learn.review){ learnMastery[v.word]=0; saveJSON("icao4_learnstate",learnMastery); }
+    learnMastery[v.word]=Math.max(0,mastery(v.word)-1);
+    saveJSON("icao4_learnstate",learnMastery);
     learn.queue.shift(); learn.queue.push(v);
     fb.innerHTML='<div style="margin-top:10px"><span style="color:var(--bad);font-weight:600">✗</span> Правильно: <b>'+esc(v.word)+'</b> — '+esc(v.translation)+
       (v.aviationMeaning?'<div class="muted" style="font-size:13px">'+esc(v.aviationMeaning)+'</div>':'')+'</div>';
   }
-  fb.innerHTML+='<div class="btnrow"><button class="btn" id="lNext">Далее →</button></div>';
+  fb.innerHTML+='<div class="btnrow"><button class="btn sec small" id="lSay2">🔊</button><button class="btn" id="lNext">Далее →</button></div>';
+  fb.querySelector("#lSay2").onclick=function(){ speak(v.word+". "+(v.aviationMeaning||"")); };
   fb.querySelector("#lNext").onclick=renderLearnStep;
-  speak(v.word);
+  if(!learn.voice) speak(v.word);
 }
 function renderLearnDone(){
-  setScreen("Заучивание",true);
-  var total=learn.pool.filter(function(v){return mastery(v.word)>=2;}).length;
+  stopMic(); speechSynthesis.cancel();
+  setScreen("Раунд завершён",true);
+  var learned=learn.cards.filter(function(v){return mastery(v.word)>=3;}).length;
+  var acc=learn.asked?Math.round(learn.right/learn.asked*100):0;
+  var totalKnown=learn.pool.filter(function(v){return mastery(v.word)>=3;}).length;
   appEl.appendChild(el('<div class="card" style="text-align:center">'+
-    '<div style="font-size:40px">🎉</div><b>Сессия завершена!</b>'+
-    '<div class="muted" style="margin-top:8px">Выучено слов в этой категории: '+total+' из '+learn.pool.length+'</div>'+
-    '<div class="btnrow" style="justify-content:center"><button class="btn" id="lMore">Ещё 7 слов</button>'+
+    '<div style="font-size:40px">'+(learned===learn.cards.length?"🎉":"💪")+'</div>'+
+    '<b>Выучено в раунде: '+learned+' из '+learn.cards.length+'</b>'+
+    '<div class="muted" style="margin-top:6px">Точность ответов: '+acc+'% · всего выучено в этом наборе: '+totalKnown+' из '+learn.pool.length+'</div>'+
+    '<div class="btnrow" style="justify-content:center"><button class="btn" id="lMore">Ещё раунд</button>'+
     '<button class="btn sec" id="lBack">К карточкам</button></div></div>'));
-  appEl.querySelector("#lMore").onclick=function(){ startLearn(learn.pool); };
+  appEl.querySelector("#lMore").onclick=function(){ startLearn(learn.pool,learn.voice?"voice":null); };
   appEl.querySelector("#lBack").onclick=renderVocab;
 }
 
