@@ -24234,7 +24234,7 @@ window.DATA_FU_E = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-08-08.2";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-08-09.1";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -26103,22 +26103,59 @@ function renderShadowList(){
   });
   appEl.appendChild(c);
 }
+function shadowUnits(sents){
+  var u=[];
+  sents.forEach(function(t,i){ u.push({text:t,label:"Фраза "+(i+1)+"/"+sents.length,kind:"sent"}); });
+  if(sents.length>=4){                                  // промежуточная ступень: связки по 2-3 предложения
+    var size=sents.length>=7?3:2, k=1;
+    for(var i=0;i<sents.length;i+=size){
+      var part=sents.slice(i,i+size);
+      if(part.length<2)continue;
+      u.push({text:part.join(" "),label:"Связка "+(k++)+" ("+part.length+" предл.)",kind:"chunk"});
+    }
+  }
+  if(sents.length>1) u.push({text:sents.join(" "),label:"ФИНАЛ: весь ответ",kind:"full"});
+  return u;
+}
 function renderShadow(q,mode){
   stopMic(); speechSynthesis.cancel();
   if(!q){ renderShadowList(); return; }
-  shadow={q:q,mode:mode,sents:splitSentences(q.level4Answer),idx:0,stage:"shadow"};
-  renderShadowStep();
+  var sents=splitSentences(q.level4Answer);
+  shadow={q:q,mode:mode,sents:sents,units:shadowUnits(sents),idx:0,stage:"shadow"};
+  renderShadowIntro();
+}
+function renderShadowIntro(){                            // экран «весь текст перед началом»
+  var s=shadow, q=s.q;
+  setScreen("Shadow & Repeat",true);
+  var qtxt=s.mode==="emergency"?(q.scenario+" — "+q.firstQuestion):q.question;
+  var card=el('<div class="card">'+
+    '<span class="tag">'+esc(q.category)+'</span>'+
+    '<div class="qtext" style="font-size:16px">'+esc(qtxt)+'</div>'+
+    '<h3 class="sub">Полный ответ (прочитайте целиком перед заучиванием)</h3>'+
+    '<div class="model-answer" style="line-height:1.7">'+esc(q.level4Answer)+'</div>'+
+    '<div class="btnrow"><button class="btn sec small" id="siSay">🔊 Прослушать целиком</button>'+
+    '<button class="btn sec small" id="siTr">🇷🇺 Перевод</button></div>'+
+    '<div id="siTrBox" class="trbox" style="display:none"></div>'+
+    '<div class="muted" style="font-size:13px;margin-top:10px">План: '+s.sents.length+' фраз'+
+      (s.units.filter(function(u){return u.kind==="chunk";}).length?(' → '+s.units.filter(function(u){return u.kind==="chunk";}).length+' связки по 2–3 предложения'):'')+
+      ' → весь ответ по памяти.</div>'+
+    '<div class="btnrow"><button class="btn" id="siGo">▶ Начать заучивание</button></div></div>');
+  appEl.appendChild(card);
+  card.querySelector("#siSay").onclick=function(){ speak(q.level4Answer); };
+  card.querySelector("#siTr").onclick=function(){ toggleTranslate(q.id+":m",q.level4Answer,card.querySelector("#siTrBox"),this); };
+  card.querySelector("#siGo").onclick=function(){ shadow.idx=0; shadow.stage="shadow"; renderShadowStep(); };
 }
 var shTimers=[];
 function shLater(fn,ms){ shTimers.push(setTimeout(fn,ms)); }
 function shClear(){ shTimers.forEach(clearTimeout); shTimers=[]; }
 function renderShadowStep(){
   stopMic(); shClear();
-  var s=shadow, total=s.sents.length;
-  var isFull=s.stage==="full";
-  var target=isFull? s.q.level4Answer : s.sents[s.idx];
-  setScreen("Shadow · "+(isFull?"весь ответ":( (s.idx+1)+"/"+total )),true);
-  var stageLabel=isFull?"ФИНАЛ: весь ответ по памяти":(s.stage==="shadow"?"Шаг 1. Повторите за диктором":"Шаг 2. Скажите по памяти");
+  var s=shadow, total=s.units.length;
+  var unit=s.units[s.idx]||s.units[0];
+  var isFull=unit.kind==="full";
+  var target=unit.text;
+  setScreen("Shadow · "+(s.idx+1)+"/"+total,true);
+  var stageLabel=unit.label+" · "+(s.stage==="shadow"?"повторите за диктором":"скажите по памяти");
   var qtxt=s.mode==="emergency"?(s.q.scenario+" — "+s.q.firstQuestion):s.q.question;
   var auto=settings.shadowAuto!==false&&micSupported();
   var card=el('<div class="card">'+
@@ -26128,10 +26165,12 @@ function renderShadowStep(){
       (s.stage==="shadow"? esc(target) : '<span class="muted">Текст скрыт — воспроизведите по памяти</span>')+'</div>'+
     '<div class="btnrow">'+
       '<button class="btn sec" id="shPlay">🔊 Прослушать</button>'+
+      '<button class="btn sec small" id="shAll">📄 Весь текст</button>'+
       (s.stage!=="shadow"?'<button class="btn sec small" id="shHint">💡 Подсказка</button>':'')+
       (s.stage!=="shadow"?'<button class="btn sec small" id="shShow">👁 Показать</button>':'')+
     '</div>'+
     '<div class="overall" style="margin-top:12px">Совпадение: <span id="shScore">—</span> <span id="shStatus" class="muted" style="font-weight:400;font-size:14px"></span></div>'+
+    '<div id="shAllBox" style="display:none"></div>'+
     '<div id="shLive" class="muted" style="font-size:13px;min-height:18px;margin:4px 0"></div>'+
     '<div id="shDiff" style="margin-top:6px;line-height:1.8"></div>'+
     '<div class="btnrow">'+
@@ -26232,6 +26271,15 @@ function renderShadowStep(){
     }
   }
   card.querySelector("#shPlay").onclick=function(){ shClear(); stopMic(); play(); };
+  card.querySelector("#shAll").onclick=function(){
+    shClear(); stopMic(); speechSynthesis.cancel();
+    var b=card.querySelector("#shAllBox");
+    if(b.style.display!=="none"){ b.style.display="none"; return; }
+    b.innerHTML='<div class="model-answer" style="line-height:1.7">'+esc(s.q.level4Answer)+'</div>'+
+      '<div class="btnrow"><button class="btn sec small" id="shAllSay">🔊 Целиком</button></div>';
+    b.style.display="";
+    b.querySelector("#shAllSay").onclick=function(){ speak(s.q.level4Answer); };
+  };
   var hintBtn=card.querySelector("#shHint");
   if(hintBtn) hintBtn.onclick=function(){ card.querySelector("#shTarget").innerHTML='<span style="letter-spacing:1px">'+shadowHint(target)+'</span>'; };
   var showBtn=card.querySelector("#shShow");
@@ -26251,13 +26299,12 @@ function renderShadowStep(){
 }
 function shadowAdvance(){
   var s=shadow;
-  if(s.stage==="shadow"){ s.stage="recall"; }
-  else if(s.stage==="recall"){
-    s.idx++;
-    if(s.idx<s.sents.length) s.stage="shadow";
-    else s.stage="full";
-  }
-  else { // full завершён
+  var unit=s.units[s.idx]||s.units[0];
+  if(s.stage==="shadow"&&unit.kind!=="full"){ s.stage="recall"; renderShadowStep(); return; }
+  // блок пройден — следующий
+  s.idx++; s.stage="shadow";
+  if(s.idx<s.units.length){ renderShadowStep(); return; }
+  {   // всё пройдено
     shadowStats[s.q.id]={done:1,ts:Date.now()};
     saveJSON("icao4_shadow",shadowStats);
     dailyDone("sh:"+s.q.id);
