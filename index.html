@@ -25132,7 +25132,7 @@ window.DATA_FU_E = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-10-14.1";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-10-14.2";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -25677,9 +25677,14 @@ function renderTraining(mode,item){
   var q=trainState.item;
   if(!q){ appEl.appendChild(el('<div class="card">Нет вопросов.</div>')); return; }
   appEl.appendChild(catPills(mode,function(){renderTraining(mode);}));
+  var lst=el('<div class="btnrow" style="margin:0 0 8px"><button class="btn sec small" id="qList">📋 Все вопросы ('+qListStat(mode).learned+' из '+qListStat(mode).total+' выучено)</button></div>');
+  lst.querySelector("#qList").onclick=function(){ renderQuestionList(mode); };
+  appEl.appendChild(lst);
 
+  var isL=qLearned(q.id);
   var body='<div class="card">'+
     '<span class="tag">'+esc(q.category)+'</span>'+
+    ' <button class="btn sec small" id="qLearnT" style="float:right;padding:4px 10px">'+(isL?"✅ Выучено":"☐ Отметить выученным")+'</button>'+
     (mode==="emergency"
       ? '<div class="scenario">'+esc(q.scenario)+'</div><div class="qtext">'+esc(q.firstQuestion)+'</div>'
       : '<div class="qtext">'+esc(q.question)+'</div>')+
@@ -25707,8 +25712,71 @@ function renderTraining(mode,item){
     toggleTranslate(q.id+":q",txt,card.querySelector("#trBox"),this);
   };
   card.querySelector("#nextBtn").onclick=function(){ renderTraining(mode); };
+  card.querySelector("#qLearnT").onclick=function(){
+    qLearnedSet(q.id,!qLearned(q.id));
+    this.textContent=qLearned(q.id)?"✅ Выучено":"☐ Отметить выученным";
+    var b=appEl.querySelector("#qList"); if(b)b.textContent="📋 Все вопросы ("+qListStat(mode).learned+" из "+qListStat(mode).total+" выучено)";
+  };
   card.querySelector("#modelBtn").onclick=function(){ toggleModel(q,mode,card); };
   card.querySelector("#checkBtn").onclick=function(){ checkAnswer(q,mode,card,null); };
+}
+
+/* ---------- СПИСОК ВОПРОСОВ с отметками «выучено» ---------- */
+var qLearnMap=loadJSON("icao4_qlearned",{});           // id -> {on:bool, ts}
+function qLearned(id){
+  var m=qLearnMap[id];
+  if(m&&m.on===false)return false;                     // снято вручную
+  return !!((m&&m.on)||shadowStats[id]);               // выучено вручную или пройдено в Shadow
+}
+function qLearnedSet(id,on){ qLearnMap[id]={on:!!on,ts:Date.now()}; saveJSON("icao4_qlearned",qLearnMap); }
+function qBest(id){
+  var b=null;
+  attempts.forEach(function(a){ if(a.qid===id&&typeof a.overall==="number"&&(b===null||a.overall>b))b=a.overall; });
+  return b;
+}
+function qListStat(mode){
+  var pool=poolFor2(mode);
+  return {total:pool.length,learned:pool.filter(function(q){return qLearned(q.id);}).length};
+}
+function poolFor2(mode){ return mode==="emergency"?ALL_EMERGENCY:ALL_INTERVIEW; }
+var qListFilter="all";
+function renderQuestionList(mode){
+  stopMic(); speechSynthesis.cancel();
+  setScreen(mode==="interview"?"Все вопросы Interview":"Все сценарии Emergency",true);
+  var pool=poolFor2(mode), st=qListStat(mode);
+  var answered=answeredIds();
+  appEl.appendChild(el('<div class="card" style="padding:10px 14px"><b>Выучено: '+st.learned+' из '+st.total+'</b>'+
+    '<div class="progress-bar"><div style="width:'+Math.round(st.learned/Math.max(1,st.total)*100)+'%"></div></div>'+
+    '<div class="muted" style="font-size:12px;margin-top:6px">✅ выучено (вручную или в Shadow) · 🟢🟡🔴 лучшая оценка AI · ○ ещё не отвечали. Нажмите на кружок слева, чтобы отметить; на вопрос — чтобы открыть.</div></div>'));
+  var f=el('<div class="pill-row">'+[["all","Все"],["todo","Не выучены"],["done","Выучены"]].map(function(x){
+    return '<span class="pill'+(qListFilter===x[0]?" on":"")+'" data-f="'+x[0]+'">'+x[1]+'</span>'; }).join("")+'</div>');
+  f.querySelectorAll(".pill").forEach(function(p){ p.onclick=function(){ qListFilter=p.dataset.f; renderQuestionList(mode); }; });
+  appEl.appendChild(f);
+  var cats={};
+  pool.forEach(function(q){ (cats[q.category]=cats[q.category]||[]).push(q); });
+  Object.keys(cats).forEach(function(c){
+    var items=cats[c].filter(function(q){
+      var l=qLearned(q.id);
+      return qListFilter==="all"||(qListFilter==="done"&&l)||(qListFilter==="todo"&&!l);
+    });
+    if(!items.length)return;
+    var ld=cats[c].filter(function(q){return qLearned(q.id);}).length;
+    appEl.appendChild(el('<div class="card" style="padding:8px 14px;background:var(--bg2);margin-bottom:4px"><b>'+esc(c)+'</b> <span class="muted" style="font-size:12px">· '+ld+' из '+cats[c].length+'</span></div>'));
+    items.forEach(function(q){
+      var l=qLearned(q.id), b=qBest(q.id);
+      var mark=b===null?(answered[q.id]?"⚪":"○"):(b>=4?"🟢":(b>=3?"🟡":"🔴"));
+      var txt=mode==="emergency"?(q.firstQuestion||q.scenario):q.question;
+      var row=el('<div class="drow" style="padding:10px 4px;align-items:flex-start">'+
+        '<span class="qtog" style="font-size:20px;padding:0 10px 0 2px;cursor:pointer">'+(l?"✅":"⬜")+'</span>'+
+        '<span class="qopen" style="flex:1;cursor:pointer;'+(l?"opacity:.6":"")+'">'+esc(txt)+'</span>'+
+        '<span style="padding-left:8px;white-space:nowrap" title="лучшая оценка">'+mark+(b!==null?' <span class="muted" style="font-size:12px">'+b.toFixed(1)+'</span>':'')+'</span></div>');
+      row.firstChild.querySelector(".qtog").onclick=function(){
+        qLearnedSet(q.id,!qLearned(q.id)); renderQuestionList(mode);
+      };
+      row.firstChild.querySelector(".qopen").onclick=function(){ renderTraining(mode,q); };
+      appEl.appendChild(row);
+    });
+  });
 }
 function toggleModel(q,mode,card){
   var box=card.querySelector("#modelBox");
@@ -26164,7 +26232,7 @@ function finishMock(){
 }
 
 /* ---------- синхронизация телефон ↔ компьютер (приватный GitHub Gist) ---------- */
-var SYNC_KEYS=["icao4_attempts","icao4_vocab","icao4_learnstate","icao4_streak","icao4_listening","icao4_rt","icao4_ask","icao4_shadow","icao4_pron","icao4_numbers","icao4_sera","icao4_time","icao4_daily","icao4_daily_meta","icao4_tr","icao4_fu","icao4_srs","icao4_lessons","icao4_audio_meta","icao4_atc_prog"];
+var SYNC_KEYS=["icao4_qlearned","icao4_attempts","icao4_vocab","icao4_learnstate","icao4_streak","icao4_listening","icao4_rt","icao4_ask","icao4_shadow","icao4_pron","icao4_numbers","icao4_sera","icao4_time","icao4_daily","icao4_daily_meta","icao4_tr","icao4_fu","icao4_srs","icao4_lessons","icao4_audio_meta","icao4_atc_prog"];
 function syncSnapshot(){
   var o={_v:1,_ts:Date.now()};
   SYNC_KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!==null)o[k]=v; });
@@ -26191,7 +26259,7 @@ function syncMerge(remote){
   res.icao4_learnstate=mergeMapBy(L("icao4_learnstate",{}),R("icao4_learnstate",{}),function(a,b){ return Math.max(a||0,b||0); });
   res.icao4_pron=mergeMapBy(L("icao4_pron",{}),R("icao4_pron",{}),function(a,b){ return Math.max(a||0,b||0); });
   // результаты заданий: берём более свежую попытку
-  ["icao4_listening","icao4_rt","icao4_ask","icao4_shadow"].forEach(function(k){
+  ["icao4_listening","icao4_rt","icao4_ask","icao4_shadow","icao4_qlearned"].forEach(function(k){
     res[k]=mergeMapBy(L(k,{}),R(k,{}),newerByTs);
   });
   // время: по устройствам — за каждое устройство берём максимум, итог = сумма (складывается, но не задваивается)
@@ -26241,7 +26309,7 @@ function syncMerge(remote){
   seraStats=loadJSON("icao4_sera",{attempts:0,correct:0}); timeStats=loadJSON("icao4_time",{});
   daily=loadJSON("icao4_daily",null); dailyMeta=loadJSON("icao4_daily_meta",{streak:0,lastDone:null});
   trCache=loadJSON("icao4_tr",{}); fuCache=loadJSON("icao4_fu",{});
-  srs=loadJSON("icao4_srs",{}); lessonProg=loadJSON("icao4_lessons",{});
+  srs=loadJSON("icao4_srs",{}); qLearnMap=loadJSON("icao4_qlearned",{}); lessonProg=loadJSON("icao4_lessons",{});
 }
 function gh(path,opts){
   opts=opts||{};
@@ -29623,7 +29691,6 @@ renderHome();
 })();
 
 autoSync();
-
 </script>
 </body>
 </html>
