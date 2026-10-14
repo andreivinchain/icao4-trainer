@@ -28834,7 +28834,7 @@ function chunkOf(v){
 function chunkHtml(v){   // чанк с подсветкой целевого слова
   var c=chunkOf(v);
   if(c.en===v.word)return esc(c.en);
-  var re=new RegExp("("+v.word.replace(/[.*+?^${}()|[\]\\]/g,"\\/*APP*/")+")","i");
+  var re=new RegExp("("+v.word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","i");
   return esc(c.en).replace(re,"<b style=\"color:var(--accent)\">$1</b>");
 }
 function frontOf(v){ return chunkOf(v).en; }
