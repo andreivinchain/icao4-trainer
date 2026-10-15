@@ -25133,10 +25133,261 @@ window.DATA_FU_E = {
 
 </script>
 <script>
+/* Вопросы в формате австрийского LPE (Austro Control): знакомство и опыт, «описание фото», общие вопросы-мнения.
+   Образцы ответов — уровень 4: простые времена, короткие связные предложения. */
+window.DATA_INTERVIEW_4 = [
+  {
+    id: "int-301", category: "🇦🇹 Austria LPE: about you",
+    question: "Can you describe a typical day in your life?",
+    level4Answer: "On a normal working day I get up at about seven o'clock. I have breakfast with my family, and then I take the children to school. After that I go to my office. I run my own IT business, so I spend most of the day in meetings and working with my team. In the evening I come home, have dinner with my wife and children and help the kids with their homework. Later, when the house is quiet, I study English for about an hour. At weekends my day is different: if the weather is good, I go to the airfield and fly.",
+    followUps: ["What is the busiest part of your day?", "How do you find time for flying?", "What do you do to relax?"],
+    vocabulary: [{term:"run a business",meaning:"to own and manage a company"},{term:"working day",meaning:"a day when you go to work"},{term:"at weekends",meaning:"on Saturday and Sunday"}],
+    grammarFocus: "Present Simple for routines; time expressions (in the evening, after that, at weekends)",
+    commonMistakes: ["I am go to office → I go to the office","in weekends → at weekends","I am studying English every day → I study English every day (routine)"]
+  },
+  {
+    id: "int-302", category: "🇦🇹 Austria LPE: about you",
+    question: "Tell me about the city where you live.",
+    level4Answer: "I live in Minsk, the capital of Belarus. It is a big city with about two million people. Minsk is very green: there are many parks, wide streets and a river in the centre. The city is clean and quite modern, because most of it was rebuilt after the Second World War. For me the best thing about Minsk is that I can drive to a small airfield outside the city in less than an hour. The worst thing is the winter: it is long, dark and cold, and there are not many good days for flying.",
+    followUps: ["What would you show a tourist in your city?", "Has your city changed in the last ten years?", "Would you prefer to live in a big city or in the countryside?"],
+    vocabulary: [{term:"capital",meaning:"the main city of a country"},{term:"rebuilt",meaning:"built again after it was destroyed"},{term:"countryside",meaning:"land outside towns and cities"}],
+    grammarFocus: "There is / there are; comparatives and superlatives (the best, the worst)",
+    commonMistakes: ["There is many parks → There are many parks","the most good → the best","Minsk is very green city → Minsk is a very green city"]
+  },
+  {
+    id: "int-303", category: "🇦🇹 Austria LPE: about you",
+    question: "How did you learn English, and what is the most difficult part for you?",
+    level4Answer: "I learned English at school, but for many years I did not use it much. When I started flying, I understood that English is very important for a pilot, especially for radio communication. Now I study almost every day: I use an app on my phone, I listen to real ATC recordings and I practise speaking. The most difficult part for me is listening. Controllers speak fast, the radio is often noisy, and different people have different accents. Speaking is easier, because I can prepare my phrases. To improve my listening, I listen to live ATC from Warsaw and Vienna.",
+    followUps: ["Do you use English in your work?", "What helps you most to improve your English?", "What will you do if you do not understand the examiner?"],
+    vocabulary: [{term:"accent",meaning:"the way people from a place pronounce words"},{term:"noisy",meaning:"with a lot of noise"},{term:"practise",meaning:"to do something many times to improve"}],
+    grammarFocus: "Past Simple (I learned) vs Present Simple (I study); because for reasons",
+    commonMistakes: ["I learn English at school (past) → I learned English at school","the most difficult for me is listen → the most difficult part for me is listening","practise speak → practise speaking"]
+  },
+  {
+    id: "int-304", category: "🇦🇹 Austria LPE: about you",
+    question: "Do you prefer to fly alone or with passengers? Why?",
+    level4Answer: "Both are good, but in a different way. When I fly alone, I can concentrate completely on the flight. I can practise manoeuvres, try a new route or simply enjoy the silence. When I fly with a passenger, it is more fun, because I can share the experience with another person. Usually I take my wife or one of my children. But with a passenger I have more responsibility. I must give a good safety briefing, check the weight and balance and be ready to calm the person if he or she is nervous. So for training I prefer to fly alone, and for pleasure I prefer to fly with my family.",
+    followUps: ["What do you tell a passenger before the flight?", "Have you ever had a nervous passenger?", "Would you fly with a passenger in bad weather?"],
+    vocabulary: [{term:"concentrate",meaning:"to give all your attention to something"},{term:"safety briefing",meaning:"information about safety before a flight"},{term:"weight and balance",meaning:"calculation of the aircraft's weight and its centre of gravity"}],
+    grammarFocus: "Comparing: I prefer X to Y; when-clauses",
+    commonMistakes: ["I prefer fly alone → I prefer to fly alone","more fun than alone → more fun than flying alone","he or she are nervous → he or she is nervous"]
+  },
+  {
+    id: "int-305", category: "🇦🇹 Austria LPE: picture",
+    question: "Imagine a photo: a small aircraft is parked on the apron, the engine cowling is open and two mechanics are working on the engine. Describe the picture and say what may be happening.",
+    level4Answer: "In this picture I can see a small single-engine aircraft. It is parked on the apron, probably near a hangar. The engine cowling is open, and two mechanics are looking at the engine. One of them is holding a tool, and there is a tool box on the ground. I think it is either a routine inspection, for example the fifty-hour check, or the pilot found a problem during the preflight inspection. Maybe there is an oil leak or the engine was running roughly. In any case, it is a good decision to check it on the ground. A small problem on the ground can become a big problem in the air.",
+    followUps: ["What would you do if you found oil under the engine before a flight?", "Who decides if the aircraft is airworthy?", "How often is your aircraft checked?"],
+    vocabulary: [{term:"cowling",meaning:"the cover around the engine"},{term:"apron",meaning:"the area where aircraft are parked"},{term:"oil leak",meaning:"when oil comes out of the engine where it should not"},{term:"run roughly",meaning:"when an engine works unevenly, with vibration"}],
+    grammarFocus: "Present Continuous to describe a picture (are working, is holding); may / maybe / probably for guesses",
+    commonMistakes: ["Two mechanics work on engine → Two mechanics are working on the engine","In picture I see → In this picture I can see","Maybe it is the engine broken → Maybe the engine is broken"]
+  },
+  {
+    id: "int-306", category: "🇦🇹 Austria LPE: picture",
+    question: "Imagine a photo: a light aircraft is standing at the start of a grass runway, the sky is dark and it is raining. Describe it and tell me if you would take off.",
+    level4Answer: "In the picture there is a light aircraft at the beginning of a grass runway. The sky is dark grey, the clouds look low and it is raining. I can also see some water on the grass. Would I take off? No, I would not. First, the cloud base looks low, and I fly only VFR. Second, the visibility in rain may be poor. Third, wet grass makes the takeoff run longer, so the aircraft needs more distance. I would check the latest weather and wait. If the weather did not improve, I would cancel the flight. It is always better to be on the ground and wish you were in the air than the opposite.",
+    followUps: ["How does wet grass affect takeoff and landing?", "What minimum weather do you use for a VFR flight?", "Have you ever cancelled a flight because of weather?"],
+    vocabulary: [{term:"cloud base",meaning:"the height of the bottom of the clouds"},{term:"takeoff run",meaning:"the distance the aircraft needs on the runway before it lifts off"},{term:"cancel",meaning:"to decide that something will not happen"}],
+    grammarFocus: "Second conditional (If the weather did not improve, I would cancel); first, second, third for arguments",
+    commonMistakes: ["I will not take off if it rains now (hypothetical) → I would not take off","more longer → longer","the visibility is bad → the visibility is poor (aviation)"]
+  },
+  {
+    id: "int-307", category: "🇦🇹 Austria LPE: picture",
+    question: "Imagine a photo of a busy airport terminal with long queues and a board showing many delayed flights. Describe it and tell me how the passengers may feel.",
+    level4Answer: "This picture shows a busy airport terminal. There are a lot of people with suitcases, and the queues at the check-in desks are very long. On the information board many flights are marked as delayed. Some passengers are sitting on the floor, others are looking at their phones. I think they feel tired, nervous and maybe angry, because they do not know when they will fly. Delays can happen because of bad weather, technical problems or strikes. In my opinion, the most important thing for the airline is to give passengers clear information. When people know what is happening, they are much calmer.",
+    followUps: ["What can cause flight delays?", "Have you ever had a long delay as a passenger?", "What should an airline do for passengers during a long delay?"],
+    vocabulary: [{term:"queue",meaning:"a line of people waiting"},{term:"delayed",meaning:"later than planned"},{term:"strike",meaning:"when workers stop working to protest"}],
+    grammarFocus: "Present Continuous for description; because / so for cause and result",
+    commonMistakes: ["There is a lot of peoples → There are a lot of people","passengers are angry because they don't know when they flying → … when they will fly","delay because weather → delay because of the weather"]
+  },
+  {
+    id: "int-308", category: "🇦🇹 Austria LPE: flying in Europe",
+    question: "Would you like to fly in the Alps? What is special about mountain flying?",
+    level4Answer: "Yes, I would like to fly in the Alps one day, but only after special training. Mountain flying is very different from flying over flat country like Belarus. The weather changes quickly, and clouds can cover the mountains and valleys in a few minutes. The wind is also dangerous: there are strong downdrafts and turbulence near the ridges. High airfields have a long takeoff run because of the thin air. And if the engine fails, there are not many places for a forced landing. So before flying in the Alps I would take a mountain flying course with an experienced instructor.",
+    followUps: ["What is a downdraft?", "How does altitude affect your aircraft's performance?", "What would you do if clouds closed the valley in front of you?"],
+    vocabulary: [{term:"ridge",meaning:"the long top part of a mountain"},{term:"downdraft",meaning:"air that moves down strongly"},{term:"thin air",meaning:"air with low density at high altitude"},{term:"forced landing",meaning:"a landing the pilot must make because of a problem"}],
+    grammarFocus: "Would like to + verb; comparatives (different from, more dangerous than)",
+    commonMistakes: ["I would like fly → I would like to fly","different than flat country → different from flying over flat country","there is not many places → there are not many places"]
+  },
+  {
+    id: "int-309", category: "🇦🇹 Austria LPE: flying in Europe",
+    question: "What should a pilot know before flying to a foreign country for the first time?",
+    level4Answer: "There are many things to check. First, the pilot must know the airspace structure of that country and which areas need a clearance. Second, he must check the NOTAMs, because there may be military areas or temporary restrictions. Third, he needs the right documents: the licence with a language proficiency endorsement, the medical certificate, aircraft documents and insurance. If the flight crosses a border, he must file a flight plan and sometimes clear customs. It is also important to study the arrival procedures and the radio frequencies, and to practise the radio calls in English before the flight.",
+    followUps: ["Have you ever flown to another country?", "What is a flight plan and when must you file one?", "Why is English especially important on international flights?"],
+    vocabulary: [{term:"airspace structure",meaning:"the different types and limits of airspace"},{term:"file a flight plan",meaning:"to send the flight plan to air traffic services"},{term:"clear customs",meaning:"to pass the official check of goods at a border"}],
+    grammarFocus: "Modal verbs for obligation: must, need to, have to",
+    commonMistakes: ["pilot must to check → the pilot must check","documents like licence → documents such as the licence","to cross border → to cross a border"]
+  },
+  {
+    id: "int-310", category: "🇦🇹 Austria LPE: flying in Europe",
+    question: "How is flying in Europe different from flying in Belarus?",
+    level4Answer: "In general, the rules are similar, because both follow ICAO standards. But there are some differences. In Europe the airspace is busier and more complex: there are more controlled zones, more traffic and more airports close to each other. Many airfields are small and uncontrolled, and pilots talk to each other on the radio in English or in the local language. In Belarus general aviation is smaller, and there are fewer private pilots. Also, in Europe there are more services for private pilots, for example good weather apps and online NOTAM briefings. I think flying in Europe needs more planning, but it gives more freedom.",
+    followUps: ["What do you like about flying in Belarus?", "What will be the biggest challenge for you in European airspace?", "Do you think the rules for private pilots should be the same everywhere?"],
+    vocabulary: [{term:"general aviation",meaning:"all civil flying except airlines, for example private and training flights"},{term:"controlled zone",meaning:"airspace where you need a clearance from ATC"},{term:"briefing",meaning:"information given before a flight"}],
+    grammarFocus: "Comparatives: busier, more complex, fewer, more; but / also for contrast",
+    commonMistakes: ["more busy → busier","less pilots → fewer pilots","the Europe → Europe"]
+  },
+  {
+    id: "int-311", category: "🇦🇹 Austria LPE: opinions",
+    question: "Is flying bad for the environment? What can pilots do about it?",
+    level4Answer: "Yes, aviation has an impact on the environment. Aircraft burn fuel, produce CO2 and make noise. Of course, small aircraft like mine are a very small part of the problem compared with airlines. But private pilots can also do something. We can plan efficient routes, fly at the best power setting and avoid unnecessary flights. We can respect noise abatement procedures near airfields. In the future I think electric and hybrid aircraft will be used for training and short flights. Many modern engines, like the Rotax, can also use unleaded fuel, which is better for the environment.",
+    followUps: ["Would you fly an electric aircraft?", "What are noise abatement procedures?", "Should private flying be more expensive because of the environment?"],
+    vocabulary: [{term:"impact",meaning:"a strong effect"},{term:"noise abatement",meaning:"procedures to reduce noise for people on the ground"},{term:"unleaded fuel",meaning:"fuel without lead"}],
+    grammarFocus: "Will for predictions; can for possibilities; compared with",
+    commonMistakes: ["aviation has impact to environment → aviation has an impact on the environment","more better → better","compare with airlines → compared with airlines"]
+  },
+  {
+    id: "int-312", category: "🇦🇹 Austria LPE: opinions",
+    question: "Some people who live near airfields complain about aircraft noise. What do you think about this?",
+    level4Answer: "I understand these people. If I lived near an airfield and heard aircraft every weekend, I would also be unhappy. But airfields are important: they are places for training, for business and for emergency services. I think the solution is cooperation. Pilots should follow the published circuit and avoid flying low over houses. Airfields can limit training flights early in the morning and late in the evening. And modern aircraft and propellers are quieter. At my airfield we try to be good neighbours, and some local people even come to watch the aircraft.",
+    followUps: ["What is a traffic circuit?", "Should airfields be closed at night?", "How can an airfield become a good neighbour?"],
+    vocabulary: [{term:"complain",meaning:"to say that you are not happy about something"},{term:"cooperation",meaning:"working together"},{term:"neighbour",meaning:"a person who lives near you"}],
+    grammarFocus: "Second conditional (If I lived…, I would…); should for advice",
+    commonMistakes: ["If I live near airfield I would be unhappy → If I lived near an airfield, I would be unhappy","should to follow → should follow","more quiet → quieter"]
+  },
+  {
+    id: "int-313", category: "🇦🇹 Austria LPE: opinions",
+    question: "What makes a good flight instructor?",
+    level4Answer: "In my opinion, a good flight instructor must be calm and patient. Students make many mistakes, and a nervous instructor makes them more nervous. He must explain things simply and show the right example in the air. A good instructor also lets the student make small mistakes and correct them himself, because this is how people learn. At the same time, he must know exactly when to take control for safety. My instructor was like this: he was strict about safety, but friendly and never shouted. Thanks to him I still enjoy every flight.",
+    followUps: ["What did your instructor teach you that you still use?", "Would you like to become an instructor?", "What is more important for a pilot: experience or training?"],
+    vocabulary: [{term:"patient",meaning:"able to wait calmly without getting angry"},{term:"strict",meaning:"demanding that rules are followed"},{term:"take control",meaning:"to start flying the aircraft yourself"}],
+    grammarFocus: "Must / should for qualities; Past Simple for your own experience",
+    commonMistakes: ["he must to be patient → he must be patient","explain simple → explain simply","He never shout → He never shouted"]
+  },
+  {
+    id: "int-314", category: "🇦🇹 Austria LPE: opinions",
+    question: "What is more important for a pilot: experience or good training?",
+    level4Answer: "I think both are important, but good training comes first. Training gives you the right habits, procedures and knowledge from the very beginning. Without it, experience can be dangerous, because you may repeat the same mistake many times and think that it is normal. Experience is also very valuable: with every flight you see new situations, new weather and new airfields, and you become more confident. But experience is useful only if you analyse your flights and learn from them. So the best combination is good training, regular practice and an honest look at your own mistakes.",
+    followUps: ["How many hours do you think make a pilot experienced?", "Can an experienced pilot become overconfident?", "How do you learn from your own flights?"],
+    vocabulary: [{term:"habit",meaning:"something you do regularly, often without thinking"},{term:"valuable",meaning:"very useful or important"},{term:"overconfident",meaning:"too sure about your own abilities"}],
+    grammarFocus: "Giving opinions: I think…, but…; so for conclusion",
+    commonMistakes: ["the experience is important → experience is important (general)","you become more confidence → you become more confident","learn on mistakes → learn from mistakes"]
+  },
+  {
+    id: "int-315", category: "🇦🇹 Austria LPE: opinions",
+    question: "How has technology changed your everyday life and your flying?",
+    level4Answer: "Technology has changed my life a lot. In my IT business almost everything happens online: we meet with clients on video calls and work with people in different countries. In flying the change is also big. Twenty years ago pilots used only paper charts and a stopwatch. Today I have a tablet with a moving map, live weather and NOTAMs, and an electronic flight instrument in the cockpit. This makes navigation much easier and safer. But there is a risk: a pilot can look at the screen too much and forget to look outside. So I always keep a paper chart and practise navigation without GPS.",
+    followUps: ["What app do you use for flight planning?", "What would you do if your tablet failed in flight?", "Do you think pilots depend too much on technology?"],
+    vocabulary: [{term:"moving map",meaning:"an electronic map that shows your position"},{term:"stopwatch",meaning:"a watch used to measure time exactly"},{term:"depend on",meaning:"to need something to work"}],
+    grammarFocus: "Present Perfect (has changed); Past Simple with 'ago'",
+    commonMistakes: ["Technology changed my life a lot (result now) → Technology has changed my life a lot","Twenty years before → Twenty years ago","look on the screen → look at the screen"]
+  },
+  {
+    id: "int-316", category: "🇦🇹 Austria LPE: opinions",
+    question: "Why do you think so many people like to watch aircraft?",
+    level4Answer: "I think aircraft give people a feeling of freedom. Flying is still something magic: a heavy machine leaves the ground and goes into the sky. Children love it, and many adults remember that they wanted to be pilots when they were young. That was my story too: as a boy I watched aircraft and dreamed about the sky. Some people also like the technical side. They know the types of aircraft, read the registrations and listen to the radio. Near big airports there are even special places for plane spotters. For me watching aircraft is relaxing, and it always makes me want to fly.",
+    followUps: ["What is plane spotting?", "Did you watch aircraft when you were a child?", "Should airports build special places for spectators?"],
+    vocabulary: [{term:"freedom",meaning:"the state of being free"},{term:"registration",meaning:"the letters painted on an aircraft that identify it"},{term:"spectator",meaning:"a person who watches an event"}],
+    grammarFocus: "Past Simple (I watched, I dreamed); used to / when I was young",
+    commonMistakes: ["give to people a feeling → give people a feeling","when they were childs → when they were children","it makes me to want → it makes me want"]
+  },
+  {
+    id: "int-317", category: "🇦🇹 Austria LPE: opinions",
+    question: "If you could change one rule for private pilots, what would you change?",
+    level4Answer: "This is a difficult question, because most rules exist for safety. But if I could change one thing, I would make international flights for private pilots simpler. Today, if you fly from one country to another outside the Schengen area, you need flight plans, customs and sometimes special permissions. The paperwork can take more time than the flight. I would also like more practical training on the radio in English during the PPL course, because many pilots are afraid of talking to controllers. I would not change the rules about medical checks or weather minimums, because they really protect us.",
+    followUps: ["Which rules do you think are the most important for safety?", "What is the Schengen area?", "Do you think English should be compulsory for all private pilots?"],
+    vocabulary: [{term:"paperwork",meaning:"documents and forms you must complete"},{term:"permission",meaning:"official agreement to do something"},{term:"compulsory",meaning:"required by a rule"}],
+    grammarFocus: "Second conditional: If I could…, I would…",
+    commonMistakes: ["If I can change, I will make (hypothetical) → If I could change one thing, I would make","more simple → simpler","afraid to talk with controllers → afraid of talking to controllers"]
+  },
+  {
+    id: "int-318", category: "🇦🇹 Austria LPE: opinions",
+    question: "What do you do when you have planned a flight but you feel tired or unwell?",
+    level4Answer: "I simply do not fly. Before every flight I ask myself honestly if I am fit to fly. I use a simple checklist called IMSAFE: illness, medication, stress, alcohol, fatigue and eating. If the answer to any of these is not good, I cancel or postpone the flight. Fatigue is especially dangerous, because a tired pilot does not always feel tired, but his reactions are slower and he makes more mistakes. Once I planned a nice flight on Saturday, but I had worked very late on Friday. In the morning I felt tired, so I stayed at home. The aircraft will be there next weekend, and so will I.",
+    followUps: ["What does IMSAFE mean?", "Is it difficult to cancel a flight when your friends are waiting?", "How does stress from work affect your flying?"],
+    vocabulary: [{term:"fit to fly",meaning:"healthy and ready to fly safely"},{term:"postpone",meaning:"to move to a later time"},{term:"fatigue",meaning:"strong tiredness"}],
+    grammarFocus: "Zero/first conditional for rules (If…, I cancel); Past Perfect (I had worked)",
+    commonMistakes: ["I am not fly → I do not fly","If answer is bad I cancel → If the answer is not good, I cancel","postpone the flight for next week → postpone the flight to next week"]
+  },
+  {
+    id: "int-319", category: "🇦🇹 Austria LPE: opinions",
+    question: "How do you choose where to fly on a free day?",
+    level4Answer: "First of all, I look at the weather. If the wind is strong or the clouds are low, I stay in the local area or do not fly at all. If the weather is good, I think about what I want: practice or pleasure. For practice I fly circuits or go to a nearby airfield to train landings on a different runway. For pleasure I choose a nice route, for example over lakes and forests, or I fly to another airfield for lunch with friends. I also check the fuel, the NOTAMs and the opening hours of the airfield. And of course I ask my family if they want to join me.",
+    followUps: ["What is your favourite route?", "Have you ever flown to another airfield just for lunch?", "How far can you fly with full tanks?"],
+    vocabulary: [{term:"circuit",meaning:"a standard rectangular pattern around the airfield"},{term:"nearby",meaning:"not far away"},{term:"opening hours",meaning:"the time when a place is open"}],
+    grammarFocus: "First conditional (If the weather is good, I…); sequence words: first of all, also, of course",
+    commonMistakes: ["If the weather will be good → If the weather is good","fly for lunch to friends → fly to another airfield for lunch with friends","ask my family do they want → ask my family if they want"]
+  },
+  {
+    id: "int-320", category: "🇦🇹 Austria LPE: opinions",
+    question: "Would you like your children to become pilots?",
+    level4Answer: "If they really want it, yes, I would support them. Flying teaches very good qualities: discipline, responsibility, the ability to make decisions and to stay calm under stress. These are useful in any profession, not only in aviation. My son is already interested in aircraft and likes to come to the airfield with me. My daughters prefer other things, and that is also fine. I would never push my children into aviation. It is a serious and expensive activity, and you need real passion for it. But if one of them asked me to teach them about flying, I would be very happy and proud.",
+    followUps: ["What qualities does flying teach?", "At what age can a person start flight training?", "Is flying a good hobby for a family?"],
+    vocabulary: [{term:"support",meaning:"to help and encourage"},{term:"passion",meaning:"a very strong interest or love"},{term:"push into",meaning:"to force someone to do something"}],
+    grammarFocus: "Second conditional (If they wanted…, I would…); would for hypothetical attitudes",
+    commonMistakes: ["I would support to them → I would support them","they prefer another things → they prefer other things","under the stress → under stress"]
+  }
+];
+
+/* образцы ответов на уточняющие вопросы */
+window.DATA_FU_F = {
+  "int-301-fu0:model": "The busiest part of my day is the morning. I take the children to school, answer many messages and have several meetings at work before lunch. After two o'clock it is usually calmer.",
+  "int-301-fu1:model": "It is not easy, because I have a business and a big family. I plan my flights in advance, usually on Saturday or Sunday morning, and I check the weather a few days before. My family knows that this time is important for me.",
+  "int-301-fu2:model": "Flying itself relaxes me. On the ground I like to walk with my family in the park, read about aviation or simply watch a good film in the evening.",
+  "int-302-fu0:model": "I would show a tourist the old part of the city, the river embankment and some big parks. In the evening I would take him to a nice restaurant with Belarusian food.",
+  "int-302-fu1:model": "Yes, it has changed a lot. There are new buildings, new roads and more cafes. The traffic has also become heavier, so now it takes longer to drive across the city.",
+  "int-302-fu2:model": "For work a big city is better, because everything is close. But for life I would prefer a quiet place near the countryside, and ideally near an airfield.",
+  "int-303-fu0:model": "Yes, sometimes. In IT a lot of documentation is in English, and we have some foreign clients. But this is written English. Speaking on the radio is a different skill.",
+  "int-303-fu1:model": "Listening to real radio communication helps me most. I also repeat model answers aloud and record myself, so I can hear my own mistakes.",
+  "int-303-fu2:model": "I will ask the examiner to repeat or to say it in a different way. I can say: sorry, could you repeat the question, please? It is better to ask than to guess.",
+  "int-304-fu0:model": "I explain how to use the seat belt and the door, where the emergency equipment is and what to do in an emergency. I also ask the passenger not to touch the controls and to tell me if he feels unwell.",
+  "int-304-fu1:model": "Yes. A friend was very nervous before his first flight. I explained every step and flew very smoothly. After ten minutes he relaxed and started to take photos.",
+  "int-304-fu2:model": "No. Bad weather is already stressful for the pilot, and with a passenger the pressure is even higher. I would wait for a better day.",
+  "int-305-fu0:model": "I would not fly. I would find out where the oil comes from, check the oil level and call a mechanic. The aircraft can fly again only when the problem is fixed.",
+  "int-305-fu1:model": "The pilot in command makes the final decision before each flight, but the maintenance organisation certifies that the aircraft is airworthy after an inspection.",
+  "int-305-fu2:model": "My aircraft has a regular inspection every fifty and one hundred hours, and an annual check. Before every flight I also do my own preflight inspection.",
+  "int-306-fu0:model": "Wet grass gives less friction, so the takeoff run is longer and the braking is weaker after landing. I always add extra distance in my calculations.",
+  "int-306-fu1:model": "For a local VFR flight I want good visibility, at least five kilometres, and a cloud base well above my planned altitude. If the weather is close to the minimums, I do not go.",
+  "int-306-fu2:model": "Yes, several times. Once low clouds were forecast to lift, but they did not. I waited two hours at the airfield and then decided to fly another day.",
+  "int-307-fu0:model": "Delays can be caused by bad weather, technical problems, air traffic control restrictions, late incoming aircraft or strikes.",
+  "int-307-fu1:model": "Yes, once I waited about five hours because of a technical problem with the aircraft. It was boring, but I was glad they fixed it before the flight.",
+  "int-307-fu2:model": "The airline should give clear information, food and drinks, and if the delay is very long, a hotel room. Good communication is the most important thing.",
+  "int-308-fu0:model": "A downdraft is air that moves down. In the mountains it is often on the side of a ridge away from the wind, and it can push a small aircraft down very quickly.",
+  "int-308-fu1:model": "At high altitude the air is thinner, so the engine gives less power and the wings give less lift. The aircraft needs a longer takeoff run and climbs more slowly.",
+  "int-308-fu2:model": "I would turn back immediately while I can still see the way out. I would never try to fly through or over the clouds in the mountains.",
+  "int-309-fu0:model": "Not yet in my own aircraft, but I plan to fly to Poland and later to other European countries after I get my EASA licence.",
+  "int-309-fu1:model": "A flight plan is a document with information about the flight: route, time, aircraft and people on board. It is needed when you cross a border or fly in some controlled airspace.",
+  "int-309-fu2:model": "Because English is the common language in aviation. On an international flight you talk to controllers from different countries, and English is the only language everybody uses.",
+  "int-310-fu0:model": "I like the quiet airspace and the friendly people at our airfield. It is easy to fly locally, and the landscape with forests and lakes is beautiful.",
+  "int-310-fu1:model": "The busy airspace and the radio communication in English with fast controllers. That is why I train listening a lot.",
+  "int-310-fu2:model": "The basic rules should be similar, because it makes international flying safer. But some local rules are necessary because every country has different terrain and traffic.",
+  "int-311-fu0:model": "Yes, I would like to try. Electric aircraft are quiet and clean. Today their endurance is short, but for training and circuits they are already a good solution.",
+  "int-311-fu1:model": "These are special procedures to reduce noise for people on the ground, for example special routes, minimum heights over towns and limited flying hours.",
+  "int-311-fu2:model": "I do not think so. Small aircraft produce very little CO2 compared with airlines. It is better to support cleaner fuels and new technology.",
+  "int-312-fu0:model": "A traffic circuit is a standard rectangular pattern around the runway. It has a departure leg, a crosswind leg, a downwind leg, a base leg and final approach.",
+  "int-312-fu1:model": "Small airfields usually do not need night operations, so closing at night is reasonable. Big airports with emergency and cargo flights are different.",
+  "int-312-fu2:model": "It can organise open days, invite local people for short flights and explain how pilots try to reduce noise. When people understand, they complain less.",
+  "int-313-fu0:model": "He taught me to always have a plan B. Before every flight I think where I can land if something goes wrong. I still do this today.",
+  "int-313-fu1:model": "Maybe one day, when I have much more experience. I like explaining things, but an instructor needs many hours and a lot of patience.",
+  "int-313-fu2:model": "I think good training comes first, because it gives the right habits. Experience is valuable only when you build it on a good base.",
+  "int-314-fu0:model": "It depends on the pilot, but I think after about three hundred hours in different conditions a private pilot can call himself experienced.",
+  "int-314-fu1:model": "Yes, and this is dangerous. When a pilot thinks nothing can happen to him, he stops checking and takes more risks.",
+  "int-314-fu2:model": "After each flight I think about what went well and what I can improve. Sometimes I write short notes in my logbook.",
+  "int-315-fu0:model": "I use a flight planning app on my tablet with charts, weather and NOTAMs. I also print the most important information on paper.",
+  "int-315-fu1:model": "I would continue with the paper chart and the compass, and if necessary I would ask ATC for help with my position.",
+  "int-315-fu2:model": "Some pilots do. They follow the line on the screen and forget to look outside. Technology should help the pilot, not replace his skills.",
+  "int-316-fu0:model": "Plane spotting is a hobby: people watch aircraft at airports, take photos and write down their types and registrations.",
+  "int-316-fu1:model": "Yes, very often. When I was a boy, I lived not far from an airport, and I watched the aircraft take off and land for hours.",
+  "int-316-fu2:model": "Yes, I think so. It is good for the airport's image, and it can inspire young people to work in aviation.",
+  "int-317-fu0:model": "The rules about weather minimums, fuel reserves and medical fitness, because they protect pilots and passengers from the most common accidents.",
+  "int-317-fu1:model": "It is a group of European countries without passport control at the borders between them. For pilots it makes flights between these countries simpler.",
+  "int-317-fu2:model": "For flights in international or controlled airspace, yes. But a pilot who flies only locally in his own country can use the local language.",
+  "int-318-fu0:model": "IMSAFE is a checklist for the pilot: Illness, Medication, Stress, Alcohol, Fatigue and Eating. If one of them is a problem, the pilot should not fly.",
+  "int-318-fu1:model": "Yes, it is a little difficult, because you do not want to disappoint people. But a good friend will understand that safety is more important.",
+  "int-318-fu2:model": "If I am stressed, I can make simple mistakes, for example forget an item on the checklist. So when I have problems at work, I fly only short local flights or I do not fly.",
+  "int-319-fu0:model": "My favourite route goes along the river and over the lakes outside Minsk. It is beautiful, especially in the evening light in summer.",
+  "int-319-fu1:model": "Yes, with friends from the airfield. We flew to a small airfield about one hour away, had lunch in the cafe and flew back. It was a perfect day.",
+  "int-319-fu2:model": "With full tanks my aircraft can fly about four to five hours, but I always land with a reserve of at least forty-five minutes of fuel.",
+  "int-320-fu0:model": "Flying teaches discipline, planning, responsibility and calm decision making. You learn that every action has consequences.",
+  "int-320-fu1:model": "Under EASA rules you can fly solo at sixteen and get a private pilot licence at seventeen. Before the first solo flight you also need a medical certificate.",
+  "int-320-fu2:model": "Yes, if the family shares the interest. It gives common experiences and trips. But it is expensive, so it needs good planning."
+};
+
+</script>
+<script>
 "use strict";
-var APP_VERSION="2026-10-14.3";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-10-15.1";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
-var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[]);
+var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[], window.DATA_INTERVIEW_4||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
 var PHRASES = (window.DATA_PHRASES||[]).concat(window.DATA_PHRASES_2||[]);
 var VOCAB = (function(){
@@ -25154,7 +25405,7 @@ var VOCAB = (function(){
   return out;
 })();
 var TR_BUILTIN = Object.assign({}, window.DATA_TR_A||{}, window.DATA_TR_B||{}, window.DATA_TR_C||{}, window.DATA_TR_D||{}, window.DATA_TR_E||{}, window.DATA_TR_F||{});
-var FU_BUILTIN = Object.assign({}, window.DATA_FU_A||{}, window.DATA_FU_B||{}, window.DATA_FU_C||{}, window.DATA_FU_D||{}, window.DATA_FU_E||{});
+var FU_BUILTIN = Object.assign({}, window.DATA_FU_A||{}, window.DATA_FU_B||{}, window.DATA_FU_C||{}, window.DATA_FU_D||{}, window.DATA_FU_E||{}, window.DATA_FU_F||{});
 var PICTURES = (window.DATA_PICTURES||[]).concat(window.DATA_PICTURES_2||[], window.DATA_PICCOMPARE||[]);
 var LISTENING = (window.DATA_LISTENING||[]).concat(window.DATA_LISTENING_2||[], window.DATA_ERRORS||[]);
 var RT = (window.DATA_RT||[]).concat(window.DATA_RT2||[]);
@@ -25573,12 +25824,11 @@ function renderHome(){
     (w?('<br>Слабый критерий: <b style="color:var(--warn)">'+esc(w.label)+'</b> (ср. '+w.avg.toFixed(1)+')'):'')+
     '</div></div>'));
   var g=el('<div class="grid">'+
-    modeCard("interview","🎙️","Interview",ALL_INTERVIEW.length+" вопросов")+
+    modeCard("shadow","🗣️","Interview · Shadow & Repeat",ALL_INTERVIEW.length+" вопросов · "+qListStat("all").learned+" выучено")+
     modeCard("emergency","⚠️","Emergency",ALL_EMERGENCY.length+" сценариев")+
     modeCard("picture","🖼️","Picture",PICTURES.length+" заданий")+
     modeCard("listening","🎧","Listening",LISTENING.length+" диалогов")+
     modeCard("rt","📡","Радиосвязь",RT.length+" сценариев полёта")+
-    modeCard("shadow","🗣️","Shadow & Repeat","Заучивание ответов")+
     modeCard("ask","❓","Задай вопросы",ASKBACK.length+" заданий (Part 2C)")+
     modeCard("liveatc","📻","Live ATC","Реальный эфир: Варшава, Вильнюс…")+
     modeCard("myaudio","📼","Мои записи","Ваши аудио: A–B, замедление, повтор")+
@@ -25680,7 +25930,7 @@ function renderTraining(mode,item){
   if(!q){ appEl.appendChild(el('<div class="card">Нет вопросов.</div>')); return; }
   appEl.appendChild(catPills(mode,function(){renderTraining(mode);}));
   var lst=el('<div class="btnrow" style="margin:0 0 8px"><button class="btn sec small" id="qList">📋 Все вопросы ('+qListStat(mode).learned+' из '+qListStat(mode).total+' выучено)</button></div>');
-  lst.querySelector("#qList").onclick=function(){ renderQuestionList(mode); };
+  lst.querySelector("#qList").onclick=function(){ renderQuestionList(mode==="emergency"?"emergency":"interview"); };
   appEl.appendChild(lst);
 
   var isL=qLearned(q.id);
@@ -25700,6 +25950,7 @@ function renderTraining(mode,item){
       '<button class="btn" id="checkBtn">Проверить (AI)</button>'+
       '<button class="btn sec" id="modelBtn">Образец L4</button>'+
       '<button class="btn sec" id="nextBtn">Другой</button>'+
+      '<button class="btn sec" id="shLearnBtn">🗣 Заучить (Shadow)</button>'+
     '</div>'+
     '<div id="recBox"></div>'+
     '<div id="modelBox" style="display:none"></div>'+
@@ -25714,6 +25965,7 @@ function renderTraining(mode,item){
     toggleTranslate(q.id+":q",txt,card.querySelector("#trBox"),this);
   };
   card.querySelector("#nextBtn").onclick=function(){ renderTraining(mode); };
+  card.querySelector("#shLearnBtn").onclick=function(){ renderShadow(q,mode); };
   card.querySelector("#qLearnT").onclick=function(){
     qLearnedSet(q.id,!qLearned(q.id));
     this.textContent=qLearned(q.id)?"✅ Выучено":"☐ Отметить выученным";
@@ -25740,11 +25992,17 @@ function qListStat(mode){
   var pool=poolFor2(mode);
   return {total:pool.length,learned:pool.filter(function(q){return qLearned(q.id);}).length};
 }
-function poolFor2(mode){ return mode==="emergency"?ALL_EMERGENCY:ALL_INTERVIEW; }
-var qListFilter="all";
+function poolFor2(mode){ return mode==="emergency"?ALL_EMERGENCY:(mode==="all"?ALL_INTERVIEW.concat(ALL_EMERGENCY):ALL_INTERVIEW); }
+var qListFilter="all", qListSrc=(lastPlace.qsrc||{}).v||"interview";
 function renderQuestionList(mode){
   stopMic(); speechSynthesis.cancel();
-  setScreen(mode==="interview"?"Все вопросы Interview":"Все сценарии Emergency",true);
+  if(mode==="interview"||mode==="emergency"||mode==="all"){ qListSrc=mode; rememberPlace("qsrc",{v:mode}); }
+  setScreen("Interview · Shadow & Repeat",true);
+  var src=el('<div class="pill-row">'+[["interview","🎙 Interview ("+ALL_INTERVIEW.length+")"],["emergency","⚠️ Emergency ("+ALL_EMERGENCY.length+")"],["all","Все"]].map(function(x){
+    return '<span class="pill'+(mode===x[0]?" on":"")+'" data-s="'+x[0]+'">'+x[1]+'</span>'; }).join("")+'</div>');
+  src.querySelectorAll(".pill").forEach(function(p){ p.onclick=function(){ renderQuestionList(p.dataset.s); }; });
+  appEl.appendChild(src);
+  appEl.appendChild(el('<div class="card muted" style="font-size:13px;padding:10px 14px">Нажмите на вопрос — откроется полный образец ответа: можно <b>заучить</b> его (Shadow) или <b>ответить своими словами</b> с AI-проверкой.</div>'));
   var pool=poolFor2(mode), st=qListStat(mode);
   var answered=answeredIds();
   appEl.appendChild(el('<div class="card" style="padding:10px 14px"><b>Выучено: '+st.learned+' из '+st.total+'</b>'+
@@ -25767,7 +26025,8 @@ function renderQuestionList(mode){
     items.forEach(function(q){
       var l=qLearned(q.id), b=qBest(q.id);
       var mark=b===null?(answered[q.id]?"⚪":"○"):(b>=4?"🟢":(b>=3?"🟡":"🔴"));
-      var txt=mode==="emergency"?(q.firstQuestion||q.scenario):q.question;
+      var isEm=!findById(ALL_INTERVIEW,q.id);
+      var txt=isEm?(q.firstQuestion||q.scenario):q.question;
       var row=el('<div class="drow" style="padding:10px 4px;align-items:flex-start">'+
         '<span class="qtog" style="font-size:20px;padding:0 10px 0 2px;cursor:pointer">'+(l?"✅":"⬜")+'</span>'+
         '<span class="qopen" style="flex:1;cursor:pointer;'+(l?"opacity:.6":"")+'">'+esc(txt)+'</span>'+
@@ -25775,7 +26034,7 @@ function renderQuestionList(mode){
       row.firstChild.querySelector(".qtog").onclick=function(){
         qLearnedSet(q.id,!qLearned(q.id)); renderQuestionList(mode);
       };
-      row.firstChild.querySelector(".qopen").onclick=function(){ renderTraining(mode,q); };
+      row.firstChild.querySelector(".qopen").onclick=function(){ renderShadow(q,isEm?"emergency":"interview"); };
       appEl.appendChild(row);
     });
   });
@@ -27632,7 +27891,8 @@ function shadowHint(target){
   }).join(" ");
 }
 function shadowSrcOf(q){ return findById(ALL_INTERVIEW,q.id)?"interview":"emergency"; }
-function renderShadowList(){
+function renderShadowList(){ return renderQuestionList(qListSrc||"interview"); }
+function renderShadowListOld(){
   stopMic(); speechSynthesis.cancel();
   setScreen("Shadow & Repeat",true);
   appEl.appendChild(el('<div class="card muted" style="font-size:13px">Метод HyperLingua: слушайте образец Level 4 → повторяйте вслух за диктором → воспроизведите по памяти. Так ответы на типовые вопросы экзамена запоминаются целиком.</div>'));
@@ -27691,11 +27951,17 @@ function renderShadowIntro(){                            // экран «вес�
     '<div class="muted" style="font-size:13px;margin-top:10px">План: '+s.sents.length+' фраз'+
       (s.units.filter(function(u){return u.kind==="chunk";}).length?(' → '+s.units.filter(function(u){return u.kind==="chunk";}).length+' связки по 2–3 предложения'):'')+
       ' → весь ответ по памяти.</div>'+
-    '<div class="btnrow"><button class="btn" id="siGo">▶ Начать заучивание</button></div></div>');
+    '<div class="btnrow"><button class="btn" id="siGo">▶ Начать заучивание</button>'+
+    '<button class="btn sec" id="siOwn">🎙 Ответить своими словами</button>'+
+    '<button class="btn sec small" id="siMark">'+(qLearned(q.id)?"✅ Выучено":"☐ Отметить выученным")+'</button></div>'+
+    '<div class="btnrow"><button class="btn sec small" id="siList">📋 К списку вопросов</button></div></div>');
   appEl.appendChild(card);
   card.querySelector("#siSay").onclick=function(){ speak(q.level4Answer); };
   card.querySelector("#siTr").onclick=function(){ toggleTranslate(q.id+":m",q.level4Answer,card.querySelector("#siTrBox"),this); };
   card.querySelector("#siGo").onclick=function(){ shadow.idx=0; shadow.stage="shadow"; renderShadowStep(); };
+  card.querySelector("#siOwn").onclick=function(){ renderTraining(s.mode==="emergency"?"emergency":"interview",q); };
+  card.querySelector("#siMark").onclick=function(){ qLearnedSet(q.id,!qLearned(q.id)); this.textContent=qLearned(q.id)?"✅ Выучено":"☐ Отметить выученным"; };
+  card.querySelector("#siList").onclick=function(){ renderQuestionList(qListSrc); };
 }
 var shTimers=[];
 function shLater(fn,ms){ shTimers.push(setTimeout(fn,ms)); }
