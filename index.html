@@ -25385,7 +25385,7 @@ window.DATA_FU_F = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-10-19.3";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-10-19.4";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[], window.DATA_INTERVIEW_4||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -25703,8 +25703,12 @@ function voiceScore(v){
   if(/google/i.test(n))s+=30;
   if(v.localService===false)s+=15;
   if(/^en[-_]US/i.test(v.lang))s+=8; else if(/^en[-_]GB/i.test(v.lang))s+=6;
-  if(/(Ava|Samantha|Allison|Evan|Zoe|Serena|Daniel|Jenny|Aria|Guy|Libby|Sonia|Ryan)\b/.test(n))s+=10;
-  if(/compact|eloquence|espeak|novelty|whisper|bad news|bells|boing|bubbles|cellos|jester|organ|superstar|trinoids|zarvox|albert|fred|junior|ralph|kathy|bahh|wobble/i.test(n))s-=80;
+  /* хорошие голоса Apple/Microsoft, в т.ч. в русской локализации macOS */
+  if(/(Ava|Samantha|Allison|Evan|Zoe|Serena|Jenny|Aria|Guy|Libby|Sonia|Ryan|Nicky|Aaron|Arthur|Martha)\b|Саманта|Эва|Зои|Никки|Артур|Марта/.test(n))s+=14;
+  if(/(Daniel|Karen|Moira|Tessa)\b|Дэниэл|Карен|Мойра|Тесса/.test(n))s+=9;
+  /* роботы Eloquence и «шуточные» голоса — в самый низ */
+  if(/compact|eloquence|espeak|novelty|whisper|bad news|good news|bells|boing|bubbles|cellos|jester|organ|superstar|trinoids|zarvox|albert|fred|junior|ralph|kathy|bahh|wobble|grandma|grandpa|\b(Eddy|Flo|Reed|Rocko|Sandy|Shelley)\b/i.test(n))s-=80;
+  if(/Альберт|Бах|Виолончель|Воббл|Джуниор|Зарвокс|Колокольчик|Кэти|Орган|Плохие новости|Хорошие новости|Прыг-скок|Пузырьки|Ральф|Суперзвезда|Триноид|Фред|Шепот|Шёпот|Шутник|Бабушка|Дедушка/.test(n))s-=80;
   return s;
 }
 function bestVoice(){
@@ -29859,7 +29863,7 @@ function renderProgress(){
 /* ---------- settings ---------- */
 function renderVoiceCard(){
   var c=el('<div class="card"><b>🔊 Голос озвучки</b>'+
-    '<div class="muted" style="font-size:12px;margin:4px 0 8px">Голоса берутся из вашего телефона или компьютера. Лучше всего звучат «Natural», «Neural», «Online» и Google-голоса. ★ — рекомендуемые.</div>'+
+    '<div class="muted" style="font-size:12px;margin:4px 0 8px">Голоса берутся из вашего телефона или компьютера. Лучше всего звучат «Natural», «Neural», «Online», «Premium» и Google-голоса. ★ — рекомендуемые.<br>Ещё лучше: на Mac — Системные настройки → Универсальный доступ → Устный контент → Системный голос → Управлять голосами → скачайте <b>Ava (Premium)</b> или <b>Zoe (Premium)</b>. На Android — Настройки → Синтез речи → Google → Установить голосовые данные → English (US).</div>'+
     '<select id="vSel"></select>'+
     '<label style="margin-top:8px">Скорость: <b id="vRateV"></b></label><input id="vRate" type="range" min="0.6" max="1.2" step="0.05">'+
     '<div class="btnrow"><button class="btn sec small" id="vTest">▶ Прослушать</button><button class="btn sec small" id="vAuto">↺ Автовыбор</button></div>'+
