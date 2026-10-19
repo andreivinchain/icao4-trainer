@@ -25385,7 +25385,7 @@ window.DATA_FU_F = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-10-15.1";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-10-19.1";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[], window.DATA_INTERVIEW_4||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -25993,7 +25993,7 @@ function qListStat(mode){
   return {total:pool.length,learned:pool.filter(function(q){return qLearned(q.id);}).length};
 }
 function poolFor2(mode){ return mode==="emergency"?ALL_EMERGENCY:(mode==="all"?ALL_INTERVIEW.concat(ALL_EMERGENCY):ALL_INTERVIEW); }
-var qListFilter="all", qListSrc=(lastPlace.qsrc||{}).v||"interview";
+var qListQuery="", qListFilter="all", qListSrc=(lastPlace.qsrc||{}).v||"interview";
 function renderQuestionList(mode){
   stopMic(); speechSynthesis.cancel();
   if(mode==="interview"||mode==="emergency"||mode==="all"){ qListSrc=mode; rememberPlace("qsrc",{v:mode}); }
@@ -26012,32 +26012,56 @@ function renderQuestionList(mode){
     return '<span class="pill'+(qListFilter===x[0]?" on":"")+'" data-f="'+x[0]+'">'+x[1]+'</span>'; }).join("")+'</div>');
   f.querySelectorAll(".pill").forEach(function(p){ p.onclick=function(){ qListFilter=p.dataset.f; renderQuestionList(mode); }; });
   appEl.appendChild(f);
-  var cats={};
-  pool.forEach(function(q){ (cats[q.category]=cats[q.category]||[]).push(q); });
-  Object.keys(cats).forEach(function(c){
-    var items=cats[c].filter(function(q){
-      var l=qLearned(q.id);
-      return qListFilter==="all"||(qListFilter==="done"&&l)||(qListFilter==="todo"&&!l);
+  var cats={}, order=[];
+  pool.forEach(function(q){ if(!cats[q.category]){cats[q.category]=[];order.push(q.category);} cats[q.category].push(q); });
+  /* темы — отдельными кнопками; выбранная тема запоминается для каждого источника */
+  var tkey="qtopic_"+mode, topic=(lastPlace[tkey]||{}).v||"Все";
+  if(topic!=="Все"&&!cats[topic])topic="Все";
+  var tp=el('<div class="pill-row" style="flex-wrap:wrap">'+['Все'].concat(order).map(function(c){
+    var n=c==="Все"?pool.length:cats[c].length, ld=c==="Все"?st.learned:cats[c].filter(function(q){return qLearned(q.id);}).length;
+    return '<span class="pill'+(c===topic?" on":"")+'" data-t="'+esc(c)+'">'+esc(c)+' <span style="opacity:.7;font-size:11px">'+ld+'/'+n+'</span></span>'; }).join("")+'</div>');
+  tp.querySelectorAll(".pill").forEach(function(p){ p.onclick=function(){ rememberPlace(tkey,{v:p.dataset.t}); renderQuestionList(mode); }; });
+  appEl.appendChild(tp);
+  /* поиск по вопросам и образцам ответов */
+  var sb=el('<div style="margin:6px 0 10px"><input id="qSearch" type="search" placeholder="🔍 Поиск: например, sterile cockpit, icing, Alps…" autocomplete="off" style="width:100%"></div>');
+  appEl.appendChild(sb);
+  var box=el('<div id="qRows"></div>'); appEl.appendChild(box);
+  var inp=sb.querySelector("#qSearch");
+  inp.value=qListQuery||"";
+  function draw(){
+    var qtxt=(inp.value||"").trim().toLowerCase(); qListQuery=inp.value;
+    box.innerHTML="";
+    var shown=0;
+    (topic==="Все"||qtxt?order:[topic]).forEach(function(c){
+      var items=cats[c].filter(function(q){
+        var l=qLearned(q.id);
+        if(!(qListFilter==="all"||(qListFilter==="done"&&l)||(qListFilter==="todo"&&!l)))return false;
+        if(!qtxt)return true;
+        var hay=((q.question||"")+" "+(q.scenario||"")+" "+(q.firstQuestion||"")+" "+(q.level4Answer||"")+" "+(q.followUps||[]).join(" ")).toLowerCase();
+        return qtxt.split(/\s+/).every(function(w){ return hay.indexOf(w)>=0; });
+      });
+      if(!items.length)return;
+      var ld=cats[c].filter(function(q){return qLearned(q.id);}).length;
+      box.appendChild(el('<div class="card" style="padding:8px 14px;background:var(--bg2);margin-bottom:4px"><b>'+esc(c)+'</b> <span class="muted" style="font-size:12px">· '+ld+' из '+cats[c].length+'</span></div>'));
+      items.forEach(function(q){
+        shown++;
+        var l=qLearned(q.id), b=qBest(q.id);
+        var mark=b===null?(answered[q.id]?"⚪":"○"):(b>=4?"🟢":(b>=3?"🟡":"🔴"));
+        var isEm=!findById(ALL_INTERVIEW,q.id);
+        var txt=isEm?(q.firstQuestion||q.scenario):q.question;
+        var row=el('<div class="drow" style="padding:10px 4px;align-items:flex-start">'+
+          '<span class="qtog" style="font-size:20px;padding:0 10px 0 2px;cursor:pointer">'+(l?"✅":"⬜")+'</span>'+
+          '<span class="qopen" style="flex:1;cursor:pointer;'+(l?"opacity:.6":"")+'">'+esc(txt)+'</span>'+
+          '<span style="padding-left:8px;white-space:nowrap" title="лучшая оценка">'+mark+(b!==null?' <span class="muted" style="font-size:12px">'+b.toFixed(1)+'</span>':'')+'</span></div>');
+        row.firstChild.querySelector(".qtog").onclick=function(){ qLearnedSet(q.id,!qLearned(q.id)); renderQuestionList(mode); };
+        row.firstChild.querySelector(".qopen").onclick=function(){ renderShadow(q,isEm?"emergency":"interview"); };
+        box.appendChild(row);
+      });
     });
-    if(!items.length)return;
-    var ld=cats[c].filter(function(q){return qLearned(q.id);}).length;
-    appEl.appendChild(el('<div class="card" style="padding:8px 14px;background:var(--bg2);margin-bottom:4px"><b>'+esc(c)+'</b> <span class="muted" style="font-size:12px">· '+ld+' из '+cats[c].length+'</span></div>'));
-    items.forEach(function(q){
-      var l=qLearned(q.id), b=qBest(q.id);
-      var mark=b===null?(answered[q.id]?"⚪":"○"):(b>=4?"🟢":(b>=3?"🟡":"🔴"));
-      var isEm=!findById(ALL_INTERVIEW,q.id);
-      var txt=isEm?(q.firstQuestion||q.scenario):q.question;
-      var row=el('<div class="drow" style="padding:10px 4px;align-items:flex-start">'+
-        '<span class="qtog" style="font-size:20px;padding:0 10px 0 2px;cursor:pointer">'+(l?"✅":"⬜")+'</span>'+
-        '<span class="qopen" style="flex:1;cursor:pointer;'+(l?"opacity:.6":"")+'">'+esc(txt)+'</span>'+
-        '<span style="padding-left:8px;white-space:nowrap" title="лучшая оценка">'+mark+(b!==null?' <span class="muted" style="font-size:12px">'+b.toFixed(1)+'</span>':'')+'</span></div>');
-      row.firstChild.querySelector(".qtog").onclick=function(){
-        qLearnedSet(q.id,!qLearned(q.id)); renderQuestionList(mode);
-      };
-      row.firstChild.querySelector(".qopen").onclick=function(){ renderShadow(q,isEm?"emergency":"interview"); };
-      appEl.appendChild(row);
-    });
-  });
+    if(!shown)box.appendChild(el('<div class="card muted">Ничего не найдено'+(qtxt?' по запросу «'+esc(inp.value)+'»':'')+'.</div>'));
+  }
+  inp.oninput=draw;
+  draw();
 }
 function toggleModel(q,mode,card){
   var box=card.querySelector("#modelBox");
