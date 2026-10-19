@@ -47,7 +47,7 @@ a{color:var(--acc)}
 <script>
 "use strict";
 /* ===== ICAO 4 · Mock Exam — отдельный тренажёр экзамена, берёт базу из index.html ===== */
-var MOCK_VERSION="2026-10-19.m1";
+var MOCK_VERSION="2026-10-19.m2";
 var $app=document.getElementById("app");
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
@@ -89,7 +89,7 @@ function voiceScore(v){
   if(/Альберт|Бах|Виолончель|Воббл|Джуниор|Зарвокс|Колокольчик|Кэти|Орган|Плохие новости|Хорошие новости|Прыг-скок|Пузырьки|Ральф|Суперзвезда|Триноид|Фред|Шепот|Шёпот|Шутник|Бабушка|Дедушка/.test(n))s-=80;
   return s;
 }
-function voices(){return enVoices().sort(function(a,b){return voiceScore(b)-voiceScore(a);});}
+function voices(){var vs=enVoices();if(navigator.onLine===false){var loc=vs.filter(function(v){return v.localService!==false;});if(loc.length)vs=loc;}return vs.sort(function(a,b){return voiceScore(b)-voiceScore(a);});}
 function examinerVoice(){var vs=voices();if(S.ttsVoice){var m=vs.filter(function(v){return v.name===S.ttsVoice;})[0];if(m)return m;}return vs[0]||null;}
 function atcVoice(){var vs=voices(),e=examinerVoice();var o=vs.filter(function(v){return v!==e&&voiceScore(v)>0;});return o[0]||e;}
 function say(text,who,cb){
@@ -107,8 +107,9 @@ if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){};
 /* ---------- распознавание речи ---------- */
 var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 var rec=null,recOn=false,finalTxt="",interimTxt="",lastSpeech=0,onTr=null;
+var srBroken=false;
 function recStart(){
-  if(!SR)return; recOn=true;
+  if(!SR||srBroken){ levelStart(); return; } recOn=true;
   if(rec){try{rec.start();}catch(e){}return;}
   rec=new SR(); rec.lang="en-US"; rec.continuous=true; rec.interimResults=true;
   rec.onresult=function(ev){
@@ -120,7 +121,10 @@ function recStart(){
     lastSpeech=Date.now(); onTr&&onTr();
   };
   rec.onend=function(){ if(recOn){ setTimeout(function(){ if(recOn)try{rec.start();}catch(e){} },250);} };
-  rec.onerror=function(e){ if(e.error==="not-allowed"){recOn=false;toast("Нет доступа к микрофону");} };
+  rec.onerror=function(e){
+    if(e.error==="not-allowed"){recOn=false;toast("Нет доступа к микрофону");}
+    else if(e.error==="network"||e.error==="service-not-allowed"||e.error==="language-not-supported"){ srBroken=true; recOn=false; toast("Офлайн: распознавание речи недоступно — ответы пишутся на аудио"); levelStart(); }
+  };
   try{rec.start();}catch(e){}
 }
 function recStop(){recOn=false;if(rec)try{rec.stop();}catch(e){}}
@@ -128,7 +132,7 @@ function recStop(){recOn=false;if(rec)try{rec.stop();}catch(e){}}
 /* ---------- запись аудио ---------- */
 var mStream=null,mRec=null,chunks=[];
 function audioStart(){
-  if(!cfg.record||!navigator.mediaDevices||!window.MediaRecorder)return Promise.resolve();
+  if(!(cfg.record||srBroken)||!navigator.mediaDevices||!window.MediaRecorder)return Promise.resolve();
   var p=mStream?Promise.resolve(mStream):navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){mStream=s;return s;});
   return p.then(function(s){chunks=[];mRec=new MediaRecorder(s);mRec.ondataavailable=function(e){if(e.data.size)chunks.push(e.data);};mRec.start();}).catch(function(){});
 }
@@ -138,6 +142,48 @@ function audioStop(){
     mRec.onstop=function(){res(chunks.length?URL.createObjectURL(new Blob(chunks,{type:chunks[0].type||"audio/webm"})):null);};
     mRec.stop();
   });
+}
+
+/* ---------- уровень звука: определяем паузы без интернета ---------- */
+var lvl=null;
+function levelStart(){
+  if(lvl||!navigator.mediaDevices)return;
+  lvl={};
+  var p=mStream?Promise.resolve(mStream):navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){mStream=s;return s;});
+  p.then(function(s){
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+    var ac=new AC(),src=ac.createMediaStreamSource(s),an=ac.createAnalyser(); an.fftSize=1024; src.connect(an);
+    var buf=new Uint8Array(an.fftSize);
+    lvl.t=setInterval(function(){
+      an.getByteTimeDomainData(buf); var sum=0; for(var i=0;i<buf.length;i++){var v=(buf[i]-128)/128;sum+=v*v;}
+      if(Math.sqrt(sum/buf.length)>0.04&&!(window.speechSynthesis&&speechSynthesis.speaking))lastSpeech=Date.now();
+    },150);
+  }).catch(function(){lvl=null;});
+}
+
+/* ---------- офлайн: заранее скачать картинки ---------- */
+function allImageUrls(){
+  var u=[]; D.pics.concat(D.cmp).forEach(function(p){ if(p.imageUrl)u.push(p.imageUrl); if(p.imageUrl2)u.push(p.imageUrl2); });
+  return u.filter(function(x,i){return u.indexOf(x)===i;});
+}
+function cachedCount(){
+  if(!window.caches)return Promise.resolve(0);
+  return caches.open("icao4-img").then(function(c){return c.keys();}).then(function(k){
+    var have={}; k.forEach(function(r){have[r.url]=1;}); return allImageUrls().filter(function(u){return have[u];}).length;
+  }).catch(function(){return 0;});
+}
+function prepareOffline(btn,info){
+  var urls=allImageUrls(),done=0,fail=0,i=0; btn.disabled=true;
+  function upd(){info.textContent="Скачиваю картинки: "+done+" / "+urls.length+(fail?" (ошибок "+fail+")":"");}
+  function one(){
+    if(i>=urls.length)return Promise.resolve();
+    var u=urls[i++];
+    return fetch(u,{mode:"no-cors"}).then(function(){done++;},function(){fail++;}).then(function(){upd();return one();});
+  }
+  upd();
+  Promise.all([one(),one(),one(),one()]).then(function(){
+    return fetch("./mock.html").catch(function(){}).then(function(){return fetch("./index.html").catch(function(){});});
+  }).then(function(){ btn.disabled=false; info.textContent="Готово: "+done+" картинок сохранено"+(fail?", не удалось "+fail:"")+". Mock Exam работает без интернета."; });
 }
 
 /* ---------- настройки экзамена ---------- */
@@ -205,6 +251,9 @@ function renderSetup(){
     '<div class="card"><h2>Голос</h2><div class="row"><select id="vs" style="max-width:100%">'+
       vs.map(function(v){return '<option'+(examinerVoice()===v?" selected":"")+'>'+esc(v.name)+'</option>';}).join("")+'</select>'+
       '<button class="btn sec" id="vt">▶︎ Проба</button></div><div class="mut">Диспетчер в Part 2 говорит другим голосом и чуть быстрее.</div></div>'+
+    '<div class="card"><h2>Офлайн</h2><div class="mut" id="offInfo">'+(navigator.onLine===false?'Сейчас нет интернета. ':'')+'Проверяю, что уже сохранено…</div>'+
+      '<div class="row" style="margin-top:8px"><button class="btn sec" id="offBtn">📥 Подготовить для офлайна</button></div>'+
+      '<div class="mut" style="margin-top:6px">Без интернета работают вопросы, голос (встроенные голоса), подсказки по паузе и запись ответа. Текст ответа распознаётся только онлайн — офлайн разбор будет по аудиозаписи.</div></div>'+
     (last?'<div class="card mut">Прошлый мок: '+esc(last.date)+' · ответов '+last.n+' · подсказок '+last.hints+' · ATC readback '+last.atc+'</div>':'')+
     (SR?'':'<div class="card" style="border-color:var(--bad)">Этот браузер не умеет распознавать речь. Откройте в Chrome.</div>')+
     '<div class="row"><button class="btn" id="go" style="flex:1">▶︎ Начать экзамен</button></div>'+
@@ -216,6 +265,9 @@ function renderSetup(){
   $app.querySelector("#rc").onchange=function(){cfg.record=this.checked;};
   [].forEach.call($app.querySelectorAll("[data-p]"),function(c){c.onchange=function(){cfg.parts[this.dataset.p]=this.checked;};});
   $app.querySelector("#vs").onchange=function(){S.ttsVoice=this.value;};
+  var $oi=$app.querySelector("#offInfo");
+  cachedCount().then(function(n){ var all=allImageUrls().length; $oi.textContent=(navigator.onLine===false?"Сейчас нет интернета. ":"")+"Сохранено картинок: "+n+" из "+all+(n>=all?" ✓ — можно заниматься офлайн.":"."); });
+  $app.querySelector("#offBtn").onclick=function(){prepareOffline(this,$oi);};
   $app.querySelector("#vt").onclick=function(){say("Good morning. My name is Anna, and I will be your examiner today. Can you tell me about yourself?");};
   $app.querySelector("#go").onclick=function(){
     lsSet("icao4_mock_cfg",cfg);
@@ -229,6 +281,7 @@ var E=null,tick=null;
 function stopAll(){recStop();try{speechSynthesis.cancel();}catch(e){}clearInterval(tick);tick=null;onTr=null;}
 function startExam(items){
   E={items:items,i:0,res:[]};
+  if(navigator.onLine===false&&SR){ srBroken=true; toast("Офлайн: ответы записываются на аудио, подсказки — по паузе"); }
   if(cfg.record)audioStart().then(function(){audioStop();}); /* запросить доступ к микрофону заранее */
   showItem();
 }
@@ -289,7 +342,7 @@ function showItem(){
     var $s=$app.querySelector("#stt"); if(!$s)return;
     $s.textContent="🎙️ Слушаю ваш ответ"; $s.className="state l"; listenFrom=Date.now(); lastSpeech=0;
     if(!cfg.showText&&it.kind!=="atc")$app.querySelector("#qt").style.display="none";
-    recStart(); if(cfg.record&&(!mRec||mRec.state==="inactive"))audioStart();
+    recStart(); if((cfg.record||srBroken)&&(!mRec||mRec.state==="inactive"))audioStart();
     if(cfg.mode==="train"&&cfg.delay===0)showHint(1);
   }
   function ask(){
@@ -336,7 +389,7 @@ function finish(){
   audioStop();
   var atc=E.res.filter(function(r){return r.it.kind==="atc";}),hints=E.res.filter(function(r){return r.hint;}).length;
   var atcAvg=atc.length?Math.round(atc.reduce(function(s,r){return s+(coverage(r.it.model,r.tr)||0);},0)/atc.length)+"%":"—";
-  var silent=E.res.filter(function(r){return words(r.tr).length<5&&r.it.kind!=="atc";}).length;
+  var silent=srBroken?0:E.res.filter(function(r){return words(r.tr).length<5&&r.it.kind!=="atc";}).length;
   lsSet("icao4_mock_last",{date:new Date().toLocaleString("ru-RU"),n:E.res.length,hints:hints,atc:atcAvg});
   var html='<h1>📋 Разбор мока</h1><div class="card">Ответов: <b>'+E.res.length+'</b> · с подсказкой: <b>'+hints+'</b> · ATC readback: <b>'+atcAvg+'</b>'+(silent?' · почти без ответа: <b style="color:var(--bad)">'+silent+'</b>':'')+
     '<div class="mut" style="margin-top:4px">Сравните свои ответы с образцами. Главное на Level 4 — говорить без длинных пауз, связно и понятно.</div></div>';
@@ -369,6 +422,7 @@ document.addEventListener("keydown",function(e){
 });
 function toast(t){var d=document.createElement("div");d.textContent=t;d.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;padding:10px 16px;border-radius:10px;z-index:9";document.body.appendChild(d);setTimeout(function(){d.remove();},2500);}
 
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
 loadData().then(function(){buildPools();setTimeout(renderSetup,300);}).catch(function(e){$app.innerHTML='<div class="card">Не удалось загрузить базу: '+esc(e.message)+'</div>';});
 </script>
 </body>
