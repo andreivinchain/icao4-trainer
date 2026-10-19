@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1724">
+<title>ICAO 4 · Mock Exam</title>
+<style>
+:root{--bg:#0b1724;--card:#13263a;--line:#24405c;--txt:#e8f0f8;--mut:#8fa6bd;--acc:#3fa9f5;--ok:#3ecf8e;--warn:#f5b83f;--bad:#f56b6b}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+#app{max-width:860px;margin:0 auto;padding:12px 14px 120px}
+h1{font-size:22px;margin:6px 0 4px}h2{font-size:18px;margin:4px 0 8px}
+.mut{color:var(--mut);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.btn{appearance:none;border:0;border-radius:11px;padding:12px 16px;font-size:16px;font-weight:600;background:var(--acc);color:#fff;cursor:pointer}
+.btn.sec{background:#22405e}.btn.ok{background:var(--ok);color:#06261a}.btn.warn{background:var(--warn);color:#2a1d00}
+.btn:disabled{opacity:.45}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label.opt{display:flex;gap:8px;align-items:center;padding:7px 0}
+select,input[type=range]{font-size:15px;background:#0e1f30;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px}
+.pill{display:inline-block;padding:3px 9px;border-radius:99px;background:#1c3550;font-size:13px;margin:2px 4px 2px 0}
+#hint{position:sticky;top:0;z-index:5;background:#2a2108;border:1px solid #6b5313;border-radius:0 0 14px 14px;padding:10px 14px;margin:-12px -14px 8px;display:none;max-height:45vh;overflow:auto}
+#hint.on{display:block}
+#hint .ttl{font-weight:700;color:var(--warn);font-size:14px;margin-bottom:4px}
+#hint ul{margin:4px 0 0 18px;padding:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.prog{height:6px;background:#1a3046;border-radius:9px;overflow:hidden;margin:6px 0}
+.prog i{display:block;height:100%;background:var(--acc)}
+.q{font-size:19px;font-weight:600}
+.imgs{display:grid;gap:8px}.imgs.two{grid-template-columns:1fr 1fr}
+.imgs img{width:100%;border-radius:10px;background:#091521;min-height:120px;object-fit:cover;max-height:52vh}
+.state{font-weight:700}.state.l{color:var(--ok)}.state.s{color:var(--acc)}
+.tr{min-height:48px;background:#0e1f30;border-radius:10px;padding:8px 10px;font-size:15px;color:#cfe0f0}
+.tr i{color:var(--mut)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#0b1724ee;border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
+.bar .row{max-width:860px;margin:0 auto;justify-content:space-between}
+.model{background:#0f2a1f;border:1px solid #1f5a40;border-radius:10px;padding:8px 10px;font-size:15px}
+.you{background:#0e1f30;border-radius:10px;padding:8px 10px;font-size:15px}
+.score{font-weight:700}.score.g{color:var(--ok)}.score.m{color:var(--warn)}.score.b{color:var(--bad)}
+.ru{color:#b9c9d9;font-size:15px}
+a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div id="app"><div class="card">Загружаю базу вопросов…</div></div>
+<script>
+"use strict";
+/* ===== ICAO 4 · Mock Exam — отдельный тренажёр экзамена, берёт базу из index.html ===== */
+var MOCK_VERSION="2026-10-19.m1";
+var $app=document.getElementById("app");
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function sentences(t,n){var s=String(t||"").match(/[^.!?]+[.!?]+/g)||[t||""];return s.slice(0,n).join(" ").trim();}
+function lsGet(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+/* ---------- загрузка базы из основного приложения ---------- */
+function loadData(){
+  return fetch("./index.html",{cache:"no-cache"}).then(function(r){return r.text();}).then(function(html){
+    var doc=new DOMParser().parseFromString(html,"text/html");
+    var ss=[].slice.call(doc.querySelectorAll("script")).filter(function(s){return !s.src;});
+    ss.slice(0,-1).forEach(function(s){ var el=document.createElement("script"); el.textContent=s.textContent; document.head.appendChild(el); });
+  });
+}
+var D={};
+function buildPools(){
+  var W=window;
+  D.interview=[].concat(W.DATA_INTERVIEW_1||[],W.DATA_INTERVIEW_2||[],W.DATA_INTERVIEW_3||[],W.DATA_INTERVIEW_4||[]);
+  D.fu=Object.assign({},W.DATA_FU_A||{},W.DATA_FU_B||{},W.DATA_FU_C||{},W.DATA_FU_D||{},W.DATA_FU_E||{},W.DATA_FU_F||{});
+  D.rt=[].concat(W.DATA_RT||[],W.DATA_RT2||[]);
+  D.pics=[].concat(W.DATA_PICTURES||[],W.DATA_PICTURES_2||[]);
+  D.cmp=[].concat(W.DATA_PICCOMPARE||[],W.DATA_PICCOMPARE_2||[]);
+  D.emg=W.DATA_EMERGENCY||[];
+}
+function fuModel(id,k){return D.fu[id+"-fu"+k+":model"]||"";}
+
+/* ---------- голос ---------- */
+var S=lsGet("icao4_settings",{});
+function enVoices(){return (speechSynthesis.getVoices()||[]).filter(function(v){return /^en[-_]/i.test(v.lang);});}
+function voiceScore(v){
+  var n=(v.name||"")+" "+(v.voiceURI||""),s=0;
+  if(/natural|neural/i.test(n))s+=60; if(/online/i.test(n))s+=25; if(/premium|enhanced/i.test(n))s+=40; if(/google/i.test(n))s+=30;
+  if(v.localService===false)s+=15; if(/^en[-_]US/i.test(v.lang))s+=8; else if(/^en[-_]GB/i.test(v.lang))s+=6;
+  if(/(Ava|Samantha|Allison|Evan|Zoe|Serena|Jenny|Aria|Guy|Libby|Sonia|Ryan|Nicky|Aaron|Arthur|Martha)\b|Саманта|Эва|Зои|Никки|Артур|Марта/.test(n))s+=14;
+  if(/(Daniel|Karen|Moira|Tessa)\b|Дэниэл|Карен|Мойра|Тесса/.test(n))s+=9;
+  if(/compact|eloquence|espeak|novelty|whisper|bad news|good news|bells|boing|bubbles|cellos|jester|organ|superstar|trinoids|zarvox|albert|fred|junior|ralph|kathy|bahh|wobble|grandma|grandpa|\b(Eddy|Flo|Reed|Rocko|Sandy|Shelley)\b/i.test(n))s-=80;
+  if(/Альберт|Бах|Виолончель|Воббл|Джуниор|Зарвокс|Колокольчик|Кэти|Орган|Плохие новости|Хорошие новости|Прыг-скок|Пузырьки|Ральф|Суперзвезда|Триноид|Фред|Шепот|Шёпот|Шутник|Бабушка|Дедушка/.test(n))s-=80;
+  return s;
+}
+function voices(){return enVoices().sort(function(a,b){return voiceScore(b)-voiceScore(a);});}
+function examinerVoice(){var vs=voices();if(S.ttsVoice){var m=vs.filter(function(v){return v.name===S.ttsVoice;})[0];if(m)return m;}return vs[0]||null;}
+function atcVoice(){var vs=voices(),e=examinerVoice();var o=vs.filter(function(v){return v!==e&&voiceScore(v)>0;});return o[0]||e;}
+function say(text,who,cb){
+  try{speechSynthesis.cancel();}catch(e){}
+  var u=new SpeechSynthesisUtterance(text),v=who==="atc"?atcVoice():examinerVoice();
+  if(v){u.voice=v;u.lang=v.lang;}else u.lang="en-US";
+  var r=parseFloat(S.ttsRate);u.rate=(r>=0.6&&r<=1.3)?r:0.92; if(who==="atc")u.rate=Math.min(1.15,u.rate+0.12);
+  var done=false;function fin(){if(done)return;done=true;clearInterval(k);cb&&cb();}
+  u.onend=fin;u.onerror=fin;
+  var k=setInterval(function(){if(!speechSynthesis.speaking&&!speechSynthesis.pending)fin();},400);
+  speechSynthesis.speak(u);
+}
+if(window.speechSynthesis)speechSynthesis.onvoiceschanged=function(){};
+
+/* ---------- распознавание речи ---------- */
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+var rec=null,recOn=false,finalTxt="",interimTxt="",lastSpeech=0,onTr=null;
+function recStart(){
+  if(!SR)return; recOn=true;
+  if(rec){try{rec.start();}catch(e){}return;}
+  rec=new SR(); rec.lang="en-US"; rec.continuous=true; rec.interimResults=true;
+  rec.onresult=function(ev){
+    interimTxt="";
+    for(var i=ev.resultIndex;i<ev.results.length;i++){
+      var t=ev.results[i][0].transcript;
+      if(ev.results[i].isFinal)finalTxt+=(finalTxt?" ":"")+t.trim(); else interimTxt+=t;
+    }
+    lastSpeech=Date.now(); onTr&&onTr();
+  };
+  rec.onend=function(){ if(recOn){ setTimeout(function(){ if(recOn)try{rec.start();}catch(e){} },250);} };
+  rec.onerror=function(e){ if(e.error==="not-allowed"){recOn=false;toast("Нет доступа к микрофону");} };
+  try{rec.start();}catch(e){}
+}
+function recStop(){recOn=false;if(rec)try{rec.stop();}catch(e){}}
+
+/* ---------- запись аудио ---------- */
+var mStream=null,mRec=null,chunks=[];
+function audioStart(){
+  if(!cfg.record||!navigator.mediaDevices||!window.MediaRecorder)return Promise.resolve();
+  var p=mStream?Promise.resolve(mStream):navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){mStream=s;return s;});
+  return p.then(function(s){chunks=[];mRec=new MediaRecorder(s);mRec.ondataavailable=function(e){if(e.data.size)chunks.push(e.data);};mRec.start();}).catch(function(){});
+}
+function audioStop(){
+  return new Promise(function(res){
+    if(!mRec||mRec.state==="inactive")return res(null);
+    mRec.onstop=function(){res(chunks.length?URL.createObjectURL(new Blob(chunks,{type:chunks[0].type||"audio/webm"})):null);};
+    mRec.stop();
+  });
+}
+
+/* ---------- настройки экзамена ---------- */
+var isMobile=/Android|iPhone|iPad/i.test(navigator.userAgent);
+var cfg=Object.assign({mode:"train",delay:6,parts:{p1:true,p2:true,p3:true,p4:true,p5:true},record:!isMobile,showText:true},lsGet("icao4_mock_cfg",{}));
+
+/* ---------- сборка экзамена ---------- */
+var PART_NAMES={p1:"Part 1 · Interview",p2:"Part 2 · ATC communication",p3:"Part 3 · Picture description",p4:"Part 4 · Picture comparison",p5:"Part 5 · Non-routine situation"};
+function buildExam(){
+  var items=[];
+  if(cfg.parts.p1){
+    var first=D.interview.filter(function(q){return q.id==="int-001";})[0];
+    var aus=shuffle(D.interview.filter(function(q){return /Austria/.test(q.category);}));
+    var rest=shuffle(D.interview.filter(function(q){return q.id!=="int-001"&&!/Austria/.test(q.category);}));
+    var qs=[first].concat(aus.slice(0,2),rest.slice(0,1)).filter(Boolean);
+    qs.forEach(function(q){
+      items.push({part:"p1",kind:"q",text:q.question,model:q.level4Answer,vocab:(q.vocabulary||[]).map(function(v){return v.term||v;})});
+      var ks=(q.followUps||[]).map(function(f,k){return k;}).filter(function(k){return fuModel(q.id,k);});
+      if(ks.length){var k=pick(ks);items.push({part:"p1",kind:"q",text:q.followUps[k],model:fuModel(q.id,k),follow:true});}
+    });
+  }
+  if(cfg.parts.p2&&D.rt.length){
+    var sc=pick(D.rt.filter(function(r){return r.steps.filter(function(s){return s.atcText;}).length>=4;}));
+    var st=sc.steps.filter(function(s){return s.atcText&&s.expected;}).slice(0,6);
+    items.push({part:"p2",kind:"brief",title:sc.title,text:sc.briefing,callsign:sc.callsign});
+    st.forEach(function(s){items.push({part:"p2",kind:"atc",text:s.atcText,model:s.expected,must:s.mustInclude||[],tip:s.tip||"",situation:s.situation||"",phase:s.phase||"",callsign:sc.callsign});});
+  }
+  if(cfg.parts.p3&&D.pics.length){
+    var p=pick(D.pics);
+    items.push({part:"p3",kind:"pic",img:[p.imageUrl],text:p.prompt||"Describe this picture.",model:p.level4Answer,steps:p.steps||[],vocab:(p.vocabulary||[]).map(function(v){return v.term||v;})});
+    (p.examinerQuestions||[]).map(function(q,k){return {q:q,k:k};}).filter(function(o){return fuModel(p.id,o.k);}).slice(0,2).forEach(function(o){
+      items.push({part:"p3",kind:"q",img:[p.imageUrl],text:o.q,model:fuModel(p.id,o.k),follow:true});
+    });
+  }
+  if(cfg.parts.p4&&D.cmp.length){
+    var c=pick(D.cmp);
+    items.push({part:"p4",kind:"pic",img:[c.imageUrl,c.imageUrl2],text:c.prompt,model:c.level4Answer,steps:c.steps||[],vocab:(c.vocabulary||[]).map(function(v){return v.term||v;})});
+    if(c.examinerQuestions&&c.examinerQuestions.length)items.push({part:"p4",kind:"q",img:[c.imageUrl,c.imageUrl2],text:c.examinerQuestions[0],model:"",keys:(c.risks||[]).concat((c.vocabulary||[]).map(function(v){return v.term;})),follow:true});
+  }
+  if(cfg.parts.p5&&D.emg.length){
+    var e=pick(D.emg);
+    items.push({part:"p5",kind:"q",scenario:e.scenario,text:e.scenario+" "+(e.firstQuestion||"What would you do?"),model:e.level4Answer,keys:e.actions||[],vocab:(e.vocabulary||[]).map(function(v){return v.term||v;})});
+    (e.followUps||[]).map(function(q,k){return {q:q,k:k};}).filter(function(o){return fuModel(e.id,o.k);}).slice(0,2).forEach(function(o){
+      items.push({part:"p5",kind:"q",scenario:e.scenario,text:o.q,model:fuModel(e.id,o.k),follow:true});
+    });
+  }
+  return items;
+}
+
+/* ---------- экран настроек ---------- */
+function renderSetup(){
+  stopAll();
+  var last=lsGet("icao4_mock_last",null);
+  var vs=voices();
+  $app.innerHTML=
+    '<h1>🎓 ICAO 4 · Mock Exam</h1><div class="mut">Пробный экзамен в формате LPE: вопросы звучат голосом, вы отвечаете вслух, в конце — разбор с образцами. Версия '+MOCK_VERSION+'</div>'+
+    '<div class="card"><h2>Режим</h2>'+
+      '<label class="opt"><input type="radio" name="md" value="train"'+(cfg.mode==="train"?" checked":"")+'> <b>Тренировка</b>&nbsp;— подсказка сверху, если замолчал</label>'+
+      '<label class="opt"><input type="radio" name="md" value="exam"'+(cfg.mode==="exam"?" checked":"")+'> <b>Экзамен</b>&nbsp;— без подсказок, разбор в конце</label>'+
+      '<div class="row" id="dlRow"><span>Подсказка через</span><select id="dl">'+[0,4,6,8,12,20].map(function(s){return '<option value="'+s+'"'+(cfg.delay==s?" selected":"")+'>'+(s?s+" сек тишины":"сразу")+'</option>';}).join("")+'</select></div>'+
+      '<label class="opt"><input type="checkbox" id="st"'+(cfg.showText?" checked":"")+'> Показывать текст вопроса (на реальном экзамене его нет)</label>'+
+      '<label class="opt"><input type="checkbox" id="rc"'+(cfg.record?" checked":"")+'> Записывать мой голос для разбора'+(isMobile?' <span class="mut">(на телефоне может мешать распознаванию)</span>':'')+'</label>'+
+    '</div>'+
+    '<div class="card"><h2>Части</h2>'+Object.keys(PART_NAMES).map(function(k){return '<label class="opt"><input type="checkbox" data-p="'+k+'"'+(cfg.parts[k]?" checked":"")+'> '+PART_NAMES[k]+'</label>';}).join("")+'</div>'+
+    '<div class="card"><h2>Голос</h2><div class="row"><select id="vs" style="max-width:100%">'+
+      vs.map(function(v){return '<option'+(examinerVoice()===v?" selected":"")+'>'+esc(v.name)+'</option>';}).join("")+'</select>'+
+      '<button class="btn sec" id="vt">▶︎ Проба</button></div><div class="mut">Диспетчер в Part 2 говорит другим голосом и чуть быстрее.</div></div>'+
+    (last?'<div class="card mut">Прошлый мок: '+esc(last.date)+' · ответов '+last.n+' · подсказок '+last.hints+' · ATC readback '+last.atc+'</div>':'')+
+    (SR?'':'<div class="card" style="border-color:var(--bad)">Этот браузер не умеет распознавать речь. Откройте в Chrome.</div>')+
+    '<div class="row"><button class="btn" id="go" style="flex:1">▶︎ Начать экзамен</button></div>'+
+    '<p class="mut"><a href="./">← в основное приложение</a> · Пробел — «дальше», H — подсказка, R — повторить вопрос.</p>';
+  function upd(){$app.querySelector("#dlRow").style.display=cfg.mode==="train"?"":"none";}
+  [].forEach.call($app.querySelectorAll("input[name=md]"),function(r){r.onchange=function(){cfg.mode=this.value;upd();};});upd();
+  $app.querySelector("#dl").onchange=function(){cfg.delay=+this.value;};
+  $app.querySelector("#st").onchange=function(){cfg.showText=this.checked;};
+  $app.querySelector("#rc").onchange=function(){cfg.record=this.checked;};
+  [].forEach.call($app.querySelectorAll("[data-p]"),function(c){c.onchange=function(){cfg.parts[this.dataset.p]=this.checked;};});
+  $app.querySelector("#vs").onchange=function(){S.ttsVoice=this.value;};
+  $app.querySelector("#vt").onclick=function(){say("Good morning. My name is Anna, and I will be your examiner today. Can you tell me about yourself?");};
+  $app.querySelector("#go").onclick=function(){
+    lsSet("icao4_mock_cfg",cfg);
+    var it=buildExam(); if(!it.length){toast("Выберите хотя бы одну часть");return;}
+    startExam(it);
+  };
+}
+
+/* ---------- прохождение ---------- */
+var E=null,tick=null;
+function stopAll(){recStop();try{speechSynthesis.cancel();}catch(e){}clearInterval(tick);tick=null;onTr=null;}
+function startExam(items){
+  E={items:items,i:0,res:[]};
+  if(cfg.record)audioStart().then(function(){audioStop();}); /* запросить доступ к микрофону заранее */
+  showItem();
+}
+function hintHtml(it,level){
+  var h="";
+  if(it.kind==="atc"){
+    h+='<div class="ttl">💡 Readback / ответ пилота</div>';
+    if(level===1&&it.must.length)h+='<div>Обязательно назовите: '+it.must.map(function(m){return '<span class="pill">'+esc(m)+'</span>';}).join("")+'</div><div class="mut">Нажмите 💡 ещё раз — полный ответ</div>';
+    else h+='<div style="font-size:17px">'+esc(it.model)+'</div>'+(it.tip?'<div class="ru" style="margin-top:4px">'+esc(it.tip)+'</div>':'');
+    return h;
+  }
+  h+='<div class="ttl">💡 Подсказка</div>';
+  if(level===1){
+    if(it.steps&&it.steps.length)h+='<div>План: '+it.steps.map(function(s){return '<span class="pill">'+esc(s)+'</span>';}).join("")+'</div>';
+    if(it.model)h+='<div style="margin-top:4px">Начните так: <i>'+esc(sentences(it.model,2))+'</i></div>';
+    if(it.keys&&it.keys.length)h+='<ul>'+it.keys.slice(0,6).map(function(k){return '<li>'+esc(k)+'</li>';}).join("")+'</ul>';
+    if(it.vocab&&it.vocab.length)h+='<div style="margin-top:4px">'+it.vocab.slice(0,6).map(function(v){return '<span class="pill">'+esc(v)+'</span>';}).join("")+'</div>';
+    if(it.model)h+='<div class="mut">Нажмите 💡 ещё раз — полный образец</div>';
+  } else {
+    h+='<div>'+esc(it.model||"")+'</div>';
+    if(!it.model&&it.keys)h+='<ul>'+it.keys.map(function(k){return '<li>'+esc(k)+'</li>';}).join("")+'</ul>';
+  }
+  return h;
+}
+function showItem(){
+  stopAll();
+  var it=E.items[E.i]; if(!it)return finish();
+  var r={it:it,hint:0,t0:Date.now(),tr:"",audio:null};
+  E.cur=r; finalTxt="";interimTxt="";
+  var pct=Math.round(E.i/E.items.length*100);
+  var body="";
+  if(it.kind==="brief"){
+    body='<div class="card"><div class="pill">📻 Брифинг</div><h2>'+esc(it.title)+'</h2><div class="ru">'+esc(it.text)+'</div><div style="margin-top:8px">Ваш позывной: <b>'+esc(it.callsign)+'</b></div>'+
+      '<div class="mut" style="margin-top:6px">Дальше диспетчер будет давать указания. Отвечайте как пилот: readback + позывной в конце.</div></div>';
+  } else {
+    if(it.img)body+='<div class="imgs'+(it.img.length>1?" two":"")+'">'+it.img.map(function(u){return '<img src="'+esc(u)+'" alt="">';}).join("")+'</div>';
+    if(it.kind==="atc")body+='<div class="card"><div class="pill">📻 '+esc(it.phase)+'</div> <span class="mut">'+esc(it.callsign)+'</span><div class="ru" style="margin-top:6px">'+esc(it.situation)+'</div></div>';
+    if(it.scenario&&it.follow)body+='<div class="card ru">'+esc(it.scenario)+'</div>';
+    body+='<div class="card"><div class="row" style="justify-content:space-between"><span class="state s" id="stt">🔊 Экзаменатор говорит…</span><span class="mut" id="tm">0:00</span></div>'+
+      '<div class="q" id="qt" style="margin-top:6px;'+(cfg.showText?"":"display:none")+'">'+esc(it.kind==="atc"?"ATC: "+it.text:it.text)+'</div>'+
+      '<div class="tr" id="tr" style="margin-top:8px"><i>Ваш ответ появится здесь…</i></div></div>';
+  }
+  $app.innerHTML='<div id="hint"></div>'+
+    '<div class="top"><b>'+esc(PART_NAMES[it.part])+'</b><span class="mut">'+(E.i+1)+' / '+E.items.length+'</span></div>'+
+    '<div class="prog"><i style="width:'+pct+'%"></i></div>'+body+
+    '<div class="bar"><div class="row">'+
+      '<button class="btn sec" id="bx">✕</button>'+
+      (it.kind==="brief"?'':'<button class="btn sec" id="br">🔁 Say again</button>'+(cfg.mode==="train"?'<button class="btn warn" id="bh">💡</button>':''))+
+      '<button class="btn ok" id="bn" style="flex:1">'+(it.kind==="brief"?"Начать связь ➜":"Дальше ➜")+'</button></div></div>';
+  window.scrollTo(0,0);
+  var $h=$app.querySelector("#hint");
+  function showHint(lv){ if(cfg.mode!=="train")return; r.hint=Math.max(r.hint,lv); $h.innerHTML=hintHtml(it,r.hint); $h.classList.add("on"); }
+  $app.querySelector("#bx").onclick=function(){ if(confirm("Завершить экзамен и перейти к разбору?"))finish(); };
+  $app.querySelector("#bn").onclick=next;
+  if(it.kind==="brief"){ say("Part two. Radio communication. Listen to the controller and respond as the pilot."); return; }
+  var listenFrom=0;
+  function listen(){
+    var $s=$app.querySelector("#stt"); if(!$s)return;
+    $s.textContent="🎙️ Слушаю ваш ответ"; $s.className="state l"; listenFrom=Date.now(); lastSpeech=0;
+    if(!cfg.showText&&it.kind!=="atc")$app.querySelector("#qt").style.display="none";
+    recStart(); if(cfg.record&&(!mRec||mRec.state==="inactive"))audioStart();
+    if(cfg.mode==="train"&&cfg.delay===0)showHint(1);
+  }
+  function ask(){
+    recStop(); var $s=$app.querySelector("#stt"); $s.textContent=it.kind==="atc"?"📻 Диспетчер…":"🔊 Экзаменатор говорит…"; $s.className="state s";
+    say(it.text,it.kind==="atc"?"atc":"ex",listen);
+  }
+  $app.querySelector("#br").onclick=ask;
+  var $bh=$app.querySelector("#bh"); if($bh)$bh.onclick=function(){showHint(r.hint>=1?2:1);};
+  onTr=function(){
+    if(/\b(say again|repeat)\b/i.test(finalTxt)&&words(finalTxt).length<9){ finalTxt="";interimTxt=""; ask(); return; }
+    var t=$app.querySelector("#tr"); if(t)t.innerHTML=(esc(finalTxt)+(interimTxt?' <i>'+esc(interimTxt)+'</i>':''))||'<i>…</i>';
+  };
+  tick=setInterval(function(){
+    var s=Math.floor((Date.now()-r.t0)/1000),$t=$app.querySelector("#tm"); if($t)$t.textContent=Math.floor(s/60)+":"+("0"+s%60).slice(-2);
+    if(cfg.mode==="train"&&listenFrom&&r.hint===0&&cfg.delay>0){
+      var since=Date.now()-Math.max(listenFrom,lastSpeech);
+      if(since>cfg.delay*1000)showHint(1);
+    }
+  },400);
+  setTimeout(ask,350);
+}
+function next(){
+  var it=E.items[E.i],r=E.cur;
+  recStop();
+  var tr=(finalTxt+" "+interimTxt).trim();
+  var p=it.kind==="brief"?Promise.resolve(null):audioStop();
+  p.then(function(a){
+    if(it.kind!=="brief"){ r.tr=tr; r.audio=a; r.sec=Math.round((Date.now()-r.t0)/1000); E.res.push(r); }
+    E.i++; if(E.i>=E.items.length)finish(); else showItem();
+  });
+}
+
+/* ---------- разбор ---------- */
+var NUM={zero:"0",one:"1",two:"2",three:"3",four:"4",five:"5",six:"6",seven:"7",eight:"8",nine:"9",niner:"9",tree:"3",fife:"5"};
+function words(t){return String(t||"").toLowerCase().replace(/[^a-z0-9 ]+/g," ").split(/\s+/).filter(Boolean).map(function(w){return NUM[w]||w;});}
+var STOP={the:1,a:1,an:1,and:1,to:1,of:1,"for":1,is:1,at:1,on:1,in:1,with:1,please:1};
+function coverage(model,tr){
+  var m=words(model).filter(function(w){return !STOP[w];}),t={};words(tr).forEach(function(w){t[w]=1;});
+  if(!m.length)return null; var hit=m.filter(function(w){return t[w];}).length; return Math.round(hit/m.length*100);
+}
+function finish(){
+  stopAll();
+  if(E.cur&&E.res.indexOf(E.cur)<0&&E.items[E.i]&&E.items[E.i].kind!=="brief"){E.cur.tr=(finalTxt+" "+interimTxt).trim();E.res.push(E.cur);}
+  audioStop();
+  var atc=E.res.filter(function(r){return r.it.kind==="atc";}),hints=E.res.filter(function(r){return r.hint;}).length;
+  var atcAvg=atc.length?Math.round(atc.reduce(function(s,r){return s+(coverage(r.it.model,r.tr)||0);},0)/atc.length)+"%":"—";
+  var silent=E.res.filter(function(r){return words(r.tr).length<5&&r.it.kind!=="atc";}).length;
+  lsSet("icao4_mock_last",{date:new Date().toLocaleString("ru-RU"),n:E.res.length,hints:hints,atc:atcAvg});
+  var html='<h1>📋 Разбор мока</h1><div class="card">Ответов: <b>'+E.res.length+'</b> · с подсказкой: <b>'+hints+'</b> · ATC readback: <b>'+atcAvg+'</b>'+(silent?' · почти без ответа: <b style="color:var(--bad)">'+silent+'</b>':'')+
+    '<div class="mut" style="margin-top:4px">Сравните свои ответы с образцами. Главное на Level 4 — говорить без длинных пауз, связно и понятно.</div></div>';
+  var lastPart="";
+  E.res.forEach(function(r,idx){
+    var it=r.it;
+    if(it.part!==lastPart){html+='<h2 style="margin-top:18px">'+esc(PART_NAMES[it.part])+'</h2>';lastPart=it.part;}
+    var wc=words(r.tr).length,cv=it.kind==="atc"?coverage(it.model,r.tr):null;
+    html+='<div class="card"><div class="mut">'+(it.kind==="atc"?"📻 ATC":"❓ Вопрос")+' · '+(r.sec||0)+' сек · '+wc+' слов'+(r.hint?' · 💡 подсказка':'')+
+      (cv!=null?' · <span class="score '+(cv>=80?"g":cv>=55?"m":"b")+'">'+cv+'%</span>':'')+'</div>'+
+      '<div class="q" style="font-size:16px;margin:4px 0 6px">'+esc(it.text)+'</div>'+
+      '<div class="you"><b>Вы:</b> '+(r.tr?esc(r.tr):'<i class="mut">ничего не распознано</i>')+'</div>'+
+      (r.audio?'<audio controls src="'+r.audio+'" style="width:100%;margin-top:6px"></audio>':'')+
+      (it.model?'<div class="model" style="margin-top:6px"><b>Образец:</b> '+esc(it.model)+'</div>':'')+
+      (it.tip?'<div class="ru" style="margin-top:4px">'+esc(it.tip)+'</div>':'')+
+      '<div class="row" style="margin-top:6px"><button class="btn sec" data-play="'+idx+'">🔊 Образец</button></div></div>';
+  });
+  html+='<div class="row"><button class="btn" id="again" style="flex:1">🔄 Новый мок</button><a class="btn sec" href="./" style="text-decoration:none">Основное приложение</a></div>';
+  $app.innerHTML=html; window.scrollTo(0,0);
+  [].forEach.call($app.querySelectorAll("[data-play]"),function(b){b.onclick=function(){var r=E.res[+this.dataset.play];say(r.it.model||r.it.text,r.it.kind==="atc"?"atc":"ex");};});
+  $app.querySelector("#again").onclick=renderSetup;
+}
+
+/* ---------- клавиши, тост ---------- */
+document.addEventListener("keydown",function(e){
+  if(!E||!document.getElementById("bn")||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+  if(e.code==="Space"){e.preventDefault();document.getElementById("bn").click();}
+  else if(e.key==="h"||e.key==="р"){var b=document.getElementById("bh");b&&b.click();}
+  else if(e.key==="r"||e.key==="к"){var b2=document.getElementById("br");b2&&b2.click();}
+});
+function toast(t){var d=document.createElement("div");d.textContent=t;d.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;padding:10px 16px;border-radius:10px;z-index:9";document.body.appendChild(d);setTimeout(function(){d.remove();},2500);}
+
+loadData().then(function(){buildPools();setTimeout(renderSetup,300);}).catch(function(e){$app.innerHTML='<div class="card">Не удалось загрузить базу: '+esc(e.message)+'</div>';});
+</script>
+</body>
+</html>
