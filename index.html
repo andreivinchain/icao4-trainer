@@ -25384,8 +25384,201 @@ window.DATA_FU_F = {
 
 </script>
 <script>
+/* 30 заданий «сравни две картинки» — фото Wikimedia Commons, проверены вручную */
+(function(){
+function cU(f){ return "https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(f.replace(/ /g,"_"))+"?width=1200"; }
+var STEPS=["What does each picture show?","What is similar?","What is different?","Which situation is more difficult or risky, and why?","What should the pilot think about in each case?","Which situation would you prefer, and why?"];
+function T(id,f1,f2,q,ans,vocab,risks){
+  return {id:id,category:"Сравнение картинок",imageUrl:cU(f1),imageUrl2:cU(f2),attribution:"Wikimedia Commons (2 фото)",
+    prompt:"Compare these two pictures. What is similar and what is different?",steps:STEPS,examinerQuestions:q,level4Answer:ans,
+    vocabulary:vocab.map(function(v){return {term:v[0],meaning:v[1]};}),risks:risks};
+}
+window.DATA_PICCOMPARE_2=[
+T("cmp-101","Cessna 172A in snow (365370782).jpg","Cessna 172 landing at SXM.jpg",
+ ["Which conditions are more difficult for a light aircraft?","How do you prepare an aircraft for a cold winter flight?","Why do pilots need to be careful when they fly low over people?"],
+ "Both pictures show a Cessna, a high-wing light aircraft, but the conditions are completely different. In the first picture the aircraft is parked on snow, and everything around it is white and cold. In the second picture a Cessna is flying very low over a sunny tropical beach with many people. The first situation is about winter operations: before the flight the pilot must remove all snow and frost, preheat the engine and check the brakes. The second situation is about hot weather and low flying: the air is hot, so the performance is lower, and the aircraft is close to people on the ground. I think the winter picture is more typical for me, because I fly in Belarus.",
+ [["preheat","to warm the engine before starting it in cold weather"],["frost","a thin layer of ice crystals"],["high-wing","an aircraft with the wing above the cabin"],["performance","how well an aircraft climbs, flies and stops"]],
+ ["Ice or frost on the wings in winter","Low flying over people and high temperature in the tropics"]),
+
+T("cmp-102","Lüdinghausen, Flugplatz Borkenberge -- 2014 -- 7187.jpg","AirportFrankfurt fromair 2010-09-19.jpg",
+ ["Where would you prefer to fly from, and why?","What is difficult for a private pilot at a big international airport?","What services does a small airfield usually have?"],
+ "The first picture shows a small light aircraft on a grass airfield with trees around it. The second picture is an aerial view of Frankfurt, one of the biggest airports in Europe, with long concrete runways, terminals and many aircraft. Both are places where aircraft take off and land, but the difference is huge. At the small airfield there is usually no control tower; pilots talk to each other on the radio and use a simple circuit. At Frankfurt there is strict air traffic control, heavy traffic and complicated taxi routes. For a private pilot the small airfield is easier and cheaper. A big airport needs very good preparation, perfect radio communication in English and careful taxiing.",
+ [["aerial view","a picture taken from the air"],["grass airfield","an airfield with grass instead of concrete"],["heavy traffic","a lot of aircraft at the same time"],["taxi route","the way an aircraft moves on the ground"]],
+ ["Soft or wet grass on a small airfield","Runway incursion and complex taxiing at a big airport"]),
+
+T("cmp-103","West Malling Airfield Control Tower (2022-05-24 14.49.58 by JOHN K THORNE @ Flickr 52096402454).jpg","Schiphol Control Tower.jpg",
+ ["What is the job of a control tower?","How has air traffic control changed over the years?","What would happen if a control tower lost power?"],
+ "Both pictures show airport control towers, but they are from different times. The first one is an old, low building with big windows, probably from the middle of the last century. Today it is not an active airfield tower. The second picture shows the modern tower at Amsterdam Schiphol. It is very tall and thin, with a glass cab on top, so the controllers can see all runways and taxiways. In the old tower controllers used binoculars, paper strips and simple radios. In the modern tower they have radar screens, computers and surface movement radar. But the main job is the same: to keep aircraft safely separated on the ground and in the air.",
+ [["control tower","the building where controllers manage traffic at an airport"],["cab","the glass room at the top of a tower"],["binoculars","an instrument for seeing things far away"],["separated","kept at a safe distance from each other"]],
+ ["Limited view and old equipment in an old tower","Very busy traffic and technical failures in a modern tower"]),
+
+T("cmp-104","047 Glider winch launch, Schleicher ASK-21 in Innsbruck, Austria - Segelflugzeug.jpg","Piper PA-28-181 Archer TX takeoff from Macon Downtown Airport.jpg",
+ ["What is the main difference between flying a glider and a powered aircraft?","What can go wrong during a winch launch?","Would you like to try gliding?"],
+ "In the first picture there is a white glider climbing steeply above a forest. It is a winch launch in Innsbruck, Austria: a long cable pulls the glider into the air. In the second picture a Piper, a single-engine powered aircraft, is taking off from a runway. Both aircraft are climbing after takeoff, and both pilots must control the speed very carefully. The difference is the source of energy. The Piper has an engine, so the pilot can climb, level off and go around. The glider has no engine: after the cable releases, it must find rising air or come back to land. If the cable breaks low, the glider pilot needs a quick decision.",
+ [["glider","an aircraft without an engine"],["winch launch","a launch where a cable pulls the glider up"],["rising air","air that moves up and helps a glider climb"],["level off","to stop climbing and fly at a constant height"]],
+ ["Cable break at low height during a winch launch","Engine failure just after takeoff in a powered aircraft"]),
+
+T("cmp-105","RWJBarnabas helicopter landing on helipad at Robert Wood Johnson University Hospital.jpg","Dragonair Airbus A320 taxiing to gate 5.JPG",
+ ["Why do hospitals have helipads?","What is difficult about landing on a rooftop?","What happens at the gate before a passenger flight?"],
+ "The first picture shows a medical helicopter on a helipad on the roof of a hospital. The second picture shows an Airbus A320 at an airport gate next to the jet bridge, with ground equipment around it. Both aircraft are on the ground, and both pictures show transport of people. However, the helicopter is used for emergencies: it brings patients directly to the hospital very quickly. The airliner carries many passengers on a normal scheduled flight. The helicopter pilot must land on a small platform between buildings, often with turbulence from the wind. At the gate the main risks are ground vehicles and people near the aircraft.",
+ [["helipad","a small area where helicopters take off and land"],["rooftop","the top surface of a building"],["jet bridge","the moving tunnel from the terminal to the aircraft"],["scheduled flight","a regular flight with a fixed timetable"]],
+ ["Wind and turbulence around buildings for the helicopter","Collisions with ground vehicles at the gate"]),
+
+T("cmp-106","C150M instrument panel.jpg","Cessna 172SP G1000 01.jpg",
+ ["Which cockpit would you prefer to fly, and why?","What should a pilot do if the screens fail in a glass cockpit?","Is it difficult for a pilot to change from analogue to glass instruments?"],
+ "Both pictures show the instrument panel of a small Cessna. The first one is a classic analogue panel: round gauges for airspeed, altitude, attitude and heading, and a simple radio. The second picture shows a modern glass cockpit with two large Garmin G1000 screens. Both cockpits give the pilot the same basic information. The difference is how it is shown. In the glass cockpit everything is on the screens, with a moving map, engine data and traffic. It reduces workload, but the pilot can spend too much time looking inside. The analogue panel is simple and reliable, but the pilot must scan more instruments. My Viper has an electronic display, but I still keep basic skills.",
+ [["analogue","with needles and round dials"],["glass cockpit","a cockpit with electronic screens"],["gauge","an instrument that measures and shows a value"],["scan","to look at instruments in a regular order"]],
+ ["Screen failure in a glass cockpit","Misreading a small round gauge in an analogue cockpit"]),
+
+T("cmp-107","Cumulonimbus sunset panorama, Albury NSW Australia.jpg","Cumulus humilis - 39.jpg",
+ ["Which cloud is dangerous for a light aircraft, and why?","How do you get information about thunderstorms before a flight?","What would you do if you saw a cloud like the first one on your route?"],
+ "Both pictures show clouds, but they mean very different weather. In the first picture there is a huge cumulonimbus cloud lit by the evening sun. It is very tall, and it can bring a thunderstorm, heavy rain, hail, strong gusts and severe turbulence. The second picture shows small, flat grey cumulus clouds. They are typical for normal weather and usually give only light turbulence. For a VFR pilot the first cloud is a clear no-go: I must stay far away from it, at least ten or twenty miles. With clouds like in the second picture, I can fly safely below them, but I check the cloud base and the visibility.",
+ [["cumulonimbus","a very tall storm cloud"],["hail","balls of ice that fall from clouds"],["gust","a sudden strong wind"],["no-go","a situation when you must not fly"]],
+ ["Thunderstorm, hail and severe turbulence near a cumulonimbus","Low cloud base under a layer of cumulus"]),
+
+T("cmp-108","US Airways Flight 1549 in Hudson.JPG","A Floatplane lifts off from Lake Chelan (25c7de851c53492c85544a69af28ca50).JPG",
+ ["What happened to US Airways Flight 1549?","What equipment should you carry if you fly over water?","How is landing on water different from landing on a runway?"],
+ "Both pictures show aircraft on water, but for very different reasons. The first picture shows the Hudson River in New York after the famous ditching of US Airways Flight 1549. Both engines failed after a bird strike, and the pilots landed the Airbus on the river. Boats came to rescue the passengers. The second picture shows a floatplane taking off from a lake in the mountains. For the floatplane, water is the normal runway. For the airliner, it was an emergency landing. The ditching was successful because the crew stayed calm and followed procedures. It shows how important training and good decisions are.",
+ [["ditching","an emergency landing on water"],["floatplane","an aircraft with floats instead of wheels"],["rescue","to save people from danger"],["bird strike","a collision between a bird and an aircraft"]],
+ ["Cold water and evacuation after a ditching","Waves, boats and wind during a floatplane takeoff"]),
+
+T("cmp-109","JadeWeserAirport D-EEVB refueling.jpg","Aircraft Refueling at Gatwork Airport.jpg",
+ ["How do you refuel your own aircraft?","What safety rules are important during refuelling?","Why is it important to check the fuel type?"],
+ "Both pictures show refuelling. In the first picture a small private aircraft is being refuelled at a regional airport; the pilot or an airport worker does it himself from a fuel station. In the second picture a fuel truck is parked next to an airliner, and ground staff are connecting hoses. The procedure is similar: the aircraft must be grounded to prevent static electricity, nobody smokes, and the fuel type and quantity are checked. The difference is the scale. The airliner takes many tonnes of jet fuel, and it is done by professionals. In my small aircraft I refuel myself, so I am responsible for the correct fuel and for checking for water after refuelling.",
+ [["refuel","to put fuel into an aircraft"],["fuel truck","a vehicle that carries fuel to aircraft"],["static electricity","electricity that can make a spark"],["fuel type","the kind of fuel, for example avgas or Jet A-1"]],
+ ["Wrong fuel type or water in the fuel","Fire from a spark during refuelling"]),
+
+T("cmp-110","Regional Express pushback tug 'Green 8' at Melbourne Airport.jpg","Marshaller at hannover airport.jpg",
+ ["What is a pushback, and why do airliners need it?","What is a follow-me car used for?","Have you ever needed help to find your way on the ground?"],
+ "Both pictures show special vehicles at an airport. The first is a pushback tug: a small, very strong tractor that pushes an airliner back from the gate, because aircraft cannot reverse with their engines. The second picture shows a follow-me car with a black and yellow checked pattern. It drives in front of an aircraft and shows the pilot the way to the parking position. Both vehicles help aircraft move safely on the ground and both drivers talk to ground control by radio. The difference is that the tug is connected to the aircraft, while the follow-me car only guides. At a big unfamiliar airport, a follow-me car is very helpful for a private pilot.",
+ [["pushback tug","a tractor that pushes aircraft backwards"],["follow-me car","a car that leads aircraft to their parking place"],["reverse","to move backwards"],["guide","to show someone the way"]],
+ ["Collision between the tug and the aircraft during pushback","Getting lost on a big apron without guidance"]),
+
+T("cmp-111","Check-in on terminal 2 of the Václav Havel Airport in Prague.jpg","(20260318) BER Airport Terminal 1, empty due to strike 31.jpg",
+ ["Why can a terminal suddenly become empty?","How does a strike affect pilots and passengers?","Do you prefer to travel by airline or to fly your own aircraft?"],
+ "Both pictures show check-in areas in European airports. In the first picture, in Prague, the hall is busy: there are many passengers with suitcases standing in queues. In the second picture, in Berlin, the check-in machines are there, but there are no people at all. The terminal is empty because of a strike. Normally an airport looks like the first picture. A strike stops flights, so thousands of passengers must change their plans, and airlines lose a lot of money. For a private pilot a strike at a big airport can also be a problem, for example if air traffic control or airport services stop working.",
+ [["check-in","the place where passengers register for a flight"],["queue","a line of people waiting"],["strike","when workers stop working to protest"],["terminal","the airport building for passengers"]],
+ ["Crowds and long queues at peak times","Cancelled flights and closed services during a strike"]),
+
+T("cmp-112","Cappadocia Balloon Inflating Wikimedia Commons.JPG","Quadcopter camera drone in flight.jpg",
+ ["Are balloons and drones a danger for light aircraft?","What rules must drone operators follow?","Would you like to fly in a hot-air balloon?"],
+ "Both pictures show aircraft without wings that fly slowly. In the first picture a big colourful hot-air balloon is being inflated with hot air, probably in Cappadocia, early in the morning. In the second picture a small white quadcopter drone with a camera is flying. Both can share the same airspace with light aircraft at low height. The balloon is big and easy to see, and it cannot move quickly, so other pilots must give way to it. The drone is very small and almost invisible from the cockpit. For a pilot the drone is the bigger risk, because you cannot see it until it is very close.",
+ [["inflate","to fill with air"],["quadcopter","a drone with four rotors"],["give way","to let another aircraft go first"],["invisible","impossible to see"]],
+ ["A drone that is too small to see from the cockpit","A balloon drifting with the wind into the flight path"]),
+
+T("cmp-113","Pearl Harbor Control Tower control room interior in August 1994.jpg","117th ACS Radar Screen (8047707398).jpg",
+ ["How do controllers know where the aircraft are?","What is the difference between a tower controller and a radar controller?","What would you do if ATC lost you on radar?"],
+ "Both pictures show places where air traffic controllers work. The first is the inside of an old control tower: there are big windows, simple desks and old equipment. The controllers there worked mainly by looking outside. The second picture shows a controller working at a modern radar screen in a dark room, with no windows. Both people have the same goal: to keep aircraft separated and to give clear instructions. The difference is how they see the traffic. In a tower you see aircraft with your eyes, so it works well near the airport. A radar controller sees aircraft as targets on the screen, so he can control traffic far away and in bad weather.",
+ [["radar","a system that shows the position of aircraft"],["target","an aircraft shown as a symbol on a radar screen"],["instruction","an order from a controller"],["control room","a room where controllers work"]],
+ ["Poor visibility for a tower controller in fog","Radar failure or a missing target on the screen"]),
+
+T("cmp-114","Runway 16R, Narita Airport (4055519259).jpg","JAL B747-400(JA8921) (4343772150).jpg",
+ ["What lights can you see on a runway at night?","Why is night flying more difficult?","Would you like to get a night rating?"],
+ "Both pictures are from Narita airport in Japan. The first one shows runway 16R at night: it is completely dark, and we can see only the white edge lights and the centre line lights going into the distance. The second picture shows a Boeing 747 of Japan Airlines on the ground in daylight. During the day the pilot can see the whole airport, the terrain and other aircraft. At night he depends on lights and instruments. Distances and heights are more difficult to judge, and it is easy to lose orientation. For this reason private pilots need a special night rating. I would like to get it in the future.",
+ [["edge lights","lights along the sides of a runway"],["centre line","the line in the middle of the runway"],["judge","to estimate, for example a distance"],["night rating","a qualification to fly at night"]],
+ ["Illusions and disorientation at night","Traffic and wake turbulence from heavy aircraft"]),
+
+T("cmp-115","Microlight aircraft at Leven beach - geograph.org.uk - 6520495.jpg","Qatar Executive G650, EBACE 2019, Le Grand-Saconnex (EB190516).jpg",
+ ["Who uses business jets, and why?","What are the limits of a microlight?","Which kind of flying is closer to your own flying?"],
+ "These pictures show two opposite sides of aviation. The first picture shows a small microlight on a sandy beach. It has an open seat, a wing and a small engine, and it is very simple and cheap to fly. The second picture shows the inside of a Gulfstream G650 business jet: there is a bed, soft seats and round windows, like in a luxury hotel. Both are used for private flying, not for airlines. The microlight is for fun and short local flights in good weather. The business jet flies very fast and high, across continents, with two professional pilots. My Viper SD4 is somewhere in between, but much closer to the microlight.",
+ [["microlight","a very light and simple aircraft"],["business jet","a small jet for private or company travel"],["luxury","great comfort and expensive things"],["across continents","from one part of the world to another"]],
+ ["Weather and wind for a very light open microlight","Fatigue and high workload on long business jet flights"]),
+
+T("cmp-116","Lukla Airport, Nepal.jpg","Madeira Airport Runway RB.jpg",
+ ["What makes an airport difficult or dangerous?","Why do pilots need special training for some airports?","Which airport would you be afraid to land at?"],
+ "Both pictures show airports that are famous because they are difficult. The first is Lukla in Nepal, in the high mountains. The runway is very short and on a slope, and there are mountains all around and often clouds. There is no possibility for a go-around. The second picture shows Madeira airport, where part of the runway stands on big concrete columns above the sea. There the problem is strong and changing winds near the mountains. Both airports need special pilot training and good weather. The difference is that at Lukla the main danger is terrain and altitude, while at Madeira it is wind and turbulence.",
+ [["slope","a surface that goes up or down"],["go-around","to stop the approach and climb again"],["terrain","the shape and height of the land"],["column","a tall support for a construction"]],
+ ["Mountains, short runway and no go-around at Lukla","Strong crosswind and turbulence at Madeira"]),
+
+T("cmp-117","Norwood Airport Flood, March 16, 2010 (4443766686).jpg","Snow Ploughs Clear the Runway at RAF Coningsby MOD 45152127.jpg",
+ ["What is a contaminated runway?","How does water or snow affect landing distance?","Where can you find information about the runway condition?"],
+ "Both pictures show runways that are not usable in normal conditions. In the first picture the airport is flooded: there is so much water that we can see only the top of the runway sign. In the second picture snow covers the runway, and machines are clearing it. In both cases the surface is contaminated, the braking action is poor and aircraft cannot operate safely. The difference is the solution. Snow can be removed with snow ploughs in a few hours, but after a flood the airport may be closed for days. Before a flight in winter or after heavy rain, I always check the NOTAMs and the runway condition.",
+ [["flooded","covered with water"],["contaminated runway","a runway covered with water, snow, ice or slush"],["braking action","how well the brakes work on a surface"],["snow plough","a machine that removes snow"]],
+ ["Aquaplaning on a wet or flooded runway","Ice and snow causing a runway excursion"]),
+
+T("cmp-118","View of Ash Plume at Eyjafjallajökull Volcano (4538943540).jpg","United Airlines Boeing 747-400 takeoff at FRA.jpg",
+ ["Why is volcanic ash dangerous for aircraft?","What happened in Europe in 2010?","How do pilots get information about volcanic ash?"],
+ "The first picture is a satellite photo of the ash cloud from the Eyjafjallajökull volcano in Iceland in 2010. We can see a long grey plume going over the clouds. The second picture shows a Boeing 747 taking off from Frankfurt on a normal day. These pictures are connected: in 2010 the ash cloud closed most of the airspace in Europe for several days, and thousands of flights like this one were cancelled. Volcanic ash is very dangerous, because it can melt inside jet engines and stop them. It also damages the windscreen and the instruments. Pilots get warnings from special advisory centres and from NOTAMs.",
+ [["volcanic ash","small pieces of rock from a volcano"],["plume","a long cloud of smoke or ash"],["satellite","a device in space that takes photos of the Earth"],["advisory","an official warning or information"]],
+ ["Engine failure after flying into volcanic ash","Mass cancellations and airspace closures"]),
+
+T("cmp-119","Red Arrows Formation Duxford Flying Finale 2024 02.jpg","Zlin 526 ASF.jpg",
+ ["Why is formation flying so demanding?","What special training does aerobatic flying need?","Have you ever been to an air show?"],
+ "Both pictures are connected with aerobatic flying. In the first picture the Red Arrows, the British display team, are flying in a tight formation with red, white and blue smoke. In the second picture a Zlin 526, a classic Czech aerobatic aircraft, is standing on the ground. It is painted red and white. Both show precise flying and high skills. The difference is that the Red Arrows are military jet pilots who fly very close to each other at high speed, while the Zlin is a single propeller aircraft for solo aerobatics and training. Formation flying needs perfect teamwork and trust, and solo aerobatics needs excellent control of the aircraft.",
+ [["formation","aircraft flying together in a fixed pattern"],["display team","a team that flies at air shows"],["aerobatics","manoeuvres such as loops and rolls"],["precise","very exact"]],
+ ["Mid-air collision in close formation","Loss of control or overstress during aerobatics"]),
+
+T("cmp-120","London Air Ambulance Helicopter (G-EHMS Rowan).jpg","Canadair CL-415 Kroatien 1.JPG",
+ ["What kinds of special missions do aircraft fly?","Why are these flights more dangerous than normal flights?","How should a private pilot behave near a firefighting operation?"],
+ "Both pictures show aircraft that save lives. The first is a red air ambulance helicopter flying over London. It brings doctors to accidents and patients to hospitals very quickly. The second picture shows a yellow and red Canadair CL-415, a firefighting aircraft, flying in Croatia. It scoops water from the sea or a lake and drops it on forest fires. Both work in difficult conditions: low height, smoke, wind and pressure of time. The helicopter can land almost anywhere, while the Canadair needs open water. For private pilots it is important to stay away from fire areas and to listen to NOTAMs and ATC.",
+ [["air ambulance","an aircraft that carries medical help"],["scoop","to take water while flying over it"],["forest fire","a large fire in a forest"],["pressure of time","the need to do something very quickly"]],
+ ["Low flying in smoke near terrain","Collision with other aircraft in a busy rescue area"]),
+
+T("cmp-121","Yellow Tiger Moth Góraszka.JPG","Diamond DA40 D-ESBL.jpg",
+ ["How has light aircraft design changed in the last 80 years?","Would you like to fly an old biplane?","What makes a modern training aircraft safer?"],
+ "Both pictures show light training aircraft, but from very different times. The first is a yellow Tiger Moth biplane from the 1930s, flying at an air show in Poland. It has two wings, an open cockpit and simple instruments. The second picture shows a white Diamond DA40, a modern four-seat aircraft made of composite materials. It has a closed cockpit and a glass cockpit with screens. Both were made for training pilots. The Tiger Moth is slow, noisy and needs good stick-and-rudder skills, especially in crosswind. The DA40 is faster, more comfortable and much safer, with better visibility and modern avionics.",
+ [["biplane","an aircraft with two wings, one above the other"],["composite","a light, strong material such as carbon fibre"],["open cockpit","a cockpit without a roof"],["stick-and-rudder skills","basic hand flying skills"]],
+ ["Poor visibility and difficult handling in an old biplane","Too much trust in automation in a modern aircraft"]),
+
+T("cmp-122","AirBridgeCargo Airlines Boeing 747-200F nose loading door open and cargo loader at Sheremetyevo International Airport.jpg","Spring Airlines aircraft with passenger boarding stairs @ PVG.jpg",
+ ["What is the difference between a cargo flight and a passenger flight?","Why is weight and balance so important when loading cargo?","How do you load your own aircraft before a flight?"],
+ "Both pictures show aircraft on the ground being loaded. In the first picture a Boeing 747 freighter has its nose door open, and a cargo loader lifts big pallets into the aircraft. In the second picture passengers are walking up the stairs into an Airbus. Both aircraft are preparing for departure. The difference is what they carry: goods or people. In the cargo aircraft the most important thing is to secure the load and calculate weight and balance correctly, because moving cargo can be very dangerous. With passengers, the important things are safety briefings and fast boarding. In my small aircraft I also check weight and balance before every flight.",
+ [["freighter","an aircraft that carries only cargo"],["pallet","a flat platform for cargo"],["secure","to fix something so it cannot move"],["boarding","getting onto the aircraft"]],
+ ["Cargo moving in flight and changing the centre of gravity","Passengers walking near engines and vehicles on the apron"]),
+
+T("cmp-123","A350-900 full flight simulator cockpit VHHH.jpg","CAP Pilot Checks Oil.JPG",
+ ["What can you practise in a simulator that you cannot practise in a real aircraft?","Why is the preflight inspection important?","Have you ever trained in a flight simulator?"],
+ "Both pictures show pilot training and preparation. The first picture shows the cockpit of a full flight simulator for the Airbus A350. It looks exactly like the real cockpit, with screens and controls. In the second picture a pilot is checking a real light aircraft before the flight, looking at the engine and the oil. Both are important for safety. In the simulator pilots can practise emergencies, like engine fires, that are too dangerous to practise in the air. The preflight inspection is real and simple, but it can find a problem before it becomes an emergency. A good pilot needs both: training for emergencies and careful checks every day.",
+ [["full flight simulator","a machine that copies a real cockpit and its movement"],["preflight inspection","checking the aircraft before a flight"],["oil level","how much oil is in the engine"],["practise","to train by doing something again and again"]],
+ ["Missing a defect during a quick preflight check","Over-confidence after simulator training"]),
+
+T("cmp-124","Windsock Hodenhagen Aerodrome 2013.jpg","United States Airport Windsock at 66G Airport, Frankenmuth, MI.jpg",
+ ["How do you read a windsock?","How does a strong crosswind affect your landing?","What other ways can you get wind information?"],
+ "Both pictures show windsocks at small airfields. In the first picture the red and white windsock is completely straight, so the wind is strong, probably fifteen knots or more. In the second picture the orange windsock is only partly filled and hangs down a little, so the wind is lighter. A windsock shows the wind direction and gives an idea of the speed. It is very important at airfields without a tower or ATIS. With the strong wind in the first picture, I would check if it is a crosswind and if it is within the limits of my aircraft. With the light wind, takeoff and landing would be much easier.",
+ [["windsock","a fabric tube that shows wind direction and strength"],["crosswind","wind from the side of the runway"],["within limits","not more than the allowed maximum"],["knot","one nautical mile per hour"]],
+ ["Strong crosswind and gusts during landing","Wind shift that changes the active runway"]),
+
+T("cmp-125","Sydney Seaplanes, DHC-2 Beaver on water.jpg","Helicóptero Robinson R44, Portage, Alaska, Estados Unidos, 2017-08-22, DD 44.jpg",
+ ["Why are seaplanes and helicopters popular in remote areas?","What are the risks of flying in mountains with low clouds?","Which of these aircraft would you like to learn to fly?"],
+ "Both pictures show aircraft that are often used for tourist flights. In the first picture a de Havilland Beaver on floats is on the water near Sydney, with trees and houses in the background. In the second picture a small Robinson R44 helicopter is flying in the mountains in Alaska, under low clouds. Both can operate where there is no runway: the seaplane uses water, and the helicopter can land almost anywhere. The difference is the weather. The seaplane is in calm, sunny conditions, while the helicopter is close to clouds and terrain. For the helicopter pilot the weather and the mountains are a serious risk.",
+ [["floats","large tubes that let an aircraft stay on water"],["remote","far away from towns"],["low clouds","clouds with a low base, close to the ground"],["operate","to work or fly"]],
+ ["Low clouds and terrain in the mountains","Boats, waves and wind on the water"]),
+
+T("cmp-126","Cessna 172 OO-KPA MG 8868 (34325050801).jpg","Boeing 747-8 Takeoff.JPG",
+ ["What is wake turbulence?","How long should a light aircraft wait behind a heavy aircraft?","Have you ever flown at an airport with big jets?"],
+ "Both pictures show aircraft flying low near an airport. The first one is a small white Cessna 172 flying over a green field, probably on approach. The second picture shows a huge Boeing 747-8 climbing after takeoff. The difference in size and weight is enormous: the Boeing can weigh more than four hundred tonnes, and the Cessna about one tonne. A heavy aircraft produces strong wake turbulence behind its wings. If a light aircraft flies into it, it can roll over and lose control. That is why controllers give a separation time, usually a few minutes, and pilots stay above the flight path of the heavy aircraft.",
+ [["wake turbulence","dangerous air movement behind a large aircraft"],["approach","the phase of flight before landing"],["roll over","to turn upside down"],["flight path","the line an aircraft follows"]],
+ ["Wake turbulence behind a heavy aircraft","Mixing slow and fast traffic at the same airport"]),
+
+T("cmp-127","A flock of starlings (Sturnus vulgaris) gather in the evening hours in autumn.jpg","Wildlife Services (35288195716).jpg",
+ ["Why are flocks of birds dangerous for aircraft?","What do airports do to reduce bird strikes?","What would you do if you saw birds on the runway before takeoff?"],
+ "Both pictures show large flocks of birds. In the first picture there are hundreds of starlings flying close together in the evening sky. In the second picture an airliner is climbing after takeoff, and a big flock of birds is flying just below it. The second picture shows exactly why birds are a danger: a bird strike during takeoff or landing can damage the engines, the windscreen or the wings. A flock is worse than one bird, because many birds can enter the engines at the same time. Airports use many methods against birds: cutting the grass, removing food, special noise devices and even trained falcons.",
+ [["flock","a large group of birds"],["starling","a small black bird that flies in big groups"],["windscreen","the front window of the cockpit"],["falcon","a hunting bird used to scare other birds"]],
+ ["Multiple bird strikes during takeoff","Engine damage and loss of power at low height"]),
+
+T("cmp-128","Kempegowda International Airport Runway, Bengaluru (Ank Kumar, Infosys) 04.jpg","Elba runway 1.jpg",
+ ["What do pilots need to know before flying to an island airport?","How does the terrain around an airport affect the approach?","Which airport looks more pleasant for a private pilot?"],
+ "Both pictures show runways, but in very different places. The first picture shows the large, modern Bengaluru airport in India, with a long runway, a big flat area around it and buildings far away. The second picture shows the small airport on the island of Elba in Italy, in a green valley between hills, near a town. Both airports have paved runways and serve passengers. The big airport has a long runway, instrument approaches and many services. The Elba runway is short, and the hills around it make the approach more demanding, especially with wind. For a private pilot Elba looks beautiful, but it needs careful planning.",
+ [["paved runway","a runway with a hard surface"],["valley","low land between hills"],["demanding","needing a lot of skill or attention"],["instrument approach","an approach with navigation aids for bad weather"]],
+ ["Hills and turbulence on approach to a small island airport","Heavy traffic and long taxi distances at a big airport"]),
+
+T("cmp-129","Palm Springs International Airport photo Don Ramey Logan.jpg","Cessna in the snow (8401997865).jpg",
+ ["How does high temperature affect aircraft performance?","What special preparation do you need for cold weather?","In which conditions do you prefer to fly?"],
+ "These two pictures show opposite climates. The first one is Palm Springs airport in a hot desert, with a runway, palm trees and dry mountains in the background. The second picture shows a small Cessna standing in deep snow, with everything white and cold. In hot weather the air is thin, so the engine gives less power and the aircraft needs a longer runway and climbs slower. This is called high density altitude. In cold weather the performance is better, but there are other problems: frost on the wings, a cold engine and a slippery surface. Both situations need careful performance calculations before takeoff.",
+ [["desert","a very dry and hot area"],["density altitude","how high the aircraft feels because of temperature"],["slippery","difficult to stand or brake on"],["climb rate","how fast an aircraft goes up"]],
+ ["Long takeoff run and poor climb in hot weather","Frost, a cold engine and slippery surfaces in winter"]),
+
+T("cmp-130","Cumulus cloud above Lechtaler Alps at tannheim, Austria.jpg","045 Winch launch of glider Schleicher ASK-21 in cloudy weather in Innsbruck, Austria - Segelflugzeug.jpg",
+ ["What makes flying in the Alps special?","How can weather in the mountains change during the day?","Would you like to fly a glider in Austria?"],
+ "Both pictures were taken in Austria and both are about weather in the mountains. The first picture shows a beautiful white cumulus cloud above the snowy Lechtal Alps, in a clear blue sky. It is good weather for flying, especially for gliders, because cumulus clouds show rising air. In the second picture a glider is climbing on a winch launch in Innsbruck, but the sky is grey and cloudy. The visibility is lower, and the clouds are close to the mountains. In the Alps the weather can change very fast, so a pilot must check the forecast carefully and always have a plan to turn back.",
+ [["cumulus","a white, fluffy cloud"],["clear sky","a sky without many clouds"],["turn back","to fly back to where you started"],["forecast","a prediction of the weather"]],
+ ["Clouds covering mountain tops and valleys","Fast weather changes during the day in the Alps"])
+];
+})();
+</script>
+<script>
 "use strict";
-var APP_VERSION="2026-10-19.4";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-10-19.5";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[], window.DATA_INTERVIEW_4||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -25406,7 +25599,7 @@ var VOCAB = (function(){
 })();
 var TR_BUILTIN = Object.assign({}, window.DATA_TR_A||{}, window.DATA_TR_B||{}, window.DATA_TR_C||{}, window.DATA_TR_D||{}, window.DATA_TR_E||{}, window.DATA_TR_F||{});
 var FU_BUILTIN = Object.assign({}, window.DATA_FU_A||{}, window.DATA_FU_B||{}, window.DATA_FU_C||{}, window.DATA_FU_D||{}, window.DATA_FU_E||{}, window.DATA_FU_F||{});
-var PICTURES = (window.DATA_PICTURES||[]).concat(window.DATA_PICTURES_2||[], window.DATA_PICCOMPARE||[]);
+var PICTURES = (window.DATA_PICTURES||[]).concat(window.DATA_PICTURES_2||[], window.DATA_PICCOMPARE||[], window.DATA_PICCOMPARE_2||[]);
 var LISTENING = (window.DATA_LISTENING||[]).concat(window.DATA_LISTENING_2||[], window.DATA_ERRORS||[]);
 var RT = (window.DATA_RT||[]).concat(window.DATA_RT2||[]);
 var CAP_SECTIONS = (window.DATA_CAP_C||[]).concat(window.DATA_CAP_A||[], window.DATA_CAP_B||[]);
