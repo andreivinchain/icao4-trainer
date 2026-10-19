@@ -25385,7 +25385,7 @@ window.DATA_FU_F = {
 </script>
 <script>
 "use strict";
-var APP_VERSION="2026-10-19.1";   // видно в Настройках — чтобы проверить, обновилось ли приложение
+var APP_VERSION="2026-10-19.2";   // видно в Настройках — чтобы проверить, обновилось ли приложение
 /* ================= ICAO 4 Trainer — app logic (v2) ================= */
 var ALL_INTERVIEW = (window.DATA_INTERVIEW_1||[]).concat(window.DATA_INTERVIEW_2||[], window.DATA_INTERVIEW_3||[], window.DATA_INTERVIEW_4||[]);
 var ALL_EMERGENCY = window.DATA_EMERGENCY||[];
@@ -27978,7 +27978,8 @@ function renderShadowIntro(){                            // экран «вес�
     '<div class="btnrow"><button class="btn" id="siGo">▶ Начать заучивание</button>'+
     '<button class="btn sec" id="siOwn">🎙 Ответить своими словами</button>'+
     '<button class="btn sec small" id="siMark">'+(qLearned(q.id)?"✅ Выучено":"☐ Отметить выученным")+'</button></div>'+
-    '<div class="btnrow"><button class="btn sec small" id="siList">📋 К списку вопросов</button></div></div>');
+    '<div class="btnrow"><button class="btn sec small" id="siList">📋 К списку вопросов</button>'+
+    '<button class="btn sec small" id="siLink">🔗 Ссылка на вопрос</button></div><div id="siLinkBox" class="muted" style="font-size:12px;word-break:break-all"></div></div>');
   appEl.appendChild(card);
   card.querySelector("#siSay").onclick=function(){ speak(q.level4Answer); };
   card.querySelector("#siTr").onclick=function(){ toggleTranslate(q.id+":m",q.level4Answer,card.querySelector("#siTrBox"),this); };
@@ -27986,6 +27987,12 @@ function renderShadowIntro(){                            // экран «вес�
   card.querySelector("#siOwn").onclick=function(){ renderTraining(s.mode==="emergency"?"emergency":"interview",q); };
   card.querySelector("#siMark").onclick=function(){ qLearnedSet(q.id,!qLearned(q.id)); this.textContent=qLearned(q.id)?"✅ Выучено":"☐ Отметить выученным"; };
   card.querySelector("#siList").onclick=function(){ renderQuestionList(qListSrc); };
+  card.querySelector("#siLink").onclick=function(){
+    var url=location.origin+location.pathname+"#q/"+q.id;
+    var box=card.querySelector("#siLinkBox"); box.textContent=url;
+    if(navigator.share){ navigator.share({title:"ICAO 4: "+(q.question||q.firstQuestion||""),url:url}).catch(function(){}); }
+    else if(navigator.clipboard){ navigator.clipboard.writeText(url).then(function(){ box.textContent="Скопировано: "+url; }).catch(function(){}); }
+  };
 }
 var shTimers=[];
 function shLater(fn,ms){ shTimers.push(setTimeout(fn,ms)); }
@@ -29972,11 +29979,36 @@ function renderSettings(){
 }
 
 renderHome();
+/* прямые ссылки: #interview, #emergency, #topic/Human%20factors, #q/int-271 */
+function openFromHash(){
+  var h=decodeURIComponent((location.hash||"").replace(/^#\/?/,""));
+  if(!h)return false;
+  var parts=h.split("/");
+  if(parts[0]==="interview"||parts[0]==="emergency"||parts[0]==="questions"){
+    var m=parts[0]==="emergency"?"emergency":"interview";
+    if(parts[1]) rememberPlace("qtopic_"+m,{v:parts.slice(1).join("/")});
+    renderQuestionList(m); return true;
+  }
+  if(parts[0]==="topic"&&parts[1]){
+    var t=parts.slice(1).join("/");
+    var isEm=ALL_EMERGENCY.some(function(q){return q.category===t;})&&!ALL_INTERVIEW.some(function(q){return q.category===t;});
+    rememberPlace("qtopic_"+(isEm?"emergency":"interview"),{v:t});
+    renderQuestionList(isEm?"emergency":"interview"); return true;
+  }
+  if(parts[0]==="q"&&parts[1]){
+    var q=findById(ALL_INTERVIEW,parts[1]), mode="interview";
+    if(!q){ q=findById(ALL_EMERGENCY,parts[1]); mode="emergency"; }
+    if(q){ renderShadow(q,mode); return true; }
+  }
+  return false;
+}
+var openedByHash=openFromHash();
+window.addEventListener("hashchange",openFromHash);
 /* Android может выгрузить вкладку во время занятий — вернём человека туда, где он был */
 (function(){
   try{
     var m=JSON.parse(sessionStorage.getItem("icao4_screen")||"null");
-    if(m&&Date.now()-m.ts<15*60000&&/Словарь|Фразы|Заучивание|Подбор|Бласт|Блоки|Повторение/.test(m.t)){
+    if(!openedByHash&&m&&Date.now()-m.ts<15*60000&&/Словарь|Фразы|Заучивание|Подбор|Бласт|Блоки|Повторение/.test(m.t)){
       renderVocab();
     }
   }catch(e){}
